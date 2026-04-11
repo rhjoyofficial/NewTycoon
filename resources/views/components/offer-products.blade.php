@@ -2,12 +2,12 @@
 <section class="relative z-10 max-w-8xl mx-auto px-4 py-14">
 
     {{-- ================== MAIN BANNER ================== --}}
-    <div class="relative overflow-hidden mb-10">
+    <div class="relative overflow-hidden mb-10 aspect-[28/5]">
 
         {{-- Banner Image --}}
         @if ($offer->main_banner_image)
-            <img src="{{ asset($offer->main_banner_image) }}" class="absolute inset-0 w-full h-full object-cover"
-                alt="{{ $offer->title }}" />
+            <img src="{{ asset($offer->main_banner_image) }}"
+                class="absolute inset-0 w-full h-full object-cover aspect-[28/5]" alt="{{ $offer->title }}" />
             <div class="absolute inset-0 bg-black/40"></div>
         @endif
 

@@ -19,13 +19,12 @@
                             title="Tycoon Hi-Tech Park">
                             <img src="{{ asset('images/wh-logo.png') }}" alt="BK Logo" class="h-6 md:h-8 w-auto">
                         </a>
-                        <div class="w-16 h-1 bg-primary rounded-full mx-auto lg:mx-0 mb-6"></div>
                     </div>
 
                     <!-- Description -->
-                    <p class="mt-6 text-gray-300 leading-relaxed text-sm text-justify lg:text-justify">
+                    {{-- <p class="mt-6 text-gray-300 leading-relaxed text-sm text-justify lg:text-justify">
                         {{ $footerData['brand']['description'] }}
-                    </p>
+                    </p> --}}
                     <p class="mt-2 text-gray-400 text-sm text-center lg:text-left">
                         {{ $footerData['brand']['address'] }}
                     </p>
@@ -88,16 +87,16 @@
             <div class="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 @foreach ($footerData['columns'] as $index => $column)
                     <div class="flex-1" data-aos="fade-up" data-aos-delay="{{ ($index + 1) * 100 }}">
-                        <h3 class="text-xl font-semibold mb-6 text-white border-l-4 border-primary pl-3 font-cambay">
+                        <h3 class="text-xl font-semibold mb-6 text-white font-cambay">
                             {{ $column['title'] }}
                         </h3>
                         <ul class="space-y-3">
                             @foreach ($column['links'] as $link)
                                 <li class="font-poppins">
                                     <a href="{{ url($link['url'] ?? '#') }}"
-                                        class="group flex items-center text-gray-300 hover:text-white transition-all duration-300 py-1">
+                                        class="group flex items-center text-gray-300 hover:text-white transition-all duration-300 ">
                                         <span
-                                            class="w-1.5 h-1.5 bg-primary rounded-full mr-3 opacity-0 group-hover:opacity-100 transform -translate-x-2 group-hover:translate-x-0 transition-all duration-300"></span>
+                                            class="w-1.5 h-1.5 bg-primary rounded-full opacity-0 group-hover:opacity-100 transform -translate-x-2 group-hover:translate-x-0 transition-all duration-300"></span>
                                         <span
                                             class="text-base hover:text-primary transition-colors">{{ $link['title'] }}</span>
                                     </a>
@@ -133,13 +132,6 @@
                 </div>
             </div>
 
-            <!-- Additional Links -->
-            <div class="flex items-center gap-6 order-3" data-aos="fade-left">
-                <a href="/privacy" class="text-gray-400 hover:text-white text-sm transition-colors">Privacy Policy</a>
-                <a href="/terms" class="text-gray-400 hover:text-white text-sm transition-colors">Terms of
-                    Service</a>
-                <a href="/support" class="text-gray-400 hover:text-white text-sm transition-colors">Contact</a>
-            </div>
         </div>
     </div>
 </footer>

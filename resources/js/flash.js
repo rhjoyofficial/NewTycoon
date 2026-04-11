@@ -135,7 +135,7 @@ class FlashMessageSystem {
                 <div class="flex-shrink-0 ${colors.icon}">
                     ${this.getIcon(type)}
                 </div>
-                <div class="ml-3 flex-1 min-w-0">
+                <div class="ml-3 flex-1 min-w-0 text-blue-800">
                     <p class="text-sm font-semibold break-words">${this.escapeHtml(message)}</p>
                     ${description ? `<p class="text-sm mt-1 opacity-80 break-words">${this.escapeHtml(description)}</p>` : ""}
                 </div>
@@ -145,14 +145,13 @@ class FlashMessageSystem {
                     </svg>
                 </button>
             </div>
-            ${
-                duration > 0
-                    ? `
+            ${duration > 0
+                ? `
                 <div class="h-1 w-full bg-gray-200/50">
                     <div class="flash-progress h-full transition-all duration-100 ease-linear ${colors.progress}" style="width: 100%"></div>
                 </div>
             `
-                    : ""
+                : ""
             }
         `;
 

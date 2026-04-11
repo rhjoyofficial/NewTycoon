@@ -13,10 +13,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use App\Services\PaymentService;
 
 class OrderController extends Controller
 {
-    public function __construct()
+    public function __construct(
+        protected PaymentService $paymentService
+    )
     {
         $this->middleware(['auth', 'role:admin']);
     }
@@ -208,8 +211,14 @@ class OrderController extends Controller
                     'attributes' => $itemData['attributes'] ?? [],
                 ]);
 
-                // Update product stock
-                $product->decrement('stock', $itemData['quantity']);
+                $product->reserveStock($itemData['quantity']);
+                $product->recordSale($itemData['quantity'], (float) $itemData['unit_price']);
+            }
+
+            $this->paymentService->createPendingPayment($order, $validated['payment_method']);
+
+            if ($validated['payment_status'] !== 'pending') {
+                $this->paymentService->syncOrderPaymentStatus($order, $validated['payment_status']);
             }
 
             DB::commit();
@@ -368,8 +377,8 @@ class OrderController extends Controller
                         $productName = $product->name;
                         $productSku = $product->sku;
 
-                        // Update product stock
-                        $product->decrement('stock', $itemData['quantity']);
+                        $product->reserveStock($itemData['quantity']);
+                        $product->recordSale($itemData['quantity'], (float) $itemData['unit_price']);
                     } else {
                         $productName = $itemData['product_name'];
                         $productSku = $itemData['product_sku'];
@@ -395,6 +404,8 @@ class OrderController extends Controller
                 'total_amount' => $subtotal + $validated['shipping_cost'] + $validated['tax_amount'] - ($validated['discount_amount'] ?? 0),
             ]);
 
+            $this->paymentService->syncOrderPaymentStatus($order, $validated['payment_status']);
+
             DB::commit();
 
             return redirect()->route('admin.orders.show', $order)
@@ -418,7 +429,7 @@ class OrderController extends Controller
             // Restock products before deleting
             foreach ($order->items as $item) {
                 if ($item->product) {
-                    $item->product->increment('stock', $item->quantity);
+                    $item->product->reverseSale($item->quantity, (float) $item->unit_price);
                 }
             }
 
@@ -447,7 +458,7 @@ class OrderController extends Controller
     public function updateStatus(Request $request, Order $order)
     {
         $request->validate([
-            'status' => 'required|string|in:pending,processing,on_hold,completed,cancelled,refunded,shipped',
+            'status' => 'required|string|in:pending,processing,on_hold,completed,cancelled,refunded',
         ]);
 
         $status = $request->status;
@@ -458,9 +469,6 @@ class OrderController extends Controller
             switch ($status) {
                 case 'processing':
                     $order->markAsProcessing();
-                    break;
-                case 'shipped':
-                    $order->markAsShipped();
                     break;
                 case 'completed':
                     $order->markAsDelivered();
@@ -501,10 +509,7 @@ class OrderController extends Controller
 
         DB::beginTransaction();
         try {
-            $order->update([
-                'payment_status' => $request->payment_status,
-                'paid_at' => $request->payment_status === 'paid' ? now() : null,
-            ]);
+            $this->paymentService->syncOrderPaymentStatus($order, $request->payment_status);
 
             DB::commit();
 
@@ -673,13 +678,14 @@ class OrderController extends Controller
                 'total_price' => $request->quantity * $unitPrice,
             ]);
 
-            // Update product stock
-            $product->decrement('stock', $request->quantity);
+            $product->reserveStock($request->quantity);
+            $product->recordSale($request->quantity, (float) $unitPrice);
 
             // Update order totals
+            $newSubtotal = $order->subtotal + $item->total_price;
             $order->update([
-                'subtotal' => $order->subtotal + $item->total_price,
-                'total_amount' => $order->subtotal + $order->shipping_cost + $order->tax_amount - $order->discount_amount,
+                'subtotal' => $newSubtotal,
+                'total_amount' => $newSubtotal + $order->shipping_cost + $order->tax_amount - $order->discount_amount,
             ]);
 
             DB::commit();
@@ -723,9 +729,10 @@ class OrderController extends Controller
             if ($item->product) {
                 $quantityDiff = $newQuantity - $oldQuantity;
                 if ($quantityDiff > 0) {
-                    $item->product->decrement('stock', $quantityDiff);
+                    $item->product->reserveStock($quantityDiff);
+                    $item->product->recordSale($quantityDiff, (float) $request->unit_price);
                 } elseif ($quantityDiff < 0) {
-                    $item->product->increment('stock', abs($quantityDiff));
+                    $item->product->reverseSale(abs($quantityDiff), (float) $request->unit_price);
                 }
             }
 
@@ -760,7 +767,7 @@ class OrderController extends Controller
         try {
             // Restock product
             if ($item->product) {
-                $item->product->increment('stock', $item->quantity);
+                $item->product->reverseSale($item->quantity, (float) $item->unit_price);
             }
 
             // Delete item

@@ -80,7 +80,7 @@ class SectionSeeder extends Seeder
                 'title_bn' => 'সবচেয়ে বেশী বিক্রি পণ্য',
                 'product_type' => 'best_sells',
                 'order' => 2,
-                'banner' => $dualPromo
+                'banner' => $mainPromo
             ],
 
             [
@@ -89,7 +89,7 @@ class SectionSeeder extends Seeder
                 'title_bn' => 'আপনার জন্য প্রস্তাবিত',
                 'product_type' => 'recommended',
                 'order' => 3,
-                'banner' => $triplePromo
+                'banner' => $mainPromo
             ],
         ];
 
@@ -129,7 +129,7 @@ class SectionSeeder extends Seeder
                 'title_bn' => 'মধ্য পৃষ্ঠার প্রচারণা',
                 'type' => 'banner',
                 'order' => 4,
-                'ad_banner_id' => $dualPromo->id,
+                'ad_banner_id' => $mainPromo->id,
                 'is_active' => true,
             ]
         );

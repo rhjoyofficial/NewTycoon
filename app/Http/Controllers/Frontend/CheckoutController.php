@@ -3,22 +3,21 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Models\Cart;
-use App\Models\User;
 use App\Models\Order;
-use App\Models\Address;
-use App\Models\Payment;
 use App\Models\Product;
-use App\Models\OrderItem;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use App\Services\CheckoutService;
 
 class CheckoutController extends Controller
 {
+    public function __construct(
+        protected CheckoutService $checkoutService
+    ) {}
+
     /**
      * Show checkout page (from cart)
      */
@@ -163,6 +162,7 @@ class CheckoutController extends Controller
 
         // Guest account creation
         if (!Auth::check() && $request->boolean('create_account')) {
+            $rules['email'] = 'required|email|max:255|unique:users,email';
             $rules['password'] = 'required|min:8|confirmed';
         }
 
@@ -207,56 +207,15 @@ class CheckoutController extends Controller
             ], 400);
         }
 
-        DB::beginTransaction();
-
         try {
-            $userId = $this->handleUserCreation($request, $validated);
-
-            // Calculate totals
-            $subtotal = $buyNowData['price'] * $buyNowData['quantity'];
-            $shippingCost = 0;
-            $total = $subtotal + $shippingCost;
-
-            // CREATE ORDER
-            $order = $this->createOrder($validated, $userId, $subtotal, $shippingCost, $total, $request);
-
-            // CREATE ORDER ITEM
-            OrderItem::create([
-                'order_id' => $order->id,
-                'product_id' => $product->id,
-                'product_name' => $product->name,
-                'product_sku' => $product->sku ?? 'N/A',
-                'product_image' => is_array($product->featured_images) && !empty($product->featured_images)
-                    ? $product->featured_images[0]
-                    : null,
-                'quantity' => $buyNowData['quantity'],
-                'unit_price' => $buyNowData['price'],
-                'total_price' => $buyNowData['quantity'] * $buyNowData['price'],
-                'discount_amount' => 0,
-                'tax_amount' => 0,
-            ]);
-
-            // UPDATE PRODUCT STOCK
-            if ($product->track_quantity) {
-                $product->decrement('quantity', $buyNowData['quantity']);
-                $product->increment('total_sold', $buyNowData['quantity']);
-                $product->updateStockStatus();
-            }
-
-            // CREATE PAYMENT RECORD
-            $this->createPayment($order, $validated['payment_method']);
-
-            // CLEAR BUY NOW SESSION
+            $order = $this->checkoutService->checkoutBuyNow($buyNowData, $validated, $request);
             Session::forget('buy_now_product');
-
-            DB::commit();
 
             return response()->json([
                 'success' => true,
-                'redirect_url' => route('checkout.success', $order->order_number)
+                'redirect_url' => $this->buildSuccessUrl($order)
             ]);
-        } catch (\Exception $e) {
-            DB::rollBack();
+        } catch (\Throwable $e) {
             Log::error('Buy Now checkout failed: ' . $e->getMessage());
 
             return response()->json([
@@ -301,60 +260,14 @@ class CheckoutController extends Controller
             }
         }
 
-        DB::beginTransaction();
-
         try {
-            $userId = $this->handleUserCreation($request, $validated);
-
-            // Calculate totals
-            $subtotal = $cart->subtotal;
-            $shippingCost = 0;
-            $total = $subtotal + $shippingCost;
-
-            // CREATE ORDER
-            $order = $this->createOrder($validated, $userId, $subtotal, $shippingCost, $total, $request);
-
-            // CREATE ORDER ITEMS
-            foreach ($cart->items as $item) {
-                $product = $item->product;
-
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $product->id,
-                    'product_name' => $product->name,
-                    'product_sku' => $product->sku ?? 'N/A',
-                    'product_image' => is_array($product->featured_images) && !empty($product->featured_images)
-                        ? $product->featured_images[0]
-                        : null,
-                    'quantity' => $item->quantity,
-                    'unit_price' => $item->price,
-                    'total_price' => $item->quantity * $item->price,
-                    'discount_amount' => 0,
-                    'tax_amount' => 0,
-                ]);
-
-                // UPDATE PRODUCT STOCK
-                if ($product->track_quantity) {
-                    $product->decrement('quantity', $item->quantity);
-                    $product->increment('total_sold', $item->quantity);
-                    $product->updateStockStatus();
-                }
-            }
-
-            // CREATE PAYMENT RECORD
-            $this->createPayment($order, $validated['payment_method']);
-
-            // CLEAR CART
-            $cart->items()->delete();
-
-            DB::commit();
+            $order = $this->checkoutService->checkoutCart($cart, $validated, $request);
 
             return response()->json([
                 'success' => true,
-                'redirect_url' => route('checkout.success', $order->order_number)
+                'redirect_url' => $this->buildSuccessUrl($order)
             ]);
-        } catch (\Exception $e) {
-            DB::rollBack();
+        } catch (\Throwable $e) {
             Log::error('Cart checkout failed: ' . $e->getMessage());
 
             return response()->json([
@@ -365,123 +278,19 @@ class CheckoutController extends Controller
     }
 
     /**
-     * Handle user creation for guest checkout
-     */
-    private function handleUserCreation(Request $request, array $validated)
-    {
-        $userId = Auth::id();
-
-        if (!$userId && $request->boolean('create_account')) {
-            $user = User::create([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'phone' => $validated['phone'],
-                'password' => Hash::make($validated['password']),
-                'status' => 'active',
-            ]);
-
-            // Assign customer role
-            $user->assignRole('customer');
-
-            // Auto-login
-            Auth::login($user);
-            $userId = $user->id;
-
-            // Create address for user
-            Address::create([
-                'user_id' => $userId,
-                'type' => 'shipping',
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'phone' => $validated['phone'],
-                'address_line_1' => $validated['address'],
-                'address_line_2' => null,
-                'city' => $validated['city'],
-                'state' => 'Dhaka',
-                'postal_code' => $validated['postal_code'],
-                'country' => 'Bangladesh',
-                'is_default' => true,
-            ]);
-        }
-
-        return $userId;
-    }
-
-    /**
-     * Create order
-     */
-    private function createOrder(array $validated, $userId, $subtotal, $shippingCost, $total, Request $request)
-    {
-        return Order::create([
-            'order_number' => $this->generateOrderNumber(),
-            'user_id' => $userId,
-
-            // Customer info
-            'customer_name' => $validated['name'],
-            'customer_email' => $validated['email'],
-            'customer_phone' => $validated['phone'],
-
-            // Shipping address
-            'shipping_name' => $validated['name'],
-            'shipping_email' => $validated['email'],
-            'shipping_phone' => $validated['phone'],
-            'shipping_address_line1' => $validated['address'],
-            'shipping_address_line2' => null,
-            'shipping_city' => $validated['city'],
-            'shipping_state' => 'Bangladesh',
-            'shipping_country' => 'Bangladesh',
-            'shipping_zip_code' => $validated['postal_code'],
-
-            // Billing same as shipping
-            'billing_same_as_shipping' => true,
-
-            // Totals
-            'subtotal' => $subtotal,
-            'shipping_cost' => $shippingCost,
-            'tax_amount' => 0,
-            'discount_amount' => 0,
-            'total_amount' => $total,
-
-            // Status
-            'status' => 'pending',
-            'payment_status' => 'pending',
-
-            // Payment & Shipping
-            'payment_method' => $validated['payment_method'],
-            'shipping_method' => 'standard',
-
-            // Notes
-            'customer_note' => $validated['notes'] ?? null,
-
-            // Meta
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
-    }
-
-    /**
-     * Create payment record
-     */
-    private function createPayment(Order $order, string $paymentMethod)
-    {
-        return Payment::create([
-            'order_id' => $order->id,
-            'payment_method' => $paymentMethod,
-            'amount' => $order->total_amount,
-            'status' => $paymentMethod === 'cod' ? 'pending' : 'pending',
-            'transaction_id' => null,
-        ]);
-    }
-
-    /**
      * Show order success page
      */
     public function success($orderNumber)
     {
         $order = Order::where('order_number', $orderNumber)
             ->with('items.product')
-            ->when(Auth::check(), fn($q) => $q->where('user_id', Auth::id()))
             ->firstOrFail();
+
+        if (Auth::check()) {
+            abort_unless($order->user_id === Auth::id(), 404);
+        } else {
+            abort_unless($order->canAccessAsGuest(request('access_token')), 404);
+        }
 
         return view('frontend.checkout.success', compact('order'));
     }
@@ -506,15 +315,14 @@ class CheckoutController extends Controller
             ->with('info', 'Checkout cancelled');
     }
 
-    /**
-     * Generate unique order number
-     */
-    private function generateOrderNumber()
+    private function buildSuccessUrl(Order $order): string
     {
-        do {
-            $orderNumber = 'ORD-' . date('Ymd') . '-' . strtoupper(\Illuminate\Support\Str::random(6));
-        } while (Order::where('order_number', $orderNumber)->exists());
+        $parameters = ['orderNumber' => $order->order_number];
 
-        return $orderNumber;
+        if (!Auth::check() && $order->guest_access_token) {
+            $parameters['access_token'] = $order->guest_access_token;
+        }
+
+        return route('checkout.success', $parameters);
     }
 }

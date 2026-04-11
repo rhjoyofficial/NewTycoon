@@ -23,7 +23,7 @@ class OfferSeeder extends Seeder
             'timer_end_date' => now()->addDays(7),
             'view_all_link' => 'products',
             'main_banner_image' => 'images/offers/main-banner.jpeg',
-            'view_all_text' => 'View All Deals',
+            'view_all_text' => 'View All',
             'product_source' => 'manual',
             'product_limit' => 8,
             'status' => 'active',
@@ -41,5 +41,4 @@ class OfferSeeder extends Seeder
                 ]);
             });
     }
-
 }

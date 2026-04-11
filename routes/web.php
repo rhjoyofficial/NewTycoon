@@ -192,9 +192,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/downloads', [ProfileController::class, 'downloads'])->name('downloads');
     // User Profile Management
     Route::get('/profile', [ProfileController::class, 'profile'])->name('profile');
-    Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/update', [ProfileController::class, 'updateProfile']);
     Route::put('/profile/password', [ProfileController::class, 'updateProfilePassword'])->name('profile.password.update');
-    Route::delete('/profile/delete', [ProfileController::class, 'deleteAccount'])->name('profile.delete');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.delete');
+    Route::delete('/profile/delete', [ProfileController::class, 'deleteAccount']);
 });
 
 // ==============================

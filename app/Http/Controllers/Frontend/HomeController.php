@@ -26,7 +26,7 @@ class HomeController extends Controller
         // dd($heroSlides);
 
         // Get active categories with active parents
-        $categories = Category::active()->featured()->limit(12)->get();
+        $categories = Category::active()->featured()->limit(20)->get();
         // $categories = Cache::remember('homepage.featured.categories', 3600, function () {
         //     return Category::active()->root()->featured()->limit(12)->get();
         // });

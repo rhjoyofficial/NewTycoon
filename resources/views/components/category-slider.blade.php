@@ -41,7 +41,7 @@
         @else
             <p class="text-gray-500 col-span-full text-center">No featured categories found.</p>
         @endif
-        <a href="{{ route('categories.index') }}"
+        {{-- <a href="{{ route('categories.index') }}"
             class="absolute bottom-0 right-0 rotate-90 origin-bottom-right group inline-flex items-center gap-1 text-gray-900 text-sm 2xl:text-base font-inter font-normal tracking-wide transition-colors duration-300 hover:text-primary">
 
             <span class="hover:underline">{{ __('home.cat-button') }}</span>
@@ -52,6 +52,6 @@
                     d="M26.68 3.867H8.175a1 1 0 0 0 0 2h16.544L4.2 26.387A1 1 0 1 0 5.613 27.8l20.52-20.52v16.545a1 1 0 0 0 2 0V5.321a1.456 1.456 0 0 0-1.453-1.454"
                     data-name="Layer 2" />
             </svg>
-        </a>
+        </a> --}}
     </div>
 </div>

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use RuntimeException;
 
 class Product extends Model
 {
@@ -129,6 +130,11 @@ class Product extends Model
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function vendor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'vendor_id');
     }
 
     public function orderItems(): HasMany
@@ -374,9 +380,7 @@ class Product extends Model
         }
 
         if ($this->quantity <= 0) {
-            $this->stock_status = 'out_of_stock';
-        } elseif ($this->quantity <= 5) {
-            $this->stock_status = 'low_stock';
+            $this->stock_status = $this->allow_backorder ? 'backorder' : 'out_of_stock';
         } else {
             $this->stock_status = 'in_stock';
         }
@@ -384,19 +388,65 @@ class Product extends Model
         $this->save();
     }
 
-    /**
-     * Check if track quantity
-     */
-    public function getTrackQuantityAttribute()
+    public function canFulfill(int $quantity): bool
     {
-        return true; // Or check a column: return $this->attributes['track_quantity'] ?? true;
+        if ($quantity <= 0 || !$this->is_active) {
+            return false;
+        }
+
+        if (!$this->track_quantity) {
+            return true;
+        }
+
+        return $this->allow_backorder || $this->quantity >= $quantity;
     }
 
-    /**
-     * Check if allow backorder
-     */
-    public function getAllowBackorderAttribute()
+    public function ensureCanFulfill(int $quantity): void
     {
-        return false; // Or check a column: return $this->attributes['allow_backorder'] ?? false;
+        if (!$this->canFulfill($quantity)) {
+            throw new RuntimeException("{$this->name} does not have enough stock.");
+        }
+    }
+
+    public function reserveStock(int $quantity): void
+    {
+        $this->ensureCanFulfill($quantity);
+
+        if ($this->track_quantity) {
+            $this->decrement('quantity', $quantity);
+        }
+
+        $this->refresh();
+        $this->updateStockStatus();
+    }
+
+    public function recordSale(int $quantity, float $unitPrice): void
+    {
+        $this->increment('total_sold', $quantity);
+        $this->increment('total_revenue', round($quantity * $unitPrice, 2));
+    }
+
+    public function releaseStock(int $quantity): void
+    {
+        if ($quantity <= 0) {
+            return;
+        }
+
+        if ($this->track_quantity) {
+            $this->increment('quantity', $quantity);
+        }
+
+        $this->refresh();
+        $this->updateStockStatus();
+    }
+
+    public function reverseSale(int $quantity, float $unitPrice): void
+    {
+        $this->releaseStock($quantity);
+
+        $this->forceFill([
+            'total_sold' => max(0, $this->total_sold - $quantity),
+            'total_revenue' => max(0, (float) $this->total_revenue - round($quantity * $unitPrice, 2)),
+        ])->saveQuietly();
     }
 }

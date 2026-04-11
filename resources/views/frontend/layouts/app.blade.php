@@ -56,7 +56,7 @@
     <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
     <script src="{{ asset('js/gsap/gsap-featured-products.js') }}"></script>
-    <script src="{{ asset('js/gsap/gsap-tilt-category-card.js') }}"></script>
+    {{-- <script src="{{ asset('js/gsap/gsap-tilt-category-card.js') }}"></script> --}}
     <script src="{{ asset('js/gsap/gsap-offer-products.js') }}"></script>
 
     @stack('scripts')

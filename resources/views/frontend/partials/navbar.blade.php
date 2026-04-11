@@ -1,5 +1,5 @@
 <!-- resources/views/components/navbar.blade.php -->
-<nav class="bg-white fixed top-0 left-0 right-0 z-50 font-cambay border-b shadow-sm">
+<nav class="bg-[#111827] fixed top-0 left-0 right-0 z-50 font-cambay border-b shadow-sm">
     <!-- TOP BAR -->
     <div class="top-bar border-b border-gray-200">
         <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -7,7 +7,7 @@
                 <!-- Logo -->
                 <div class="flex-shrink-0">
                     <a href="{{ url('/') }}" aria-label="Home">
-                        <img src="{{ asset('images/bk-logo.png') }}" alt="BK Logo" class="h-7 md:h-8 w-auto">
+                        <img src="{{ asset('images/wh-logo.png') }}" alt="BK Logo" class="h-7 md:h-8 w-auto">
                     </a>
                 </div>
 
@@ -15,7 +15,7 @@
                     <!-- All Categories Mega Menu (desktop) -->
                     <div class="relative group ml-2">
                         <button id="all-categories-btn"
-                            class="flex items-center space-x-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-base font-medium text-gray-800 border border-gray-300 rounded-l-lg">
+                            class="flex items-center space-x-1 px-4 py-2 bg-accent hover:bg-primary/80 text-base font-medium text-white border border-gray-300 rounded-l-lg">
                             <span id="selected-category-text">{{ __('home.all-categories') }}</span>
                             <svg class="w-4 h-4 transition-transform duration-200 group-hover:rotate-180" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24">
@@ -134,7 +134,7 @@
 
                 <!-- Catalog link (desktop) -->
                 <a href="{{ route('catalogs') }}"
-                    class="hidden lg:block text-gray-700 hover:text-primary text-base font-medium px-3 py-2 border border-transparent hover:border-gray-300 hover:rounded-lg transition duration-200 mr-2">
+                    class="hidden lg:block text-white hover:text-primary text-base font-medium px-3 py-2 border border-transparent hover:border-gray-300 hover:rounded-lg transition duration-200 mr-2">
                     {{ __('home.catalogs') }}
                 </a>
 
@@ -143,14 +143,14 @@
                     <!-- Language -->
                     <div class="hidden lg:block">
                         <a href="{{ url('language/' . (app()->getLocale() == 'en' ? 'bn' : 'en')) }}"
-                            class="text-base font-medium text-gray-700 px-3 py-2 border border-transparent hover:border-gray-300 bg-accent/10 hover:bg-accent/20 rounded-lg transition duration-200 inline-block">
+                            class="text-base font-medium text-white px-3 py-2 border border-transparent hover:border-gray-300 bg-accent hover:bg-accent/20 rounded-lg transition duration-200 inline-block">
                             {{ app()->getLocale() == 'en' ? 'বাংলা' : 'English' }}
                         </a>
                     </div>
 
                     <!-- User icon + dropdown -->
                     <div class="relative group">
-                        <button class="p-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-full">
+                        <button class="p-2 text-white hover:text-primary hover:bg-gray-100 rounded-full">
                             <svg class="w-5 h-5" fill="currentColor" stroke="currentColor" viewBox="0 0 24 24">
                                 <path clip-rule="evenodd" stroke-linecap="round" stroke-linejoin="round"
                                     stroke-width="0.5"
@@ -202,7 +202,7 @@
 
                     <!-- Cart icon -->
                     <a href="{{ route('cart.index') }}"
-                        class="p-2 text-gray-600 hover:text-primary hover:bg-gray-100 relative rounded-full">
+                        class="p-2 text-white hover:text-primary hover:bg-gray-100 relative rounded-full">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
