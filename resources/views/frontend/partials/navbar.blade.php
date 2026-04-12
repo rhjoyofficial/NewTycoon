@@ -134,7 +134,7 @@
 
                 <!-- Catalog link (desktop) -->
                 <a href="{{ route('catalogs') }}"
-                    class="hidden lg:block text-white hover:text-primary text-base font-medium px-3 py-2 border border-transparent hover:border-gray-300 hover:rounded-lg transition duration-200 mr-2">
+                    class="hidden lg:block text-white text-base font-medium px-3 py-2 border border-transparent hover:border-gray-300 hover:bg-primary rounded-lg transition duration-200 mr-2">
                     {{ __('home.catalogs') }}
                 </a>
 
@@ -143,7 +143,7 @@
                     <!-- Language -->
                     <div class="hidden lg:block">
                         <a href="{{ url('language/' . (app()->getLocale() == 'en' ? 'bn' : 'en')) }}"
-                            class="text-base font-medium text-white px-3 py-2 border border-transparent hover:border-gray-300 bg-accent hover:bg-accent/20 rounded-lg transition duration-200 inline-block">
+                            class="text-base font-medium text-white px-3 py-2 border border-transparent hover:border-gray-300 bg-accent hover:bg-primary leading-tight rounded-lg transition duration-200 inline-block">
                             {{ app()->getLocale() == 'en' ? 'বাংলা' : 'English' }}
                         </a>
                     </div>

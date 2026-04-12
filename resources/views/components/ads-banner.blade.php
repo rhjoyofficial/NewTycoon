@@ -17,7 +17,7 @@
 
 @if ($count > 0)
 
-    <section class="max-w-8xl mx-auto px-4 md:px-6 pt-10">
+    <section class="max-w-8xl mx-auto px-4">
 
         <div class="grid {{ $gridClass }} gap-4">
 

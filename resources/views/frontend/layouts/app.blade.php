@@ -44,7 +44,7 @@
             @yield('content')
         </main>
 
-        @include('frontend.partials.newsletter')
+        {{-- @include('frontend.partials.newsletter') --}}
         @include('frontend.partials.footer')
     </div>
 

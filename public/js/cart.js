@@ -41,10 +41,10 @@ class CartManager {
 
         if (hoursSinceUpdate > 24) {
             // Cart is stale — show warning
-            this.showFlash(
-                "Your cart may be outdated. Please refresh.",
-                "warning",
-            );
+            // this.showFlash(
+            //     "Your cart may be outdated. Please refresh.",
+            //     "warning",
+            // );
 
             // update the timestamp so it doesn't warn repeatedly
             localStorage.setItem(lastUpdateKey, now);

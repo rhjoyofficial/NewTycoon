@@ -19,7 +19,7 @@ class OfferSeeder extends Seeder
             'subtitle_bn' => 'মৌসুমের সবচেয়ে শীতল ডিসকাউন্টগুলি আপনি পাবেন 70% পর্যন্ত!',
             'short_des_en' => 'Limited time offer for winter season.',
             'short_des_bn' => 'শীতকালের জন্য সীমিত সময়ের অফার।',
-            'timer_enabled' => true,
+            'timer_enabled' => false,
             'timer_end_date' => now()->addDays(7),
             'view_all_link' => 'products',
             'main_banner_image' => 'images/offers/main-banner.jpeg',

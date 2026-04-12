@@ -4,7 +4,7 @@
         <!-- Section Title -->
         <div class="flex justify-between items-end mb-6 md:mb-10">
             <h2
-                class="category-heading text-xl md:text-2xl lg:text-4xl font-medium text-gray-900 leading-tight capitalize font-poppins">
+                class="category-heading text-xl md:text-2xl lg:text-3xl font-medium text-gray-900 leading-tight capitalize font-poppins">
                 {{ __('common.featured-products') }}
             </h2>
 
@@ -47,7 +47,7 @@
                                 </span>
                             @endif
 
-                            @if ($product->discount_percentage > 0)
+                            {{-- @if ($product->discount_percentage > 0)
                                 <div class="absolute top-2 right-2 w-16 md:w-20 drop-shadow-lg">
 
                                     <svg viewBox="0 0 600 200" class="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
@@ -103,7 +103,7 @@
 
                                     </svg>
                                 </div>
-                            @endif
+                            @endif --}}
 
                             <!-- Hover Overlay with Actions -->
                             <div
@@ -135,8 +135,8 @@
                                             <button type="submit"
                                                 class="wishlist-btn bg-white text-gray-900 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center space-x-2"
                                                 title="Add to Wishlist">
-                                                <svg class="w-5 h-5 text-red-500" fill="none"
-                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                         stroke-width="2"
                                                         d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -166,8 +166,8 @@
                                             <button type="submit" title="Add to Cart"
                                                 class="add-to-cart-btn bg-white p-3 rounded-full hover:bg-gray-100 transition-all duration-300 transform hover:scale-110 {{ !$product->in_stock ? 'opacity-50 cursor-not-allowed' : '' }}"
                                                 {{ !$product->in_stock ? 'disabled' : '' }}>
-                                                <svg class="w-5 h-5 text-gray-700" fill="none"
-                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                         stroke-width="2"
                                                         d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -199,7 +199,7 @@
                             @if ($product->discount_percentage > 0)
                                 <div class="flex items-end justify-between">
                                     <div>
-                                        <span class="text-base md:text-2xl font-bold  text-gray-900 font-poppins">
+                                        <span class="text-base md:text-xl font-bold  text-gray-900 font-poppins">
                                             <span class="font-bengali">৳</span>
                                             {{ format_currency($product->price, '') }}
                                         </span>
@@ -215,8 +215,8 @@
                                         <div class="flex items-center justify-between pt-1">
                                             <div class="flex items-center md:space-x-1">
                                                 <!-- Wishlist Icon -->
-                                                <form action="{{ route('wishlist.add', $product->id) }}"
-                                                    method="POST" class="add-to-wishlist-form inline-block">
+                                                <form action="{{ route('wishlist.add', $product->id) }}" method="POST"
+                                                    class="add-to-wishlist-form inline-block">
                                                     @csrf
                                                     <button type="submit"
                                                         class="wishlist-btn p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-200"

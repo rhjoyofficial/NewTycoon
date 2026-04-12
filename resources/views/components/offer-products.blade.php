@@ -1,8 +1,8 @@
 {{-- ==================OFFER SECTION CONTENT ================== --}}
-<section class="relative z-10 max-w-8xl mx-auto px-4 py-14">
+<section class="relative z-10 max-w-8xl mx-auto py-6 md:py-12 px-4">
 
     {{-- ================== MAIN BANNER ================== --}}
-    <div class="relative overflow-hidden mb-10 aspect-[28/5]">
+    <div class="relative overflow-hidden mb-6 aspect-[28/5]">
 
         {{-- Banner Image --}}
         @if ($offer->main_banner_image)
@@ -16,7 +16,7 @@
 
             {{-- Title --}}
             <div class="text-center md:text-left">
-                <h2 class="text-white text-3xl md:text-4xl font-bold font-poppins mb-2">
+                <h2 class="text-white text-3xl md:text-3xl font-bold font-poppins mb-2">
                     {{ $offer->title }}
                 </h2>
                 <p class="text-white/90 text-base md:text-lg font-cambay max-w-xl">
@@ -49,7 +49,7 @@
 
             {{-- Header --}}
             <div class="flex items-center justify-between mb-6">
-                <h3 class="text-xl md:text-2xl lg:text-4xl font-medium text-gray-900 leading-tight font-poppins">
+                <h3 class="text-xl md:text-2xl lg:text-3xl font-medium text-gray-900 leading-tight font-poppins">
                     {{ $offer->short_description }}
                 </h3>
 

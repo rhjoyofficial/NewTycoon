@@ -61,6 +61,40 @@
 
                     </div>
 
+                    <!-- Subscription Form -->
+                    <div class="mt-6">
+                        <h3 class="text-lg font-medium mb-1 text-white font-cambay">
+                            {{ __('footer.subscribe_title') }}
+                        </h3>
+
+                        <form id="newsletter-form" class="flex flex-col sm:flex-row gap-2">
+                            @csrf
+
+                            <input type="email" name="email" id="newsletter-email" autocomplete="email"
+                                placeholder="{{ __('footer.email_placeholder') }}"
+                                value="{{ auth()->check() ? auth()->user()->email : '' }}" required
+                                class="flex-1 bg-gray-800 text-gray-300 placeholder:text-gray-500 border border-gray-500 focus:border-accent outline-none focus:ring-accent rounded-lg py-2 px-4">
+
+                            <button type="submit" id="subscribe-btn"
+                                class="bg-primary hover:bg-primary-dark text-white font-medium py-2 px-4 rounded-lg transition duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                                <span id="btn-text">
+                                    {{ __('footer.subscribe_button') }}
+                                </span>
+
+                                <!-- Spinner -->
+                                <svg id="btn-spinner" class="w-4 h-4 animate-spin hidden"
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white"
+                                        stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8v8H4z"></path>
+                                </svg>
+                            </button>
+                        </form>
+
+                        <!-- Message -->
+                        <div id="newsletter-message" class="mt-3 text-sm hidden"></div>
+                    </div>
+
                     <!-- Social Media -->
                     <div class="flex justify-center lg:justify-start gap-3 mt-6">
                         <a href="{{ $footerData['social_links']['facebook'] ?? '#' }}"
@@ -94,11 +128,11 @@
                             @foreach ($column['links'] as $link)
                                 <li class="font-poppins">
                                     <a href="{{ url($link['url'] ?? '#') }}"
-                                        class="group flex items-center text-gray-300 hover:text-white transition-all duration-300 ">
+                                        class="group flex items-center text-gray-300 hover:text-white text-sm transition-all duration-300 ">
                                         <span
                                             class="w-1.5 h-1.5 bg-primary rounded-full opacity-0 group-hover:opacity-100 transform -translate-x-2 group-hover:translate-x-0 transition-all duration-300"></span>
                                         <span
-                                            class="text-base hover:text-primary transition-colors">{{ $link['title'] }}</span>
+                                            class="text-sm hover:text-primary transition-colors">{{ $link['title'] }}</span>
                                     </a>
                                 </li>
                             @endforeach
@@ -109,7 +143,7 @@
         </div>
 
         <!-- Divider -->
-        <div class="border-b border-gray-700/50 my-8" data-aos="fade-right"></div>
+        <div class="border-b border-gray-700/50 my-2" data-aos="fade-right"></div>
 
         <!-- Bottom Section -->
         <div class="flex flex-col md:flex-row justify-between items-center gap-6 pt-6 font-cambay">
@@ -135,3 +169,97 @@
         </div>
     </div>
 </footer>
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const newsletterForm = document.getElementById('newsletter-form');
+            const newsletterEmail = document.getElementById('newsletter-email');
+            const subscribeBtn = document.getElementById('subscribe-btn');
+            const btnText = document.getElementById('btn-text');
+            const btnSpinner = document.getElementById('btn-spinner');
+            const messageBox = document.getElementById('newsletter-message');
+
+            newsletterForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const email = newsletterEmail.value.trim();
+
+                // Reset message
+                messageBox.classList.add('hidden');
+
+                if (!email) {
+                    showMessage('Please enter your email address.', 'error');
+                    return;
+                }
+
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    showMessage('Please enter a valid email address.', 'error');
+                    return;
+                }
+
+                // 🔥 Start Loading
+                subscribeBtn.disabled = true;
+                btnText.textContent = "Subscribing...";
+                btnSpinner.classList.remove('hidden');
+
+                try {
+                    const response = await fetch('{{ route('newsletter.subscribe') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]')
+                                .value,
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            email
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        showMessage(data.message, 'success');
+
+                        // ✅ Clear form after success
+                        newsletterForm.reset();
+
+                    } else {
+                        showMessage(data.message || 'Subscription failed.', 'error');
+                    }
+
+                } catch (error) {
+                    console.error(error);
+                    showMessage('Something went wrong. Please try again.', 'error');
+                } finally {
+                    // 🧊 Reset Button
+                    subscribeBtn.disabled = false;
+                    btnText.textContent = "{{ __('footer.subscribe_button') }}";
+                    btnSpinner.classList.add('hidden');
+                }
+            });
+
+            function showMessage(message, type = 'success') {
+                messageBox.textContent = message;
+                messageBox.classList.remove('hidden');
+
+                if (type === 'success') {
+                    messageBox.classList.remove('text-red-400');
+                    messageBox.classList.add('text-green-400');
+                } else {
+                    messageBox.classList.remove('text-green-400');
+                    messageBox.classList.add('text-red-400');
+                }
+
+                // Auto hide after 4 seconds
+                setTimeout(() => {
+                    messageBox.classList.add('hidden');
+                }, 4000);
+            }
+
+        });
+    </script>
+@endpush

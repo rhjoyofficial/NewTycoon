@@ -8,11 +8,11 @@
     <x-ads-banner :banner="$banner" />
 @endif
 
-<section class="max-w-8xl mx-auto py-12 px-4" data-slider-section="{{ $sliderId }}">
+<section class="max-w-8xl mx-auto py-6 px-4" data-slider-section="{{ $sliderId }}">
     <!-- Section Header -->
-    <div class="flex items-center justify-between mb-8">
+    <div class="flex items-center justify-between mb-6">
         <div>
-            <h2 class="text-xl md:text-2xl lg:text-4xl font-medium text-gray-900 leading-tight font-poppins">
+            <h2 class="text-xl md:text-2xl lg:text-3xl font-medium text-gray-900 leading-tight font-poppins">
                 {{ $title }}</h2>
         </div>
         @if ($showNavigation && $totalSlides >= $slidesPerView)

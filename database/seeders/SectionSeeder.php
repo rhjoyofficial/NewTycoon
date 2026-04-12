@@ -115,23 +115,5 @@ class SectionSeeder extends Seeder
             );
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | 3. PURE BANNER SECTION
-        |--------------------------------------------------------------------------
-        */
-
-        Section::updateOrCreate(
-            ['name' => 'Homepage Mid Banner'],
-            [
-                'title_en' => 'Mid-Page Promotion',
-                'title_bn' => 'মধ্য পৃষ্ঠার প্রচারণা',
-                'type' => 'banner',
-                'order' => 4,
-                'ad_banner_id' => $mainPromo->id,
-                'is_active' => true,
-            ]
-        );
     }
 }
