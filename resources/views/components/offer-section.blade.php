@@ -65,7 +65,7 @@
                             {{ $offerInfo['title'] }}
                         </h2>
                         @if ($offerInfo['subtitle'])
-                            <p class="text-white/90 text-base md:text-lg font-cambay max-w-2xl">
+                            <p class="text-white/90 text-base md:text-lg font-sans max-w-2xl">
                                 {{ $offerInfo['subtitle'] }}
                             </p>
                         @endif
@@ -75,7 +75,7 @@
                     @if ($offerInfo['timer_enabled'] && $offerInfo['timer_end_date'])
                         <div class="flex-shrink-0">
                             <div class="backdrop-blur-md bg-white/10 border border-white/20 px-6 py-3 rounded-xl">
-                                <div class="text-xs tracking-wide text-white/80 font-cambay mb-1 text-center">
+                                <div class="text-xs tracking-wide text-white/80 font-sans mb-1 text-center">
                                     OFFER ENDS IN
                                 </div>
 
@@ -133,7 +133,7 @@
                         <h3 class="text-white text-2xl md:text-3xl font-bold font-poppins">
                             Special Offer Products
                         </h3>
-                        <p class="text-white/80 text-sm md:text-base font-cambay mt-1">
+                        <p class="text-white/80 text-sm md:text-base font-sans mt-1">
                             {{ count($offerProducts) }} products on discount
                         </p>
                     </div>

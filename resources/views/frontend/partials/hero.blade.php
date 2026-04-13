@@ -137,7 +137,7 @@
                 autoplay: {
                     delay: 5000,
                     disableOnInteraction: false,
-                    pauseOnMouseEnter: false,
+                    pauseOnMouseEnter: true,
                 },
                 effect: 'fade',
                 fadeEffect: {
@@ -264,16 +264,6 @@
 
             // Initialize autoplay UI
             updateAutoplayUI(true);
-
-            // Add interaction pause on hover
-            const container = document.querySelector('.heroSwiper');
-            container.addEventListener('mouseenter', () => {
-                // Already handled by pauseOnMouseEnter: true
-            });
-
-            container.addEventListener('mouseleave', () => {
-                // Already handled by pauseOnMouseEnter: true
-            });
 
             // Manual control handlers
             const prevBtn = document.querySelector('.swiper-button-prev');

@@ -22,15 +22,11 @@ export default {
                 "10xl": "104rem",
             },
             fontFamily: {
-                sans: ['"DM Sans"', ...defaultTheme.fontFamily.sans],
-                inter: ["Inter", ...defaultTheme.fontFamily.sans],
-                cambay: ["Cambay", ...defaultTheme.fontFamily.sans],
-                poppins: ["poppins", ...defaultTheme.fontFamily.sans],
-                poppins: ["Poppins", ...defaultTheme.fontFamily.sans],
-                bengali: [
-                    '"Noto Sans Bengali"',
-                    ...defaultTheme.fontFamily.sans,
-                ],
+                // Primary UI font — Inter for Latin, Noto Sans Bengali for ৳ and Bangla
+                sans: ["Inter", '"Noto Sans Bengali"', ...defaultTheme.fontFamily.sans],
+                inter: ["Inter", '"Noto Sans Bengali"', ...defaultTheme.fontFamily.sans],
+                poppins: ["Poppins", "Inter", ...defaultTheme.fontFamily.sans],
+                bengali: ['"Noto Sans Bengali"', "Inter", ...defaultTheme.fontFamily.sans],
             },
             colors: {
                 primary: "#ea2f30",

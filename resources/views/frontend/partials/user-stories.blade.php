@@ -6,7 +6,7 @@
             <h2 class="text-3xl md:text-5xl font-bold text-gray-900 mb-4 font-poppins">
                 User Stories in Motion
             </h2>
-            <p class="text-lg md:text-xl text-gray-600 font-cambay">
+            <p class="text-lg md:text-xl text-gray-600 font-sans">
                 See how our products come to life through real user experiences and stories
             </p>
         </div>
@@ -52,7 +52,7 @@
                         d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
             </button>
-            <p class="text-gray-500 text-sm mt-4 font-cambay">
+            <p class="text-gray-500 text-sm mt-4 font-sans">
                 Upload your experience and get featured
             </p>
         </div>

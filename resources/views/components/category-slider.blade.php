@@ -30,7 +30,7 @@
                             <!-- Title -->
                             <div class="pt-2 md:pt-4 relative z-20" title="{{ $item->name }}">
                                 <p
-                                    class="text-sm md:text-base font-medium text-black text-center font-cambay line-clamp-1">
+                                    class="text-sm md:text-base font-medium text-black text-center font-sans line-clamp-1">
                                     {{ $item->name }}
                                 </p>
                             </div>
