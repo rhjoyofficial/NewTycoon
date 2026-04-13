@@ -223,15 +223,26 @@
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                    @if ($product->status == 'active') bg-green-100 text-green-800
-                                    @elseif($product->status == 'draft') bg-gray-100 text-gray-800
-                                    @elseif($product->status == 'inactive') bg-red-100 text-red-800
-                                    @else bg-yellow-100 text-yellow-800 @endif">
-                                            {{ ucfirst($product->status) }}
-                                        </span>
+                                        <select onchange="changeProductStatus(this, {{ $product->id }})"
+                                            class="text-xs font-semibold px-2 py-1 rounded-full focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-colors
+                                            {{ $product->status == 'active'
+                                                ? 'bg-green-100 text-green-800 border-green-300'
+                                                : ($product->status == 'draft'
+                                                    ? 'bg-gray-100 text-gray-800 border-gray-300'
+                                                    : ($product->status == 'inactive'
+                                                        ? 'bg-red-100 text-red-800 border-red-300'
+                                                        : 'bg-yellow-100 text-yellow-800 border-yellow-300')) }}">
+                                            <option value="active" {{ $product->status == 'active' ? 'selected' : '' }}>
+                                                Active</option>
+                                            <option value="draft" {{ $product->status == 'draft' ? 'selected' : '' }}>
+                                                Draft</option>
+                                            <option value="inactive"
+                                                {{ $product->status == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                                            <option value="archived"
+                                                {{ $product->status == 'archived' ? 'selected' : '' }}>Archived</option>
+                                        </select>
                                     </td>
+
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex items-center space-x-2">
                                             <a href="{{ route('admin.products.show', $product->slug) }}"
@@ -335,7 +346,7 @@
                             </div>
                         </div>
                         <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                            <form id="deleteForm" method="POST" class="inline">
+                            <form id="deleteForm" method="POST" class="inline" data-form>
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" data-loading data-loading-text="Deleting..."
@@ -357,6 +368,7 @@
 
 @push('scripts')
     <script>
+        const csrfToken = '{{ csrf_token() }}';
         /* ---------- SINGLE DELETE ---------- */
         function deleteProduct(id, name) {
             document.getElementById('productName').textContent = name;
@@ -380,6 +392,62 @@
                 closeDeleteModal();
             }
         });
+
+        function changeProductStatus(select, id) {
+            if (select.dataset.loading === '1') return;
+
+            select.dataset.loading = '1';
+            select.disabled = true;
+
+            fetch(`/admin/products/${id}/change-status`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: select.value
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        // Remove all possible status classes
+                        select.classList.remove(
+                            'bg-green-100', 'text-green-800', 'border-green-300',
+                            'bg-gray-100', 'text-gray-800', 'border-gray-300',
+                            'bg-red-100', 'text-red-800', 'border-red-300',
+                            'bg-yellow-100', 'text-yellow-800', 'border-yellow-300'
+                        );
+
+                        // Map status to classes
+                        const statusClasses = {
+                            'active': ['bg-green-100', 'text-green-800', 'border-green-300'],
+                            'draft': ['bg-gray-100', 'text-gray-800', 'border-gray-300'],
+                            'inactive': ['bg-red-100', 'text-red-800', 'border-red-300'],
+                            'archived': ['bg-yellow-100', 'text-yellow-800', 'border-yellow-300']
+                        };
+
+                        if (statusClasses[data.status]) {
+                            select.classList.add(...statusClasses[data.status]);
+                        }
+
+                        flash(data.message || 'Product status updated!', 'success', 3000);
+                    } else {
+                        flash(data.message || 'Failed to update status', 'error', 5000);
+                    }
+                })
+                .catch(err => {
+                    flash('System error: Could not reach the server.', 'error', 5000);
+                    console.error(err);
+                })
+                .finally(() => {
+                    select.dataset.loading = '0';
+                    select.disabled = false;
+                });
+        }
+
 
         // Bulk selection functionality
         document.addEventListener('DOMContentLoaded', function() {

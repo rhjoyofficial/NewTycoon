@@ -16,7 +16,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Cambay:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Quantico:ital,wght@0,400;0,700;1,400;1,700&family=Noto+Sans+Bengali:wght@100..900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Cambay:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=poppins:ital,wght@0,400;0,700;1,400;1,700&family=Noto+Sans+Bengali:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
         rel="stylesheet">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -40,10 +40,11 @@
         @include('frontend.partials.navbar')
         <!-- Flash Messages Container -->
         <x-flash-container />
-        <main class="pt-16">
+        <main class="pt-16 lg:pt-28">
             @yield('content')
         </main>
 
+        {{-- @include('frontend.partials.newsletter') --}}
         @include('frontend.partials.footer')
     </div>
 
@@ -55,7 +56,7 @@
     <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
     <script src="{{ asset('js/gsap/gsap-featured-products.js') }}"></script>
-    <script src="{{ asset('js/gsap/gsap-tilt-category-card.js') }}"></script>
+    {{-- <script src="{{ asset('js/gsap/gsap-tilt-category-card.js') }}"></script> --}}
     <script src="{{ asset('js/gsap/gsap-offer-products.js') }}"></script>
 
     @stack('scripts')

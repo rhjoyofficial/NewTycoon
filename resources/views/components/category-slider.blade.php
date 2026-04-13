@@ -1,25 +1,6 @@
 <div class="w-full py-6 md:py-12 max-w-8xl mx-auto px-4 category-section">
-    <div class="flex justify-between items-end mb-6 md:mb-10">
-        <h2
-            class="category-heading text-xl md:text-2xl lg:text-4xl font-bold text-gray-900 leading-tight capitalize font-quantico">
-            {!! __('home.home-categories-header', ['break' => '<br>']) !!}
-        </h2>
-
-        <a href="{{ route('categories.index') }}"
-            class="group inline-flex items-center gap-1 transform text-gray-900 text-sm 2xl:text-base font-inter font-normal tracking-wide transition-colors duration-300 hover:text-primary">
-
-            <span class="hover:underline">View All</span>
-
-            <svg class="w-4 h-4 xl:w-5 xl:h-5 transition-colors duration-300 group-hover:text-primary" fill="currentColor"
-                viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                <path
-                    d="M26.68 3.867H8.175a1 1 0 0 0 0 2h16.544L4.2 26.387A1 1 0 1 0 5.613 27.8l20.52-20.52v16.545a1 1 0 0 0 2 0V5.321a1.456 1.456 0 0 0-1.453-1.454"
-                    data-name="Layer 2" />
-            </svg>
-        </a>
-    </div>
     {{-- Category Grid --}}
-    <div class="categories grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-1 md:gap-2 lg:gap-4">
+    <div class="categories relative grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-1 md:gap-2 lg:gap-4">
         @if ($categories->isNotEmpty())
             @foreach ($categories as $item)
                 <a href="{{ route('categories.show', $item->slug) }}"
@@ -60,5 +41,17 @@
         @else
             <p class="text-gray-500 col-span-full text-center">No featured categories found.</p>
         @endif
+        {{-- <a href="{{ route('categories.index') }}"
+            class="absolute bottom-0 right-0 rotate-90 origin-bottom-right group inline-flex items-center gap-1 text-gray-900 text-sm 2xl:text-base font-inter font-normal tracking-wide transition-colors duration-300 hover:text-primary">
+
+            <span class="hover:underline">{{ __('home.cat-button') }}</span>
+
+            <svg class="w-4 h-4 xl:w-5 xl:h-5 transition-all duration-300 group-hover:text-primary group-hover:-rotate-45"
+                fill="currentColor" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M26.68 3.867H8.175a1 1 0 0 0 0 2h16.544L4.2 26.387A1 1 0 1 0 5.613 27.8l20.52-20.52v16.545a1 1 0 0 0 2 0V5.321a1.456 1.456 0 0 0-1.453-1.454"
+                    data-name="Layer 2" />
+            </svg>
+        </a> --}}
     </div>
 </div>

@@ -1,18 +1,34 @@
 <!-- resources/views/components/product-cards/minimal.blade.php -->
-
 @php
-    $productSlug = $product['slug'] ?? '#';
-    $productId = $product['id'] ?? '#';
-    $productName = $product['name'] ?? 'Product Name';
-    $primaryImage = $product['featured_images'][0] ?? 'images/placeholder.jpg';
-    $secondaryImage = $product['featured_images'][1] ?? null;
-    $discountedPrice = $product['price'] ?? ($product['compare_price'] ?? 0);
-    $originalPrice = $product['compare_price'] ?? 0;
-    $discountPercentage = $product['discount_percentage'] ?? 0;
-    $inStock = $product['in_stock'] ?? true;
-    $isNew = $product['is_new'] ?? false;
-@endphp
+    $productSlug = $product->slug;
+    $productId = $product->id;
+    $productName = $product->name;
 
+    $featuredImages = is_array($product->featured_images) ? $product->featured_images : [];
+    $galleryImages = is_array($product->gallery_images) ? $product->gallery_images : [];
+
+    $primaryImage = !empty($featuredImages)
+        ? $featuredImages[0]
+        : (!empty($galleryImages)
+            ? $galleryImages[0]
+            : 'products/placeholder.jpg');
+
+    $secondaryImage = !empty($featuredImages)
+        ? $featuredImages[1] ?? $featuredImages[0]
+        : (!empty($galleryImages)
+            ? $galleryImages[1] ?? $galleryImages[0]
+            : $primaryImage);
+
+    $finalPrice = $product->price;
+    $originalPrice = $product->compare_price ?: $product->price;
+    $discountPercentage = $product->discount_percentage;
+    $savingsAmount = $originalPrice - $finalPrice;
+
+    $inStock = $product->in_stock;
+    $isNew = $product->is_new ?? false;
+    $rating = $product->average_rating ?? 0;
+    $reviewCount = $product->rating_count ?? 0;
+@endphp
 <div
     class="group relative h-full bg-white border border-gray-200 hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden">
 
@@ -21,7 +37,7 @@
         <div class="w-full aspect-square bg-white overflow-hidden relative">
             <img src="{{ $product->featured_image_url }}"
                 class="absolute inset-0 w-full h-full object-contain transition-opacity duration-300 group-hover:opacity-0">
-            <img src="{{ asset($secondaryImage ?? $primaryImage) }}"
+            <img src="{{ asset('storage/' . ($secondaryImage ?? $primaryImage)) }}"
                 class="absolute inset-0 w-full h-full object-contain opacity-0 transition-opacity duration-300 group-hover:opacity-100 {{ !$secondaryImage ? 'group-hover:scale-105' : '' }}">
         </div>
 
@@ -29,12 +45,12 @@
 
     <!-- Stock Badge -->
     @if (!$inStock)
-        <div class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 z-20 font-quantico">
+        <div class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 z-20 font-poppins">
             OUT OF STOCK
         </div>
     @elseif($isNew)
-        <div class="absolute top-2 right-2 bg-accent text-white text-xs font-bold px-2 py-1 z-20 font-quantico">
-            NEW
+        <div class="absolute top-2 right-2 bg-accent text-white text-xs font-bold px-2 py-1 z-20 font-poppins">
+            {{ __('products.new') }}
         </div>
     @endif
 
@@ -44,17 +60,22 @@
             class="absolute bottom-0 left-0 right-0 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20">
             <div class="bg-gradient-to-t from-black/90 via-black/70 to-transparent pt-6 pb-4 px-4">
                 <div class="flex space-x-2">
-                    <a href="{{ route('checkout.process', $productId) }}"
-                        class="flex-1 bg-white hover:bg-gray-100 text-gray-900 text-center font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg font-quantico">
-                        <span class="flex items-center justify-center">
-                            <svg class="w-4 h-4 mr-2 hidden 2xl:block" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                            </svg>
-                            Buy Now
-                        </span>
-                    </a>
+                    <form action="{{ route('checkout.buy-now', $product->id) }}" method="POST"
+                        class="flex-1 buy-now-form">
+                        @csrf
+                        <input type="hidden" name="quantity" value="1" class="buy-now-quantity-input">
+                        <button type="submit"
+                            class="w-full bg-white hover:bg-gray-100 text-gray-900 text-center font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg font-poppins">
+                            <span class="flex items-center justify-center">
+                                <svg class="w-4 h-4 mr-2 hidden 2xl:block" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                                Buy Now
+                            </span>
+                        </button>
+                    </form>
 
                     <form action="{{ route('cart.add', $productId) }}" method="POST"
                         class="add-to-cart-form inline-block">
@@ -81,7 +102,7 @@
             <div class="bg-gradient-to-t from-black/90 via-black/70 to-transparent pt-6 pb-4 px-4">
                 <div class="flex space-x-2">
                     <a href="{{ route('contact') }}" title="+8801714XXXXXX"
-                        class="flex-1 bg-white hover:bg-gray-100 text-gray-900 text-center font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg font-quantico">
+                        class="flex-1 bg-white hover:bg-gray-100 text-gray-900 text-center font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg font-poppins">
                         <span class="flex items-center justify-center">
                             <!-- Contact/Phone Icon -->
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -101,15 +122,15 @@
     <div class="p-4 border-t border-gray-100 flex-grow flex flex-col">
 
         <a href="{{ route('product.show', $productSlug) }}"
-            class="font-medium font-quantico text-gray-900 text-sm mb-3 line-clamp-1 group-hover:text-primary transition-colors duration-200 flex-grow">
+            class="font-medium font-poppins text-gray-900 text-sm mb-3 line-clamp-1 group-hover:text-primary transition-colors duration-200 flex-grow">
             {{ $productName }}
         </a>
 
         <!-- Price + Wishlist -->
         <div class="mt-auto">
             <div class="flex items-center justify-between">
-                <span class="text-lg font-bold font-quantico text-gray-900">
-                    <span class="font-bengali">৳</span>{{ number_format($discountedPrice, 2) }}
+                <span class="text-lg font-bold font-poppins text-gray-900">
+                    <span class="font-bengali">৳</span>{{ format_currency($finalPrice, '') }}
                 </span>
 
                 <!-- Quick Actions -->
@@ -154,10 +175,10 @@
             @if ($discountPercentage > 0)
                 <div class="flex items-center space-x-2 mt-2 font-inter">
                     <span class="text-xs bg-accent/10 text-accent font-semibold px-2 py-1">
-                        Save {{ $discountPercentage }}%
+                        Save {{ format_number($discountPercentage) }}%
                     </span>
                     <span class="text-xs text-gray-500 line-through">
-                        <span class="font-bengali">৳</span>{{ number_format($originalPrice, 2) }}
+                        <span class="font-bengali">৳</span>{{ format_currency($originalPrice, '') }}
                     </span>
                 </div>
             @endif

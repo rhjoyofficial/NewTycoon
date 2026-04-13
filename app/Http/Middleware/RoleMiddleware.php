@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RoleMiddleware
 {
-    public function handle(Request $request, Closure $next, string $role): Response
+    public function handle(Request $request, Closure $next, string ...$roles): Response
     {
         $user = Auth::user();
 
@@ -17,7 +17,7 @@ class RoleMiddleware
             return redirect()->route('login');
         }
 
-        if (!$user->hasRole($role)) {
+        if (!$user->hasAnyRole($roles)) {
             abort(403, 'Unauthorized action.');
         }
 

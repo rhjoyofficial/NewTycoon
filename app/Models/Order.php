@@ -6,10 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 class Order extends Model
 {
     use HasFactory, SoftDeletes;
+    public ?string $guest_access_token = null;
 
     protected $fillable = [
         'order_number',
@@ -61,6 +63,7 @@ class Order extends Model
         'metadata',
         'ip_address',
         'user_agent',
+        'guest_access_token_hash',
     ];
 
     protected $casts = [
@@ -234,7 +237,7 @@ class Order extends Model
     public function markAsShipped($trackingNumber = null, $carrier = null)
     {
         $this->update([
-            'status' => 'shipped',
+            'status' => 'processing',
             'tracking_number' => $trackingNumber ?? $this->tracking_number,
             'carrier' => $carrier ?? $this->carrier,
             'shipped_at' => now(),
@@ -265,7 +268,9 @@ class Order extends Model
 
         // Restock products if cancelled
         foreach ($this->items as $item) {
-            $item->product->decrementSold($item->quantity, $item->unit_price);
+            if ($item->product) {
+                $item->product->reverseSale($item->quantity, (float) $item->unit_price);
+            }
         }
     }
 
@@ -295,6 +300,26 @@ class Order extends Model
             'gateway' => $this->payment_gateway,
             'transaction_id' => 'REF-' . Str::random(10),
         ]);
+
+        $this->payments()->update(['status' => 'refunded']);
+    }
+
+    public static function generateOrderNumber(): string
+    {
+        do {
+            $orderNumber = 'ORD-' . now()->format('Ymd') . '-' . strtoupper(Str::random(6));
+        } while (static::where('order_number', $orderNumber)->exists());
+
+        return $orderNumber;
+    }
+
+    public function canAccessAsGuest(?string $plainToken): bool
+    {
+        if (blank($plainToken) || blank($this->guest_access_token_hash)) {
+            return false;
+        }
+
+        return hash_equals($this->guest_access_token_hash, hash('sha256', $plainToken));
     }
 
     /**
@@ -403,5 +428,21 @@ class Order extends Model
         ];
 
         return $colors[$this->payment_status] ?? 'bg-gray-100 text-gray-800';
+    }
+
+    /**
+     * Get the payment for this order
+     */
+    public function payment()
+    {
+        return $this->hasOne(Payment::class);
+    }
+
+    /**
+     * Get all payments for this order
+     */
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
     }
 }

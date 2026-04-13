@@ -25,7 +25,8 @@ export default {
                 sans: ['"DM Sans"', ...defaultTheme.fontFamily.sans],
                 inter: ["Inter", ...defaultTheme.fontFamily.sans],
                 cambay: ["Cambay", ...defaultTheme.fontFamily.sans],
-                quantico: ["Quantico", ...defaultTheme.fontFamily.sans],
+                poppins: ["poppins", ...defaultTheme.fontFamily.sans],
+                poppins: ["Poppins", ...defaultTheme.fontFamily.sans],
                 bengali: [
                     '"Noto Sans Bengali"',
                     ...defaultTheme.fontFamily.sans,

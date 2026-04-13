@@ -3,7 +3,7 @@
     <div class="bg-white rounded-xl p-6 mb-6 border border-gray-200 sticky top-6">
         <!-- Search Filter -->
         <div class="mb-6">
-            <h3 class="font-semibold text-gray-900 mb-3 font-quantico">
+            <h3 class="font-semibold text-gray-900 mb-3 font-poppins">
                 @isset($currentCategory)
                     Search in {{ $currentCategory->name }}
                 @else
@@ -42,7 +42,7 @@
 
             @if ($directChildren->count() > 0)
                 <div class="mb-6">
-                    <h3 class="font-semibold text-gray-900 mb-3 font-quantico">Subcategories</h3>
+                    <h3 class="font-semibold text-gray-900 mb-3 font-poppins">Subcategories</h3>
                     <div class="space-y-2 max-h-96 overflow-y-auto border-b border-gray-200 shadow-sm pb-2">
                         <!-- "All [Category Name]" option -->
                         <a href="{{ route('categories.show', array_merge([$parentCategory->slug], request()->except(['category', 'search']))) }}"
@@ -100,7 +100,7 @@
             <!-- For Search Page: Show all categories -->
             @if ($categories->count() > 0)
                 <div class="mb-6">
-                    <h3 class="font-semibold text-gray-900 mb-3 font-quantico">Categories</h3>
+                    <h3 class="font-semibold text-gray-900 mb-3 font-poppins">Categories</h3>
                     <div class="space-y-2 max-h-96 overflow-y-auto border-b border-gray-200 shadow-sm pb-2">
                         <a href="{{ route('search', array_merge(request()->except('category'), ['category' => null])) }}"
                             class="flex items-center justify-between px-3 py-2 rounded-lg {{ !request('category') ? 'bg-primary-light text-primary border border-primary' : 'hover:bg-gray-50 border border-gray-200' }} font-inter transition-colors">
@@ -156,7 +156,7 @@
 
         <!-- Price Range Filter -->
         <div class="mb-6">
-            <h3 class="font-semibold text-gray-900 mb-3 font-quantico">Price Range</h3>
+            <h3 class="font-semibold text-gray-900 mb-3 font-poppins">Price Range</h3>
             <div class="space-y-4">
                 <div class="flex items-center justify-between">
                     <span class="text-sm font-medium text-gray-700 font-inter">
@@ -193,7 +193,7 @@
 
         <!-- Status Filter -->
         <div class="mb-6">
-            <h3 class="font-semibold text-gray-900 mb-3 font-quantico">Status</h3>
+            <h3 class="font-semibold text-gray-900 mb-3 font-poppins">Status</h3>
             <div class="grid grid-cols-2 gap-2">
                 @if (isset($currentCategory))
                     <a href="{{ route('categories.show', array_merge([$currentCategory->slug], request()->except('status'), ['status' => 'all'])) }}"

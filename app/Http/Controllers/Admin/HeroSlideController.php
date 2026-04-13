@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Admin\StoreHeroSlideRequest;
+use App\Http\Requests\Admin\UpdateHeroSlideRequest;
 
 class HeroSlideController extends Controller
 {
@@ -34,10 +35,12 @@ class HeroSlideController extends Controller
         try {
             $data = $request->validated();
 
+            // Handle background file upload
             if ($request->hasFile('background')) {
                 $filename = 'slide-' . time() . '.' . $request->file('background')->extension();
                 $data['background'] = $request->file('background')->storeAs('slides', $filename, 'public');
             }
+
             // Create slide
             HeroSlide::create($data);
 
@@ -56,7 +59,6 @@ class HeroSlideController extends Controller
 
     public function edit(HeroSlide $heroSlide)
     {
-        // Pass max order for sort_order field
         $maxOrder = HeroSlide::max('sort_order') ?? 0;
 
         return view('admin.hero-slides.edit', [
@@ -65,20 +67,24 @@ class HeroSlideController extends Controller
         ]);
     }
 
-    public function update(StoreHeroSlideRequest $request, HeroSlide $heroSlide)
+    public function update(UpdateHeroSlideRequest $request, HeroSlide $heroSlide)
     {
         try {
             $data = $request->validated();
 
-            // Handle background file update
+            // Handle background file update ONLY if a new file is uploaded
             if ($request->hasFile('background')) {
-                // Delete old background
+                // Delete old background if it exists
                 if ($heroSlide->background && Storage::disk('public')->exists($heroSlide->background)) {
                     Storage::disk('public')->delete($heroSlide->background);
                 }
 
+                // Store new background
                 $filename = 'slide-' . time() . '.' . $request->file('background')->extension();
                 $data['background'] = $request->file('background')->storeAs('slides', $filename, 'public');
+            } else {
+                // Keep the existing background - remove it from the data array
+                unset($data['background']);
             }
 
             // Update slide

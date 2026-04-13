@@ -2,7 +2,7 @@
 <section class="w-full max-w-8xl mx-auto py-16 space-y-20 px-4">
     <!-- Section Title -->
     <h2
-        class="text-3xl sm:text-4xl md:text-5xl font-semibold text-center text-gray-900 mb-12 leading-tight font-quantico">
+        class="text-3xl sm:text-4xl md:text-5xl font-semibold text-center text-gray-900 mb-12 leading-tight font-poppins">
         Build Your<br>Smart Home Today
     </h2>
     @foreach ($smartSections as $smartSection)
@@ -11,12 +11,11 @@
             <div class="relative w-full h-[40rem] overflow-hidden rounded-2xl">
                 <img src="{{ asset($smartSection['image']) }}" alt="{{ $smartSection['title'] }}"
                     class="absolute inset-0 w-full h-full object-cover rounded-2xl" loading="lazy">
-                <div
-                    class="relative z-10 flex flex-col items-center justify-start h-full text-center text-black py-12">
+                <div class="relative z-10 flex flex-col items-center justify-start h-full text-center text-black py-12">
                     <h3 class="text-2xl md:text-5xl font-bold mb-4 font-cambay">{{ $smartSection['title'] }}</h3>
                     <p class="text-lg md:text-xl mb-6 font-cambay">{{ $smartSection['description'] }}</p>
                     <a href="{{ $smartSection['button_url'] ?? '#' }}"
-                        class="inline-block px-6 py-3 border-2 border-black hover:border-gray-500 rounded-full text-lg font-medium transition duration-300 font-quantico">
+                        class="inline-block px-6 py-3 border-2 border-black hover:border-gray-500 rounded-full text-lg font-medium transition duration-300 font-poppins">
                         {{ $smartSection['button'] }}
                     </a>
                 </div>
@@ -34,7 +33,7 @@
                         <p class="text-gray-600 text-lg mb-6 font-cambay">{{ $smartSection['description'] }}</p>
                     </div>
                     <a href="{{ $smartSection['button_url'] ?? '#' }}"
-                        class="inline-block self-start px-6 py-3 border-2 border-black hover:border-gray-500 rounded-full text-lg font-medium transition  duration-300 font-quantico"
+                        class="inline-block self-start px-6 py-3 border-2 border-black hover:border-gray-500 rounded-full text-lg font-medium transition  duration-300 font-poppins"
                         aria-label="Shop {{ $smartSection['button'] }}">
                         {{ $smartSection['button'] }}
                     </a>

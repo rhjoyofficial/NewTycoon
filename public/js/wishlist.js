@@ -7,7 +7,7 @@ class WishlistManager {
         this.initAddToWishlist();
         this.initRemoveFromWishlist();
         this.initMoveToCart();
-        console.log("Wishlist Initialize Successfully.");
+        // console.log("Wishlist Initialize Successfully.");
     }
 
     /* ===============================
@@ -101,7 +101,7 @@ class WishlistManager {
 
         const url = button.dataset.url;
         const token = document.querySelector(
-            'meta[name="csrf-token"]'
+            'meta[name="csrf-token"]',
         )?.content;
         const item = button.closest(".wishlist-item");
 
@@ -148,7 +148,7 @@ class WishlistManager {
     async handleMoveToCart(button) {
         const url = button.dataset.url;
         const token = document.querySelector(
-            'meta[name="csrf-token"]'
+            'meta[name="csrf-token"]',
         )?.content;
 
         button.disabled = true;

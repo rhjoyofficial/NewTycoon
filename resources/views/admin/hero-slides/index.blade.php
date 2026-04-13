@@ -215,7 +215,7 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <button onclick="toggleStatus(this, {{ $slide->id }})"
-                                            class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 {{ $slide->is_active ? 'bg-green-600' : 'bg-gray-200' }}">
+                                            class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 {{ $slide->is_active ? 'bg-primary' : 'bg-gray-200' }}">
                                             <span
                                                 class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $slide->is_active ? 'translate-x-5' : 'translate-x-0' }}"></span>
                                         </button>
@@ -337,10 +337,10 @@
                             </div>
                         </div>
                         <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                            <form id="deleteForm" method="POST" class="inline">
+                            <form id="deleteForm" method="POST" class="inline" data-form>
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit"
+                                <button type="submit" data-loading data-loading-text="Deleting..."
                                     class="inline-flex w-full justify-center rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto">
                                     Delete
                                 </button>
@@ -435,14 +435,20 @@
                 })
                 .then(res => res.json())
                 .then(data => {
-                    if (!data.success) return;
+                    if (data.success) {
+                        // UI Update logic
+                        button.classList.toggle('bg-primary', data.is_active);
+                        button.classList.toggle('bg-gray-200', !data.is_active);
 
-                    button.classList.toggle('bg-primary', data.is_active);
-                    button.classList.toggle('bg-gray-200', !data.is_active);
+                        const knob = button.querySelector('span');
+                        knob.classList.toggle('translate-x-5', data.is_active);
+                        knob.classList.toggle('translate-x-0', !data.is_active);
 
-                    const knob = button.querySelector('span');
-                    knob.classList.toggle('translate-x-5', data.is_active);
-                    knob.classList.toggle('translate-x-0', !data.is_active);
+                        // Flash success message
+                        flash(data.message || 'Status updated!', 'success', 3000);
+                    } else {
+                        flash(data.message || 'Update failed', 'error', 5000);
+                    }
                 })
                 .finally(() => {
                     button.dataset.loading = '0';

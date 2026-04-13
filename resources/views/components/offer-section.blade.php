@@ -61,7 +61,7 @@
                 <div class="flex flex-col lg:flex-row items-center justify-between gap-4">
                     {{-- Left: Title & Info --}}
                     <div class="text-center lg:text-left">
-                        <h2 class="text-white text-2xl md:text-3xl font-bold font-quantico mb-2">
+                        <h2 class="text-white text-2xl md:text-3xl font-bold font-poppins mb-2">
                             {{ $offerInfo['title'] }}
                         </h2>
                         @if ($offerInfo['subtitle'])
@@ -80,7 +80,7 @@
                                 </div>
 
                                 <div id="offer-timer-{{ $offer->id }}"
-                                    class="flex items-center justify-center gap-3 text-white font-quantico text-lg md:text-xl"
+                                    class="flex items-center justify-center gap-3 text-white font-poppins text-lg md:text-xl"
                                     data-end-date="{{ $offerInfo['timer_end_date'] }}">
 
                                     {{-- Days --}}
@@ -130,7 +130,7 @@
                 {{-- Header Row --}}
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
                     <div>
-                        <h3 class="text-white text-2xl md:text-3xl font-bold font-quantico">
+                        <h3 class="text-white text-2xl md:text-3xl font-bold font-poppins">
                             Special Offer Products
                         </h3>
                         <p class="text-white/80 text-sm md:text-base font-cambay mt-1">

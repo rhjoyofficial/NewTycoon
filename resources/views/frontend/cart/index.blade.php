@@ -7,7 +7,7 @@
     <div class="max-w-8xl mx-auto px-4 py-8">
         <!-- Page Header -->
         <div class="mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2 font-quantico">Shopping Cart</h1>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2 font-poppins">Shopping Cart</h1>
             <p class="text-gray-600 font-inter">Review your items and proceed to checkout</p>
         </div>
 
@@ -104,7 +104,7 @@
 
                                     <!-- Price -->
                                     <div class="col-span-2 text-center">
-                                        <span class="text-gray-900 font-semibold font-quantico">
+                                        <span class="text-gray-900 font-semibold font-poppins">
                                             <span class="font-bengali">৳</span>{{ number_format($item->price, 2) }}
                                         </span>
                                     </div>
@@ -148,7 +148,7 @@
 
                                     <!-- Total -->
                                     <div class="col-span-2 text-center">
-                                        <span class="item-total text-lg font-bold text-gray-900 font-quantico">
+                                        <span class="item-total text-lg font-bold text-gray-900 font-poppins">
                                             <span class="font-bengali">৳</span>{{ number_format($itemTotal, 2) }}
                                         </span>
                                     </div>
@@ -189,7 +189,7 @@
                                                 </a>
 
                                                 <div class="mt-1">
-                                                    <span class="text-gray-900 font-semibold font-quantico">
+                                                    <span class="text-gray-900 font-semibold font-poppins">
                                                         <span
                                                             class="font-bengali">৳</span>{{ number_format($item->price, 2) }}
                                                     </span>
@@ -268,7 +268,7 @@
                                             <!-- Item Total -->
                                             <div class="text-right">
                                                 <div class="text-sm text-gray-500 font-inter">Total</div>
-                                                <div class="item-total text-lg font-bold text-gray-900 font-quantico">
+                                                <div class="item-total text-lg font-bold text-gray-900 font-poppins">
                                                     <span class="font-bengali">৳</span>{{ number_format($itemTotal, 2) }}
                                                 </div>
                                             </div>
@@ -297,7 +297,7 @@
                             </button>
                             @if ($cart->total_items > 0)
                                 <a href="{{ route('checkout.index') }}"
-                                    class="checkout-btn px-6 py-3 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg transition-colors duration-200 font-quantico">
+                                    class="checkout-btn px-6 py-3 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg transition-colors duration-200 font-poppins">
                                     Proceed to Checkout
                                 </a>
                             @endif
@@ -308,7 +308,7 @@
                 <!-- Order Summary -->
                 <div class="lg:w-1/3">
                     <div class="bg-white rounded-xl border border-gray-200 p-6 sticky top-6">
-                        <h2 class="text-xl font-bold text-gray-900 mb-6 font-quantico">Order Summary</h2>
+                        <h2 class="text-xl font-bold text-gray-900 mb-6 font-poppins">Order Summary</h2>
 
                         <!-- Summary Details -->
                         <div class="space-y-4">
@@ -317,29 +317,29 @@
                                 <span class="cart-count-text text-gray-600 font-inter">
                                     Items (<span class="cart-count-number">{{ $cart->total_items }}</span>)
                                 </span>
-                                <span id="cart-subtotal" class="text-gray-900 font-semibold font-quantico"><span
+                                <span id="cart-subtotal" class="text-gray-900 font-semibold font-poppins"><span
                                         class="font-bengali">৳</span>{{ number_format($cart->subtotal, 2) }}</span>
                             </div>
 
                             <!-- Shipping -->
                             <div class="flex justify-between items-center">
                                 <span class="text-gray-600 font-inter">Shipping</span>
-                                <span class="text-gray-900 font-semibold font-quantico"><span
+                                <span class="text-gray-900 font-semibold font-poppins"><span
                                         class="font-bengali">৳</span>0.00</span>
                             </div>
 
                             <!-- Tax -->
                             {{-- <div class="flex justify-between items-center">
                                 <span class="text-gray-600 font-inter">Tax</span>
-                                <span class="text-gray-900 font-semibold font-quantico">TK0.00</span>
+                                <span class="text-gray-900 font-semibold font-poppins">TK0.00</span>
                             </div> --}}
 
                             <!-- Divider -->
                             <div class="border-t border-gray-200 pt-4">
                                 <div class="flex justify-between items-center">
-                                    <span class="text-lg font-bold text-gray-900 font-quantico">Total</span>
+                                    <span class="text-lg font-bold text-gray-900 font-poppins">Total</span>
                                     <div class="text-right">
-                                        <div id="cart-total" class="text-2xl font-bold text-gray-900 font-quantico">
+                                        <div id="cart-total" class="text-2xl font-bold text-gray-900 font-poppins">
                                             <span class="font-bengali">৳</span>{{ number_format($cart->subtotal, 2) }}
                                         </div>
                                         <div class="text-sm text-gray-500 font-inter mt-1">
@@ -353,7 +353,7 @@
                         <!-- Checkout Button -->
                         @if ($cart->total_items > 0)
                             <a href="{{ route('checkout.index') }}"
-                                class="checkout-btn mt-6 w-full bg-primary hover:bg-primary-dark text-white font-semibold py-4 px-6 rounded-lg transition-colors duration-200 text-center block font-quantico">
+                                class="checkout-btn mt-6 w-full bg-primary hover:bg-primary-dark text-white font-semibold py-4 px-6 rounded-lg transition-colors duration-200 text-center block font-poppins">
                                 Proceed to Checkout
                             </a>
                         @endif
@@ -372,7 +372,7 @@
 
                     <!-- Promo Code -->
                     <div class="mt-6 bg-white rounded-xl border border-gray-200 p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-3 font-quantico">Have a Promo Code?</h3>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3 font-poppins">Have a Promo Code?</h3>
                         <form class="space-y-3">
                             <div class="flex gap-2">
                                 <input type="text" placeholder="Enter promo code"
@@ -397,10 +397,10 @@
                             d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
                 </div>
-                <h2 class="text-2xl font-bold text-gray-700 mb-3 font-quantico">Your cart is empty</h2>
+                <h2 class="text-2xl font-bold text-gray-700 mb-3 font-poppins">Your cart is empty</h2>
                 <p class="text-gray-500 mb-6 font-inter">Looks like you haven't added any items to your cart yet.</p>
                 <a href="{{ route('products.index') }}"
-                    class="inline-flex items-center px-6 py-3 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg transition-colors duration-200 font-quantico">
+                    class="inline-flex items-center px-6 py-3 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg transition-colors duration-200 font-poppins">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -411,4 +411,3 @@
         @endif
     </div>
 @endsection
-

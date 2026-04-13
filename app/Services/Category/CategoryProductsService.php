@@ -43,39 +43,41 @@ class CategoryProductsService
      */
     public function getRelatedCategoriesForSearch(Category $category, ?string $search = null): Collection
     {
-        // Get all parent categories
+        // Parent categories
         $parentCategories = $category->getParentCategories();
-        
-        // Get sibling categories (categories with same parent)
+
+        // Sibling categories
         $siblingCategories = Category::active()
             ->where('parent_id', $category->parent_id)
             ->where('id', '!=', $category->id)
             ->get();
 
-        // Get child categories
+        // Child categories
         $childCategories = $category->children()->active()->get();
 
-        // Combine all related categories
+        // Merge all
         $allCategories = collect()
             ->merge($parentCategories)
             ->merge($siblingCategories)
             ->merge($childCategories)
             ->unique('id');
 
-        // Filter by search if provided
+        // Attach product counts ONCE
+        $allCategories = $allCategories->map(function ($cat) use ($search) {
+            $cat->products_count = $cat->getProductsCount($search);
+            return $cat;
+        });
+
+        // must have products
         if ($search) {
-            $allCategories = $allCategories->filter(function ($cat) use ($search) {
-                return stripos($cat->name, $search) !== false ||
-                    $cat->getProductsCount($search) > 0;
+            $allCategories = $allCategories->filter(function ($cat) {
+                return $cat->products_count > 0;
             });
         }
 
-        // Add product counts
-        return $allCategories->map(function ($cat) use ($search) {
-            $cat->products_count = $cat->getProductsCount($search);
-            return $cat;
-        })->sortBy('order');
+        return $allCategories->sortBy('order')->values();
     }
+
 
     /**
      * Get price range for category products

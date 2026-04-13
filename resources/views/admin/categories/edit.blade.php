@@ -22,7 +22,8 @@
 
 @section('content')
     <div class="max-w-5xl mx-auto">
-        <form action="{{ route('admin.categories.update', $category) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('admin.categories.update', $category) }}" method="POST" enctype="multipart/form-data"
+            data-form>
             @csrf
             @method('PUT')
 

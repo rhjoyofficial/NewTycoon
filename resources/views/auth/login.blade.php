@@ -16,6 +16,9 @@
             <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus
                 autocomplete="email"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+            @error('email')
+                <p class="mt-1 text-xs text-red-600 font-medium">{{ $message }}</p>
+            @enderror
         </div>
 
         <!-- Password -->
@@ -25,6 +28,9 @@
             </label>
             <input id="password" type="password" name="password" required autocomplete="current-password"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+            @error('password')
+                <p class="mt-1 text-xs text-red-600 font-medium">{{ $message }}</p>
+            @enderror
         </div>
 
         <!-- Remember Me & Forgot Password -->

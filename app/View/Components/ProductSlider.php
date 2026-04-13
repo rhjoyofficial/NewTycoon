@@ -5,14 +5,12 @@ namespace App\View\Components;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
+use Illuminate\Support\Collection;
 
 class ProductSlider extends Component
 {
-    /**
-     * Create a new component instance.
-     */
     public $slidingProducts;
-    public $adsImages;
+    public $banner;
     public $title;
     public $sliderId;
     public $autoPlay;
@@ -23,8 +21,8 @@ class ProductSlider extends Component
     public $cardStyle;
 
     public function __construct(
+        $banner,
         $slidingProducts = [],
-        $adsImages = [],
         $title = 'Recommended for you',
         $sliderId = 'productSlider',
         $autoPlay = true,
@@ -34,8 +32,8 @@ class ProductSlider extends Component
         $spaceBetween = 24,
         $cardStyle = 'modern'
     ) {
+        $this->banner = $banner;
         $this->slidingProducts = $slidingProducts ?: [];
-        $this->adsImages = $adsImages ?: [];
         $this->title = $title;
         $this->sliderId = $sliderId;
         $this->autoPlay = filter_var($autoPlay, FILTER_VALIDATE_BOOLEAN);
@@ -46,9 +44,6 @@ class ProductSlider extends Component
         $this->cardStyle = $cardStyle;
     }
 
-    /**
-     * Get the view / contents that represent the component.
-     */
     public function render(): View|Closure|string
     {
         return view('components.product-slider');

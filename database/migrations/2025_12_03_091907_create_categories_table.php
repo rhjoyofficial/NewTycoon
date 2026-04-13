@@ -14,14 +14,21 @@ return new class extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
 
-            // $table->string('name');
+            // Bilingual fields
+            $table->string('name_en');
+            $table->string('name_bn')->nullable();
+            $table->text('description_en')->nullable();
+            $table->text('description_bn')->nullable();
+
+            // Core fields
             $table->string('slug')->unique();
-            // $table->text('description')->nullable();
             $table->string('image')->nullable();
 
+            // Hierarchy
             $table->unsignedBigInteger('parent_id')->nullable();
+            $table->unsignedTinyInteger('depth')->default(1); // 1 = root, 2 = child, 3 = sub-child
 
-            // Navigation-specific
+            // Navigation
             $table->boolean('show_in_nav')->default(false);
             $table->integer('nav_order')->default(0);
 
@@ -42,15 +49,20 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('parent_id')
-                ->references('id')
-                ->on('categories')
-                ->onDelete('cascade');
+            // Foreign key
+            $table->foreign('parent_id')->references('id')->on('categories')->onDelete('cascade');
 
+            // Indexes
             $table->index('is_active');
             $table->index('slug');
             $table->index('parent_id');
+            $table->index('depth');
             $table->index(['is_active', 'parent_id']);
+            $table->index(['show_in_nav', 'nav_order']);
+            $table->index(['parent_id', 'is_active']);
+            $table->index(['is_active', 'depth']);
+            $table->index(['is_active', 'is_featured']);
+            $table->index(['parent_id', 'order']);
         });
     }
 

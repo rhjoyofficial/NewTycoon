@@ -17,11 +17,9 @@ class Brand extends Model
         'name_bn',
         'description_en',
         'description_bn',
-
-        'name',
         'slug',
-        'description',
         'logo',
+        'order',
         'is_featured',
         'is_active',
     ];

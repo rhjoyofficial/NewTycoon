@@ -146,7 +146,7 @@ class OrderItem extends Model
 
         // Update product stock if needed
         if ($this->product && $this->product->track_quantity) {
-            $this->product->decrementSold($quantity, $this->unit_price);
+            $this->product->reverseSale($quantity, (float) $this->unit_price);
         }
 
         return true;

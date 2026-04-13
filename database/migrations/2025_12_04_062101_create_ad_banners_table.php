@@ -14,13 +14,10 @@ return new class extends Migration
         Schema::create('ad_banners', function (Blueprint $table) {
             $table->id();
             $table->string('title')->nullable();
-            $table->text('description')->nullable();
-            $table->string('image_path');
-            $table->string('alt_text')->nullable();
-            $table->string('link')->nullable();
-            $table->enum('target', ['_self', '_blank'])->default('_self');
-            $table->integer('order')->default(0);
+            $table->json('images'); // [path1, path2, path3]
+            $table->string('link')->nullable(); // Removed the duplicate line here
             $table->boolean('is_active')->default(true);
+            $table->integer('order')->default(0);
             $table->timestamps();
         });
     }

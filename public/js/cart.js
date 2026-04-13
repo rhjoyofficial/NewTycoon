@@ -22,17 +22,32 @@ class CartManager {
     }
 
     checkCartStale() {
-        const lastUpdate = localStorage.getItem(this.sessionKey);
-        if (lastUpdate) {
-            const hoursSinceUpdate =
-                (Date.now() - lastUpdate) / (1000 * 60 * 60);
-            if (hoursSinceUpdate > 24) {
-                // 24 hours
-                this.showFlash(
-                    "Your cart may be outdated. Please refresh.",
-                    "warning"
-                );
-            }
+        const now = Date.now();
+        const lastUpdateKey = this.sessionKey || "cart_last_update"; // fallback key
+
+        let lastUpdate = localStorage.getItem(lastUpdateKey);
+
+        if (!lastUpdate) {
+            // First visit / no timestamp yet — initialize
+            localStorage.setItem(lastUpdateKey, now);
+            return; // no warning on first visit
+        }
+
+        // Convert stored value to number
+        lastUpdate = parseInt(lastUpdate, 10);
+
+        // Calculate hours since last cart update
+        const hoursSinceUpdate = (now - lastUpdate) / (1000 * 60 * 60);
+
+        if (hoursSinceUpdate > 24) {
+            // Cart is stale — show warning
+            // this.showFlash(
+            //     "Your cart may be outdated. Please refresh.",
+            //     "warning",
+            // );
+
+            // update the timestamp so it doesn't warn repeatedly
+            localStorage.setItem(lastUpdateKey, now);
         }
     }
 
@@ -101,7 +116,7 @@ class CartManager {
 
             if (!response.ok || data.success === false) {
                 throw new Error(
-                    data.message || data.error || `Error ${response.status}`
+                    data.message || data.error || `Error ${response.status}`,
                 );
             }
 
@@ -126,7 +141,7 @@ class CartManager {
             // Show error message
             this.showFlash(
                 error.message || "Failed to add to cart. Please try again.",
-                "error"
+                "error",
             );
 
             // Revert button immediately
@@ -161,7 +176,7 @@ class CartManager {
                     badge.classList.add("animate-bounce");
                     setTimeout(
                         () => badge.classList.remove("animate-bounce"),
-                        800
+                        800,
                     );
                 }
             } else {
@@ -233,13 +248,13 @@ class CartManager {
             if (e.target.closest(".quantity-decrement")) {
                 this.handleQuantityChange(
                     e.target.closest(".quantity-decrement"),
-                    -1
+                    -1,
                 );
             }
             if (e.target.closest(".quantity-increment")) {
                 this.handleQuantityChange(
                     e.target.closest(".quantity-increment"),
-                    1
+                    1,
                 );
             }
         });
@@ -264,7 +279,7 @@ class CartManager {
 
         // Check if product is in stock
         const itemElement = document.querySelector(
-            `.cart-item[data-product-id="${productId}"]`
+            `.cart-item[data-product-id="${productId}"]`,
         );
 
         const isInStock = itemElement?.dataset.productInStock === "true";
@@ -281,7 +296,7 @@ class CartManager {
         if (newQuantity < min || newQuantity > max) {
             this.showFlash(
                 `Quantity must be between ${min} and ${max}`,
-                "warning"
+                "warning",
             );
             return;
         }
@@ -312,7 +327,7 @@ class CartManager {
             if (newQuantity < min || newQuantity > max) {
                 this.showFlash(
                     `Quantity must be between ${min} and ${max}`,
-                    "warning"
+                    "warning",
                 );
                 input.value = Math.min(Math.max(newQuantity, min), max);
                 return;
@@ -373,18 +388,18 @@ class CartManager {
             // Show success message
             this.showFlash(
                 data.message || "Cart updated successfully",
-                "success"
+                "success",
             );
         } catch (error) {
             if (error.name === "AbortError" || error.name === "TimeoutError") {
                 this.showFlash(
                     "Request timed out. Please check your connection.",
-                    "error"
+                    "error",
                 );
             } else if (error.name === "NetworkError") {
                 this.showFlash(
                     "Network error. Please check your connection.",
-                    "error"
+                    "error",
                 );
             } else {
                 this.showFlash(error.message, "error");
@@ -407,14 +422,14 @@ class CartManager {
     updateItemTotal(productId, itemTotal) {
         // Find the item total element for this product
         const itemElement = document.querySelector(
-            `.cart-item[data-product-id="${productId}"]`
+            `.cart-item[data-product-id="${productId}"]`,
         );
         if (itemElement) {
             const totalElement = itemElement.querySelector(".item-total");
             if (totalElement) {
                 const amount = Number(itemTotal);
                 totalElement.innerHTML = `<span class="font-bengali">৳</span>${amount.toFixed(
-                    2
+                    2,
                 )}`;
 
                 // Add animation
@@ -481,7 +496,7 @@ class CartManager {
     async handleCartRemove(button) {
         if (
             !confirm(
-                "Are you sure you want to remove this item from your cart?"
+                "Are you sure you want to remove this item from your cart?",
             )
         ) {
             return;
@@ -489,7 +504,7 @@ class CartManager {
 
         const url = button.dataset.url || button.href;
         const token = document.querySelector(
-            'meta[name="csrf-token"]'
+            'meta[name="csrf-token"]',
         )?.content;
         const itemElement = button.closest(".cart-item, tr.cart-item");
 
@@ -571,7 +586,7 @@ class CartManager {
                 method: "POST",
                 headers: {
                     "X-CSRF-TOKEN": document.querySelector(
-                        'meta[name="csrf-token"]'
+                        'meta[name="csrf-token"]',
                     ).content,
                     Accept: "application/json",
                     "Content-Type": "application/json",
@@ -592,7 +607,7 @@ class CartManager {
             // Show success message
             this.showFlash(
                 data.message || "Cart cleared successfully",
-                "success"
+                "success",
             );
 
             // Reload page after delay
@@ -611,12 +626,12 @@ class CartManager {
         const totalElement = document.getElementById("cart-total");
         if (totalElement && data.cart_total !== undefined) {
             totalElement.innerHTML = `<span class="font-bengali">৳</span>${Number(
-                data.cart_total
+                data.cart_total,
             ).toFixed(2)}`;
             totalElement.classList.add("animate-pulse");
             setTimeout(
                 () => totalElement.classList.remove("animate-pulse"),
-                1000
+                1000,
             );
         }
 
@@ -624,12 +639,12 @@ class CartManager {
         const subtotalElement = document.getElementById("cart-subtotal");
         if (subtotalElement && data.cart_subtotal !== undefined) {
             subtotalElement.innerHTML = `<span class="font-bengali">৳</span>${Number(
-                data.cart_subtotal
+                data.cart_subtotal,
             ).toFixed(2)}`;
             subtotalElement.classList.add("animate-pulse");
             setTimeout(
                 () => subtotalElement.classList.remove("animate-pulse"),
-                1000
+                1000,
             );
         }
     }
@@ -675,7 +690,7 @@ class CartManager {
         decrementBtn.classList.toggle("opacity-50", decrementBtn.disabled);
         decrementBtn.classList.toggle(
             "cursor-not-allowed",
-            decrementBtn.disabled
+            decrementBtn.disabled,
         );
 
         // Increment button
@@ -683,7 +698,7 @@ class CartManager {
         incrementBtn.classList.toggle("opacity-50", incrementBtn.disabled);
         incrementBtn.classList.toggle(
             "cursor-not-allowed",
-            incrementBtn.disabled
+            incrementBtn.disabled,
         );
     }
 
@@ -698,14 +713,14 @@ class CartManager {
                 btn.classList.add(
                     "opacity-50",
                     "cursor-not-allowed",
-                    "pointer-events-none"
+                    "pointer-events-none",
                 );
                 btn.setAttribute("aria-disabled", "true");
             } else {
                 btn.classList.remove(
                     "opacity-50",
                     "cursor-not-allowed",
-                    "pointer-events-none"
+                    "pointer-events-none",
                 );
                 btn.removeAttribute("aria-disabled");
             }

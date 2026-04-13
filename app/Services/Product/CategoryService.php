@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Product;
 
 use App\Models\Category;
 use Illuminate\Support\Facades\Cache;
@@ -42,5 +42,4 @@ class CategoryService
                 ->toArray(),
         ];
     }
-    
 }

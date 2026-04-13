@@ -1,19 +1,25 @@
-// Flash Message System - Vanilla JS
+// resources/js/flash.js - Enhanced Flash Message System
 class FlashMessageSystem {
     constructor() {
         this.messages = [];
         this.container = null;
+        this.maxMessages = 5;
+        this.initialized = false;
         this.init();
-        // console.log("Hello I am Flash");
     }
 
     init() {
-        this.container = document.querySelector(".flash-messages-container");
-
-        if (!this.container) {
-            console.warn("Flash container not found");
-            return;
+        // Wait for DOM to be ready
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", () => this.setup());
+        } else {
+            this.setup();
         }
+    }
+
+    setup() {
+        this.createContainer();
+        this.initialized = true;
 
         // Process any queued messages
         if (
@@ -22,6 +28,19 @@ class FlashMessageSystem {
         ) {
             window.queuedFlashMessages.forEach((msg) => this.add(msg));
             window.queuedFlashMessages = [];
+        }
+    }
+
+    createContainer() {
+        // Check if container already exists
+        this.container = document.querySelector(".flash-messages-container");
+
+        if (!this.container) {
+            // Create container if it doesn't exist
+            this.container = document.createElement("div");
+            this.container.className =
+                "flash-messages-container fixed top-4 right-4 z-[9999] space-y-3 w-full max-w-sm pointer-events-none";
+            document.body.appendChild(this.container);
         }
     }
 
@@ -46,30 +65,30 @@ class FlashMessageSystem {
     getColors(type) {
         const colors = {
             success: {
-                bg: "bg-emerald-50 dark:bg-emerald-900/20",
-                border: "border-emerald-200 dark:border-emerald-800",
-                text: "text-emerald-800 dark:text-emerald-200",
-                progress: "bg-emerald-500",
-                icon: "text-emerald-500",
+                bg: "bg-green-50",
+                border: "border-green-200",
+                text: "text-green-800",
+                progress: "bg-green-500",
+                icon: "text-green-500",
             },
             error: {
-                bg: "bg-red-50 dark:bg-red-900/20",
-                border: "border-red-200 dark:border-red-800",
-                text: "text-red-800 dark:text-red-200",
+                bg: "bg-red-50",
+                border: "border-red-200",
+                text: "text-red-800",
                 progress: "bg-red-500",
                 icon: "text-red-500",
             },
             warning: {
-                bg: "bg-amber-50 dark:bg-amber-900/20",
-                border: "border-amber-200 dark:border-amber-800",
-                text: "text-amber-800 dark:text-amber-200",
+                bg: "bg-amber-50",
+                border: "border-amber-200",
+                text: "text-amber-800",
                 progress: "bg-amber-500",
                 icon: "text-amber-500",
             },
             info: {
-                bg: "bg-blue-50 dark:bg-blue-900/20",
-                border: "border-blue-200 dark:border-blue-800",
-                text: "text-blue-800 dark:text-blue-200",
+                bg: "bg-blue-50",
+                border: "border-blue-200",
+                text: "text-blue-800",
                 progress: "bg-blue-500",
                 icon: "text-blue-500",
             },
@@ -78,6 +97,25 @@ class FlashMessageSystem {
     }
 
     add({ message, type = "success", duration = 5000, description = "" }) {
+        if (!this.initialized) {
+            // Queue message if not initialized
+            if (!window.queuedFlashMessages) {
+                window.queuedFlashMessages = [];
+            }
+            window.queuedFlashMessages.push({
+                message,
+                type,
+                duration,
+                description,
+            });
+            return null;
+        }
+
+        if (!this.container) {
+            console.error("Flash container not available");
+            return null;
+        }
+
         const id =
             "flash_" +
             Date.now() +
@@ -88,86 +126,94 @@ class FlashMessageSystem {
         // Create message element
         const messageEl = document.createElement("div");
         messageEl.id = id;
-        messageEl.className = `flash-message ${colors.bg} ${colors.border} ${colors.text} border rounded-xl shadow-lg overflow-hidden pointer-events-auto transform transition-all duration-300 translate-x-full opacity-0 backdrop-blur-sm`;
+        messageEl.className = `flash-message ${colors.bg} ${colors.border} ${colors.text} border rounded-xl shadow-lg overflow-hidden pointer-events-auto transform transition-all duration-300 translate-x-full opacity-0`;
         messageEl.setAttribute("role", "alert");
+        messageEl.setAttribute("aria-live", "assertive");
 
         messageEl.innerHTML = `
             <div class="flex items-start p-4">
                 <div class="flex-shrink-0 ${colors.icon}">
                     ${this.getIcon(type)}
                 </div>
-                <div class="ml-3 flex-1">
-                    <p class="text-sm font-semibold">${message}</p>
-                    ${
-                        description
-                            ? `<p class="text-sm mt-1 opacity-80">${description}</p>`
-                            : ""
-                    }
+                <div class="ml-3 flex-1 min-w-0 ${colors.text}">
+                    <p class="text-sm font-semibold break-words">${this.escapeHtml(message)}</p>
+                    ${description ? `<p class="text-sm mt-1 opacity-80 break-words">${this.escapeHtml(description)}</p>` : ""}
                 </div>
-                <button type="button" class="flash-close ml-4 flex-shrink-0 opacity-60 hover:opacity-100 focus:outline-none transition-opacity" aria-label="Close message">
+                <button type="button" class="flash-close ml-4 flex-shrink-0 opacity-60 hover:opacity-100 focus:outline-none transition-opacity" aria-label="Close notification">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
                 </button>
             </div>
-            <div class="h-1 w-full bg-gray-200/50 dark:bg-gray-700/50">
-                <div class="flash-progress h-full transition-all duration-300 ease-linear ${
-                    colors.progress
-                }" style="width: 100%"></div>
-            </div>
+            ${
+                duration > 0
+                    ? `
+                <div class="h-1 w-full bg-gray-200/50">
+                    <div class="flash-progress h-full transition-all duration-100 ease-linear ${colors.progress}" style="width: 100%"></div>
+                </div>
+            `
+                    : ""
+            }
         `;
 
         // Add to container
         this.container.appendChild(messageEl);
-        console.log("Who called my?");
 
         // Animate in
         requestAnimationFrame(() => {
-            messageEl.classList.remove("translate-x-full", "opacity-0");
-            messageEl.classList.add("translate-x-0", "opacity-100");
+            requestAnimationFrame(() => {
+                messageEl.classList.remove("translate-x-full", "opacity-0");
+                messageEl.classList.add("translate-x-0", "opacity-100");
+            });
         });
 
-        // Add hover events
-        let timer;
+        // Setup auto-dismiss if duration > 0
+        let timer = null;
         let startTime = Date.now();
         let remainingTime = duration;
         let isPaused = false;
         const progressBar = messageEl.querySelector(".flash-progress");
 
-        const updateProgress = () => {
-            if (isPaused) return;
+        if (duration > 0) {
+            const updateProgress = () => {
+                if (isPaused) return;
 
-            const elapsed = Date.now() - startTime;
-            remainingTime = duration - elapsed;
-            const progress = (remainingTime / duration) * 100;
+                const elapsed = Date.now() - startTime;
+                remainingTime = duration - elapsed;
+                const progress = (remainingTime / duration) * 100;
 
-            if (progressBar) {
-                progressBar.style.width = `${progress}%`;
-            }
+                if (progressBar) {
+                    progressBar.style.width = `${Math.max(0, progress)}%`;
+                }
 
-            if (remainingTime <= 0) {
-                this.remove(id);
-            }
-        };
+                if (remainingTime <= 0) {
+                    this.remove(id);
+                }
+            };
 
-        const startTimer = () => {
-            if (timer) clearInterval(timer);
-            startTime = Date.now();
-            isPaused = false;
-            timer = setInterval(updateProgress, 50);
-        };
+            const startTimer = () => {
+                if (timer) clearInterval(timer);
+                startTime = Date.now();
+                isPaused = false;
+                timer = setInterval(updateProgress, 50);
+            };
 
-        messageEl.addEventListener("mouseenter", () => {
-            isPaused = true;
-            if (timer) clearInterval(timer);
-        });
+            // Pause on hover
+            messageEl.addEventListener("mouseenter", () => {
+                isPaused = true;
+                if (timer) clearInterval(timer);
+            });
 
-        messageEl.addEventListener("mouseleave", () => {
-            if (remainingTime > 0) {
-                duration = remainingTime;
-                startTimer();
-            }
-        });
+            // Resume on mouse leave
+            messageEl.addEventListener("mouseleave", () => {
+                if (remainingTime > 0) {
+                    duration = remainingTime;
+                    startTimer();
+                }
+            });
+
+            startTimer();
+        }
 
         // Close button
         const closeBtn = messageEl.querySelector(".flash-close");
@@ -175,14 +221,12 @@ class FlashMessageSystem {
             closeBtn.addEventListener("click", () => this.remove(id));
         }
 
-        startTimer();
-
         // Add to messages array
         const messageObj = { id, element: messageEl, timer };
         this.messages.unshift(messageObj);
 
         // Limit messages
-        if (this.messages.length > 5) {
+        if (this.messages.length > this.maxMessages) {
             const oldMsg = this.messages.pop();
             this.remove(oldMsg.id);
         }
@@ -202,12 +246,12 @@ class FlashMessageSystem {
         }
 
         // Animate out
-        if (message.element) {
+        if (message.element && message.element.parentNode) {
             message.element.classList.remove("translate-x-0", "opacity-100");
             message.element.classList.add("translate-x-full", "opacity-0");
 
             setTimeout(() => {
-                if (message.element.parentNode) {
+                if (message.element && message.element.parentNode) {
                     message.element.remove();
                 }
             }, 300);
@@ -220,47 +264,29 @@ class FlashMessageSystem {
     clear() {
         this.messages.forEach((msg) => this.remove(msg.id));
     }
+
+    escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+    }
 }
 
-// Initialize
-document.addEventListener("DOMContentLoaded", () => {
-    window.flashSystem = new FlashMessageSystem();
+// Initialize flash system
+const flashSystem = new FlashMessageSystem();
+window.flashSystem = flashSystem;
 
-    // Global flash function
-    window.flash = function (
-        message,
-        type = "success",
-        duration = 5000,
-        description = ""
-    ) {
-        if (window.flashSystem && window.flashSystem.add) {
-            return window.flashSystem.add({
-                message,
-                type,
-                duration,
-                description,
-            });
-        } else {
-            // Queue for when system loads
-            if (!window.queuedFlashMessages) {
-                window.queuedFlashMessages = [];
-            }
-            window.queuedFlashMessages.push({
-                message,
-                type,
-                duration,
-                description,
-            });
+// Global flash function
+window.flash = function (
+    message,
+    type = "success",
+    duration = 5000,
+    description = "",
+) {
+    return flashSystem.add({ message, type, duration, description });
+};
 
-            // Try again
-            setTimeout(() => {
-                if (window.flashSystem && window.flashSystem.add) {
-                    window.queuedFlashMessages.forEach((msg) => {
-                        window.flashSystem.add(msg);
-                    });
-                    window.queuedFlashMessages = [];
-                }
-            }, 100);
-        }
-    };
-});
+// Export for ES modules
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { FlashMessageSystem, flash: window.flash };
+}

@@ -1,45 +1,14 @@
-{{-- ================== OFFER SECTION ================== --}}
-<section class="relative w-full overflow-hidden">
-
-    {{-- ================== BACKGROUND ================== --}}
-    <div class="absolute inset-0 z-0 overflow-hidden">
-
-        {{-- SVG Background (DEFAULT) --}}
-        @if ($offer->background_type === 'svg' && $offer->background_svg)
-            <div class="absolute inset-0 animate-bg-float">
-                {!! $offer->background_svg !!}
-            </div>
-
-            {{-- Image Background --}}
-        @elseif($offer->background_type === 'image' && $offer->background_image)
-            <img src="{{ asset('storage/' . $offer->background_image) }}"
-                class="absolute inset-0 w-full h-full object-cover" alt="Offer Background" />
-
-            {{-- Video Background --}}
-        @elseif($offer->background_type === 'video' && $offer->background_video)
-            <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover">
-                <source src="{{ asset('storage/' . $offer->background_video) }}" type="video/mp4">
-            </video>
-
-            {{-- Gradient Fallback --}}
-        @else
-            <div class="absolute inset-0 bg-gradient-to-br from-primary via-indigo-600 to-sky-500"></div>
-        @endif
-
-        {{-- Overlay for readability --}}
-        <div class="absolute inset-0 bg-black/50"></div>
-    </div>
-
-    {{-- ================== CONTENT ================== --}}
-    <div class="relative z-10 max-w-8xl mx-auto px-4 py-14">
+{{-- ==================OFFER SECTION CONTENT ================== --}}
+@if (isset($offer) && $offer)
+    <section class="relative z-10 max-w-8xl mx-auto py-6 md:py-12 px-4">
 
         {{-- ================== MAIN BANNER ================== --}}
-        <div class="relative rounded-2xl overflow-hidden mb-10">
+        <div class="relative overflow-hidden mb-6 aspect-[28/5]">
 
             {{-- Banner Image --}}
             @if ($offer->main_banner_image)
-                <img src="{{ asset($offer->main_banner_image) }}" class="absolute inset-0 w-full h-full object-cover"
-                    alt="{{ $offer->title }}" />
+                <img src="{{ asset($offer->main_banner_image) }}"
+                    class="absolute inset-0 w-full h-full object-cover aspect-[28/5]" alt="{{ $offer->title }}" />
                 <div class="absolute inset-0 bg-black/40"></div>
             @endif
 
@@ -48,7 +17,7 @@
 
                 {{-- Title --}}
                 <div class="text-center md:text-left">
-                    <h2 class="text-white text-3xl md:text-4xl font-bold font-quantico mb-2">
+                    <h2 class="text-white text-3xl md:text-3xl font-bold font-poppins mb-2">
                         {{ $offer->title }}
                     </h2>
                     <p class="text-white/90 text-base md:text-lg font-cambay max-w-xl">
@@ -62,7 +31,7 @@
                         <div class="text-xs text-white/80 text-center mb-1">OFFER ENDS IN</div>
 
                         <div id="offer-timer" data-end="{{ $offer->timer_end_date }}"
-                            class="flex gap-3 text-white font-quantico text-lg">
+                            class="flex gap-3 text-white font-poppins text-lg">
                             <span class="days">00</span>d
                             <span class="hours">00</span>h
                             <span class="minutes">00</span>m
@@ -81,27 +50,22 @@
 
                 {{-- Header --}}
                 <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-white text-2xl font-bold font-quantico">
-                        {{ $offer->products_section_title ?? __('home.special-offer-products') }}
+                    <h3 class="text-xl md:text-2xl lg:text-3xl font-medium text-gray-900 leading-tight font-poppins">
+                        {{ $offer->short_description }}
                     </h3>
 
-                    {{-- View All Button --}}
-                    <a href="{{ $offer->formatted_view_all_link }}" target="_self"
-                        class="group relative inline-flex items-center justify-center
-                              bg-primary text-white text-center text-xs md:text-base px-1.5 py-0.5 lg:px-8 lg:py-3 rounded-md md:rounded-full
-                              font-semibold transition-all duration-300
-                              transform font-quantico overflow-hidden">
 
-                        <div class="relative overflow-hidden">
-                            <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">
-                                {{ $offer->view_all_text ?? 'View More Products' }}
-                            </span>
-                            <span
-                                class="absolute top-full left-0 inline-block w-full
-                                         transition-transform duration-300 group-hover:-translate-y-full">
-                                {{ $offer->view_all_text ?? 'View More Products' }}
-                            </span>
-                        </div>
+                    <a href="{{ $offer->formatted_view_all_link }}" target="_self"
+                        class="group inline-flex items-center gap-1 transform text-gray-900 text-sm 2xl:text-base font-inter font-normal tracking-wide transition-colors duration-300 hover:text-primary">
+
+                        <span class="hover:underline">{{ $offer->view_all_text ?? 'View More Products' }}</span>
+
+                        <svg class="w-4 h-4 xl:w-5 xl:h-5 transition-colors duration-300 group-hover:text-primary"
+                            fill="currentColor" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M26.68 3.867H8.175a1 1 0 0 0 0 2h16.544L4.2 26.387A1 1 0 1 0 5.613 27.8l20.52-20.52v16.545a1 1 0 0 0 2 0V5.321a1.456 1.456 0 0 0-1.453-1.454"
+                                data-name="Layer 2" />
+                        </svg>
                     </a>
                 </div>
 
@@ -112,7 +76,7 @@
                         @foreach ($offerProducts as $product)
                             <div class="swiper-slide !h-auto">
                                 <div
-                                    class="group relative h-full bg-white border border-gray-200 hover:shadow-lg transition-all duration-300 flex flex-col rounded-xl overflow-hidden">
+                                    class="group relative h-full bg-white border border-gray-200 hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden">
                                     <!-- Image Section -->
                                     <a href="{{ route('product.show', $product->slug) }}">
                                         <div class="w-full aspect-square bg-white overflow-hidden relative">
@@ -130,13 +94,13 @@
                                     <!-- Stock Badge -->
                                     @if (!$product->in_stock)
                                         <div
-                                            class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 z-20 font-quantico">
+                                            class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 z-20 font-poppins">
                                             OUT OF STOCK
                                         </div>
                                     @elseif($product->is_new)
                                         <div
-                                            class="absolute top-2 right-2 bg-accent text-white text-xs font-bold px-2 py-1 z-20 font-quantico">
-                                            NEW
+                                            class="absolute top-2 right-2 bg-accent text-white text-xs font-bold px-2 py-1 z-20 font-poppins">
+                                            {{ __('products.new') }}
                                         </div>
                                     @endif
 
@@ -147,18 +111,25 @@
                                             <div
                                                 class="bg-gradient-to-t from-black/90 via-black/70 to-transparent pt-6 pb-4 px-4">
                                                 <div class="flex space-x-2">
-                                                    <a href="{{ route('checkout.process', $product->id) }}"
-                                                        class="flex-1 bg-white hover:bg-gray-100 text-gray-900 text-center font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg font-quantico">
-                                                        <span class="flex items-center justify-center">
-                                                            <svg class="w-4 h-4 mr-2 hidden 2xl:block" fill="none"
-                                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="2"
-                                                                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                                                            </svg>
-                                                            Buy Now
-                                                        </span>
-                                                    </a>
+                                                    <form action="{{ route('checkout.buy-now', $product->id) }}"
+                                                        method="POST" class="flex-1 buy-now-form">
+                                                        @csrf
+                                                        <input type="hidden" name="quantity" value="1"
+                                                            class="buy-now-quantity-input">
+                                                        <button type="submit"
+                                                            class="w-full bg-white hover:bg-gray-100 text-gray-900 text-center font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg font-poppins">
+                                                            <span class="flex items-center justify-center">
+                                                                <svg class="w-4 h-4 mr-2 hidden 2xl:block"
+                                                                    fill="none" stroke="currentColor"
+                                                                    viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2"
+                                                                        d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                                                </svg>
+                                                                {{ __('products.buy-now') }}
+                                                            </span>
+                                                        </button>
+                                                    </form>
 
                                                     <form action="{{ route('cart.add', $product->id) }}" method="POST"
                                                         class="add-to-cart-form inline-block">
@@ -188,7 +159,7 @@
                                                 class="bg-gradient-to-t from-black/90 via-black/70 to-transparent pt-6 pb-4 px-4">
                                                 <div class="flex space-x-2">
                                                     <a href="{{ route('contact') }}" title="+8801714XXXXXX"
-                                                        class="flex-1 bg-white hover:bg-gray-100 text-gray-900 text-center font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg font-quantico">
+                                                        class="flex-1 bg-white hover:bg-gray-100 text-gray-900 text-center font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg font-poppins">
                                                         <span class="flex items-center justify-center">
                                                             <!-- Contact/Phone Icon -->
                                                             <svg class="w-4 h-4 mr-2" fill="none"
@@ -208,14 +179,14 @@
                                     <!-- Product Info -->
                                     <div class="p-4 border-t border-gray-100 flex-grow flex flex-col">
                                         <a href="{{ route('product.show', $product->slug) }}"
-                                            class="font-medium font-quantico text-gray-900 text-sm mb-3 line-clamp-2 group-hover:text-primary transition-colors duration-200 flex-grow">
+                                            class="font-medium font-poppins text-gray-900 text-sm mb-3 line-clamp-2 group-hover:text-primary transition-colors duration-200 flex-grow">
                                             {{ $product->name }}
                                         </a>
 
                                         <!-- Price + Wishlist -->
                                         <div class="mt-auto">
                                             <div class="flex items-center justify-between">
-                                                <span class="text-lg font-bold font-quantico text-gray-900">
+                                                <span class="text-lg font-bold font-poppins text-gray-900">
                                                     <span
                                                         class="font-bengali">৳</span>{{ number_format($product->price, 0) }}
                                                 </span>
@@ -320,108 +291,109 @@
                 </div>
             </div>
         @endif
-    </div>
-</section>
+    </section>
 
-{{-- ================== STYLES ================== --}}
-<style>
-    @keyframes bg-float {
-        0% {
-            transform: translateY(0) scale(1);
-        }
 
-        50% {
-            transform: translateY(-20px) scale(1.03);
-        }
-
-        100% {
-            transform: translateY(0) scale(1);
-        }
-    }
-
-    .animate-bg-float {
-        animation: bg-float 16s ease-in-out infinite;
-    }
-</style>
-
-{{-- ================== SCRIPTS ================== --}}
-@push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-
-            // TIMER
-            const timer = document.getElementById('offer-timer');
-            if (timer) {
-                const end = new Date(timer.dataset.end).getTime();
-
-                setInterval(() => {
-                    const now = Date.now();
-                    const diff = end - now;
-
-                    if (diff <= 0) return;
-
-                    timer.querySelector('.days').textContent = Math.floor(diff / 86400000);
-                    timer.querySelector('.hours').textContent = Math.floor(diff / 3600000) % 24;
-                    timer.querySelector('.minutes').textContent = Math.floor(diff / 60000) % 60;
-                    timer.querySelector('.seconds').textContent = Math.floor(diff / 1000) % 60;
-                }, 1000);
+    {{-- ================== STYLES ================== --}}
+    <style>
+        @keyframes bg-float {
+            0% {
+                transform: translateY(0) scale(1);
             }
 
-            // SWIPER
-            const offerSwiperElement = document.querySelector('.offer-products-swiper');
-            if (offerSwiperElement) {
-                const productCount = {{ count($offerProducts) }};
-                console.log('Initializing Swiper with product count:', productCount);
-                const swiperConfig = {
-                    slidesPerView: 1.3,
-                    spaceBetween: 16,
-                    loop: true,
-                    grabCursor: true,
-                    speed: 500,
-                    breakpoints: {
-                        480: {
-                            slidesPerView: Math.min(2.2, productCount),
-                            spaceBetween: 16,
-                        },
-                        640: {
-                            slidesPerView: Math.min(2.5, productCount),
-                            spaceBetween: 18,
-                        },
-                        768: {
-                            slidesPerView: Math.min(3, productCount),
-                            spaceBetween: 20,
-                        },
-                        1024: {
-                            slidesPerView: Math.min(4, productCount),
-                            spaceBetween: 24,
-                        },
-                        1280: {
-                            slidesPerView: Math.min(5, productCount),
-                            spaceBetween: 24,
-                        },
-                    },
-
-                };
-
-                // Add navigation if more than 1 product
-                if (productCount > 1) {
-                    swiperConfig.navigation = {
-                        nextEl: '.swiper-button-next',
-                        prevEl: '.swiper-button-prev',
-                    };
-                    swiperConfig.pagination = {
-                        el: '.swiper-pagination',
-                        clickable: true,
-                        dynamicBullets: true,
-                    };
-                }
-
-                try {
-                    new Swiper(offerSwiperElement, swiperConfig);
-                } catch (error) {
-                    console.error('Swiper initialization error:', error);
-                }
+            50% {
+                transform: translateY(-20px) scale(1.03);
             }
-        });
-    </script>
-@endpush
+
+            100% {
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .animate-bg-float {
+            animation: bg-float 16s ease-in-out infinite;
+        }
+    </style>
+
+    {{-- ================== SCRIPTS ================== --}}
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+
+                // TIMER
+                const timer = document.getElementById('offer-timer');
+                if (timer) {
+                    const end = new Date(timer.dataset.end).getTime();
+
+                    setInterval(() => {
+                        const now = Date.now();
+                        const diff = end - now;
+
+                        if (diff <= 0) return;
+
+                        timer.querySelector('.days').textContent = Math.floor(diff / 86400000);
+                        timer.querySelector('.hours').textContent = Math.floor(diff / 3600000) % 24;
+                        timer.querySelector('.minutes').textContent = Math.floor(diff / 60000) % 60;
+                        timer.querySelector('.seconds').textContent = Math.floor(diff / 1000) % 60;
+                    }, 1000);
+                }
+
+                // SWIPER
+                const offerSwiperElement = document.querySelector('.offer-products-swiper');
+                if (offerSwiperElement) {
+                    const productCount = {{ count($offerProducts) }};
+                    // console.log('Initializing Swiper with product count:', productCount);
+                    const swiperConfig = {
+                        slidesPerView: 1.3,
+                        spaceBetween: 16,
+                        loop: true,
+                        grabCursor: true,
+                        speed: 500,
+                        breakpoints: {
+                            480: {
+                                slidesPerView: Math.min(2.2, productCount),
+                                spaceBetween: 16,
+                            },
+                            640: {
+                                slidesPerView: Math.min(2.5, productCount),
+                                spaceBetween: 18,
+                            },
+                            768: {
+                                slidesPerView: Math.min(3, productCount),
+                                spaceBetween: 20,
+                            },
+                            1024: {
+                                slidesPerView: Math.min(4, productCount),
+                                spaceBetween: 24,
+                            },
+                            1280: {
+                                slidesPerView: Math.min(5, productCount),
+                                spaceBetween: 24,
+                            },
+                        },
+
+                    };
+
+                    // Add navigation if more than 1 product
+                    if (productCount > 1) {
+                        swiperConfig.navigation = {
+                            nextEl: '.swiper-button-next',
+                            prevEl: '.swiper-button-prev',
+                        };
+                        swiperConfig.pagination = {
+                            el: '.swiper-pagination',
+                            clickable: true,
+                            dynamicBullets: true,
+                        };
+                    }
+
+                    try {
+                        new Swiper(offerSwiperElement, swiperConfig);
+                    } catch (error) {
+                        console.error('Swiper initialization error:', error);
+                    }
+                }
+            });
+        </script>
+    @endpush
+@endif

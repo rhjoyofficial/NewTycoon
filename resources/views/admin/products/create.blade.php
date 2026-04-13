@@ -127,10 +127,10 @@
                                             @foreach ($categories as $category)
                                                 <option value="{{ $category->id }}"
                                                     {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                                    {{ $category->name_en }}
-                                                    @if ($category->name_bn)
+                                                    {{ $category->full_name }}
+                                                    {{-- @if ($category->name_bn)
                                                         ({{ $category->name_bn }})
-                                                    @endif
+                                                    @endif --}}
                                                 </option>
                                             @endforeach
                                         </select>
@@ -156,7 +156,7 @@
                                         @error('sku')
                                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                         @enderror
-                                        <p class="mt-1 text-xs text-gray-500">Leave empty for auto-generation</p>
+                                        <p class="mt-1 text-xs text-primary">Leave empty for auto-generation</p>
                                     </div>
                                 </div>
 

@@ -13,11 +13,23 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            // $table->string('name');
+            $table->string('name_en');
+            $table->string('name_bn')->nullable();
+
+            $table->text('short_description_en')->nullable();
+            $table->text('short_description_bn')->nullable();
+
+            $table->longText('description_en')->nullable();
+            $table->longText('description_bn')->nullable();
+
+            $table->string('meta_title_en')->nullable();
+            $table->string('meta_title_bn')->nullable();
+
+            $table->text('meta_description_en')->nullable();
+            $table->text('meta_description_bn')->nullable();
+
             $table->string('sku')->unique();
             $table->string('slug')->unique();
-            // $table->text('short_description')->nullable();
-            // $table->longText('description')->nullable();
             $table->decimal('price', 10, 2);
             $table->decimal('compare_price', 10, 2)->nullable();
             $table->decimal('cost_price', 10, 2)->nullable();
@@ -43,9 +55,7 @@ return new class extends Migration
             $table->decimal('width', 8, 2)->nullable();
             $table->decimal('height', 8, 2)->nullable();
 
-            // SEO
-            // $table->string('meta_title')->nullable();
-            // $table->text('meta_description')->nullable();
+            // SEO           
             $table->string('meta_keywords')->nullable();
 
             // Status flags
@@ -68,11 +78,14 @@ return new class extends Migration
             $table->foreignId('brand_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('vendor_id')->nullable()->constrained('users')->nullOnDelete();
 
+            $table->unsignedBigInteger('views_count')->default(0);
+
             $table->timestamps();
             $table->softDeletes();
 
             // Indexes for performance
-            // $table->index('name');
+            $table->index('name_en');
+            $table->index('name_bn');
             $table->index('category_id');
             $table->index('vendor_id');
             $table->index('status');
@@ -81,6 +94,17 @@ return new class extends Migration
             $table->index('price');
             $table->index('slug');
             $table->index('sku');
+            $table->index(['status', 'views_count']);
+            $table->index(['category_id', 'status']);
+            $table->index(['category_id', 'price']);
+            $table->index(['status', 'stock_status']);
+            $table->index(['status', 'is_featured']);
+            $table->index(['status', 'is_new']);
+            $table->index(['status', 'is_bestsells']);
+            $table->index(['status', 'total_sold']);
+            $table->index(['status', 'average_rating']);
+            $table->index(['status', 'discount_percentage']);
+            $table->index(['status', 'created_at']);
         });
     }
 

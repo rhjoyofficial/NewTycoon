@@ -12,8 +12,6 @@ use App\Services\SearchTermService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
-use App\Http\Controllers\Frontend\HomeController;
-use App\Http\Controllers\Frontend\FooterController;
 
 class ViewServiceProvider extends ServiceProvider
 {

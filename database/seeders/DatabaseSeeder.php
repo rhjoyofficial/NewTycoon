@@ -20,12 +20,14 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             UserProfileSeeder::class,
             ProductSeeder::class,
-            OrderSeeder::class,
-            CartSeeder::class,
-            ReviewSeeder::class,
+            // OrderSeeder::class,
+            // CartSeeder::class,
+            // ReviewSeeder::class,
             FooterSeeder::class,
             OfferSeeder::class,
-            HeroSlideSeeder::class
+            HeroSlideSeeder::class,
+            SectionSeeder::class,
+            CatalogSeeder::class,
         ]);
     }
 }

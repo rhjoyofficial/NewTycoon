@@ -34,6 +34,12 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->integer('sort_order')->default(0);
 
+            $table->timestamp('start_date')->nullable();
+            $table->timestamp('end_date')->nullable();
+            $table->enum('device', ['all', 'mobile', 'desktop'])->default('all');
+            $table->integer('clicks_count')->default(0);
+            $table->integer('views_count')->default(0);
+
             $table->timestamps();
         });
     }

@@ -18,6 +18,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'phone',
         'password',
         'status',
+        'email_verified_at',
     ];
 
     protected $hidden = [
@@ -42,7 +43,49 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(UserProfile::class);
     }
+    /**
+     * Get the user's addresses
+     */
+    public function addresses()
+    {
+        return $this->hasMany(Address::class);
+    }
 
+    /**
+     * Get the user's orders
+     */
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Get the user's transactions
+     */
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    /**
+     * Get the user's default shipping address
+     */
+    public function defaultShippingAddress()
+    {
+        return $this->hasOne(Address::class)
+            ->where('type', 'shipping')
+            ->where('is_default', true);
+    }
+
+    /**
+     * Get the user's default billing address
+     */
+    public function defaultBillingAddress()
+    {
+        return $this->hasOne(Address::class)
+            ->where('type', 'billing')
+            ->where('is_default', true);
+    }
     // Role & Permission Methods
     public function assignRole($role)
     {

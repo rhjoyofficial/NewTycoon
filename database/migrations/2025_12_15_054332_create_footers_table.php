@@ -45,8 +45,10 @@ return new class extends Migration
             $table->text('brand_description_en');
             $table->text('brand_description_bn')->nullable();
 
-            $table->string('product_image')->nullable();
-            $table->string('product_link')->nullable();
+            $table->string('address_en')->nullable();
+            $table->string('address_bn')->nullable();
+
+            $table->json('contact_info')->nullable();
 
             $table->json('payment_methods')->nullable();
             $table->json('social_links')->nullable();

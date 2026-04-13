@@ -121,7 +121,7 @@
 
             <!-- Filters -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-                <form method="GET" class="space-y-4">
+                <form method="GET" class="space-y-4" data-form>
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <!-- Search -->
                         <div>
@@ -205,7 +205,7 @@
                     </div>
 
                     <div class="flex justify-end space-x-3">
-                        <button type="submit"
+                        <button type="submit" data-loading data-loading-text="Filtering..."
                             class="px-4 py-2.5 bg-gradient-to-r from-primary to-primary/80 text-white font-medium rounded-xl hover:shadow-md transition-all">
                             Apply Filters
                         </button>
@@ -357,7 +357,8 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm font-semibold text-gray-900">
-                                            ${{ number_format($order->total_amount, 2) }}
+                                            <span
+                                                class="font-bengali">৳</span>{{ number_format($order->total_amount, 2) }}
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">

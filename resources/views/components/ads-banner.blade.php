@@ -1,92 +1,42 @@
-@if ($adsBanners->count() > 0)
-    <section class="max-w-8xl mx-auto pt-12 ads-section">
-        <div class="relative">
+{{-- resources/views/components/ads-banner.blade.php --}}
+@props(['banner'])
 
-            <!-- Skeleton Overlay -->
-            <div class="ads-skeleton absolute inset-0 z-10 rounded-xl pointer-events-none p-4"></div>
+@php
+    $slides = collect($banner->slides);
+    $count = $slides->count();
 
-            <!-- Swiper -->
-            <div class="swiper adsSwiper relative z-20">
-                <div class="swiper-wrapper">
+    $gridClass = match ($count) {
+        1 => 'grid-cols-1',
+        2 => 'grid-cols-2',
+        default => 'grid-cols-3',
+    };
 
-                    @foreach ($adsBanners as $banner)
-                        <div class="swiper-slide p-4">
-                            <a href="{{ $banner->link ?? '#' }}"
-                                @if ($banner->link) target="{{ $banner->target ?? '_self' }}" @endif
-                                class="block">
+    // aspect ratio decision
+    $aspectRatio = $count === 1 ? 'aspect-[28/5]' : 'aspect-[16/6]';
+@endphp
 
-                                <div
-                                    class="relative aspect-[16/6] rounded-xl overflow-hidden
-                                       transform transition-all duration-300
-                                       hover:scale-[1.02] hover:shadow-md">
+@if ($count > 0)
 
-                                    <img src="{{ asset($banner->image_path) }}"
-                                        alt="{{ $banner->alt_text ?? 'Advertisement Banner' }}"
-                                        class="w-full h-full object-contain object-center rounded-xl" loading="lazy" />
-                                </div>
-                            </a>
-                        </div>
-                    @endforeach
+    <section class="max-w-8xl mx-auto px-4">
 
-                </div>
-            </div>
+        <div class="grid {{ $gridClass }} gap-4">
+
+            @foreach ($slides as $slide)
+                <a href="{{ $banner->link ?? '#' }}" class="group block w-full">
+
+                    <div
+                        class=" relative {{ $aspectRatio }} w-full overflow-hidden bg-gray-100 transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-lg ">
+
+                        <img src="{{ $slide }}" loading="lazy" alt="Advertisement Banner"
+                            class="absolute inset-0 w-full h-full object-cover " />
+
+                    </div>
+
+                </a>
+            @endforeach
+
         </div>
+
     </section>
+
 @endif
-@push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-
-            document.querySelectorAll('.ads-section').forEach(section => {
-                const swiperEl = section.querySelector('.adsSwiper');
-                const skeleton = section.querySelector('.ads-skeleton');
-
-                if (!swiperEl) return;
-
-                const swiper = new Swiper(swiperEl, {
-                    autoplay: {
-                        delay: 8000,
-                        disableOnInteraction: false,
-                    },
-                    loop: true,
-                    speed: 1000,
-                    spaceBetween: 4,
-
-                    breakpoints: {
-                        0: {
-                            slidesPerView: 1,
-                        },
-                        768: {
-                            slidesPerView: 2,
-                        }
-                    },
-
-                    on: {
-                        init(swiper) {
-                            const activeImg = swiper.slides[swiper.activeIndex]
-                                ?.querySelector('img');
-
-                            if (!activeImg) {
-                                skeleton?.remove();
-                                return;
-                            }
-
-                            if (activeImg.complete) {
-                                skeleton?.remove();
-                            } else {
-                                activeImg.addEventListener('load', () => skeleton?.remove(), {
-                                    once: true
-                                });
-                            }
-
-                            // Pause on hover
-                            swiper.el.addEventListener('mouseenter', () => swiper.autoplay.stop());
-                            swiper.el.addEventListener('mouseleave', () => swiper.autoplay.start());
-                        }
-                    }
-                });
-            });
-
-        });
-    </script>
-@endpush

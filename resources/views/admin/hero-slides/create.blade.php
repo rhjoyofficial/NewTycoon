@@ -21,8 +21,9 @@
 @endsection
 
 @section('content')
-    <div class="max-w-7xl mx-auto">
-        <form action="{{ route('admin.hero-slides.store') }}" method="POST" enctype="multipart/form-data" id="slideForm">
+    <div class="max-w-8xl mx-auto">
+        <form action="{{ route('admin.hero-slides.store') }}" method="POST" enctype="multipart/form-data" id="slideForm"
+            data-form>
             @csrf
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -282,7 +283,7 @@
                                     </div>
 
                                     <button type="button" onclick="addCtaButton()"
-                                        class="text-primary hover:text-primary/80 flex items-center">
+                                        class="text-primary hover:text-primary/80 flex items-center text-sm font-medium">
                                         <svg class="h-5 w-5 mr-1" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -359,41 +360,65 @@
                         </div>
 
                         <div class="p-6">
-                            <div class="relative aspect-video w-full overflow-hidden rounded-xl bg-gray-900"
-                                id="previewContainer">
-                                <!-- Preview will be inserted here by JavaScript -->
-                                <div class="absolute inset-0 flex items-center justify-center text-gray-400">
-                                    <div class="text-center">
-                                        <svg class="h-12 w-12 mx-auto mb-3" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
-                                        <p class="text-sm">Upload a file to preview</p>
+                            <!-- Hero Preview Container -->
+                            <section class="relative w-full overflow-hidden" id="heroPreview">
+                                <div
+                                    class="w-full aspect-[16/9] max-h-[600px] overflow-hidden bg-gray-900/50 rounded-lg border border-gray-300">
+                                    <div class="relative w-full h-full" id="previewSlide">
+                                        <!-- Background will be added here -->
+                                        <div class="absolute inset-0 flex items-center justify-center text-gray-400">
+                                            <div class="text-center">
+                                                <svg class="h-12 w-12 mx-auto mb-3" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                </svg>
+                                                <p class="text-sm">Upload a file to preview</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Preview Information -->
+                            <div class="mt-6 space-y-4">
+                                <h4 class="text-sm font-medium text-gray-900">Preview Settings</h4>
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="space-y-2">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-sm text-gray-600">Content Position:</span>
+                                            <span id="previewPosition"
+                                                class="text-sm font-medium text-gray-900">Left</span>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-sm text-gray-600">Has Content:</span>
+                                            <span id="previewHasContent"
+                                                class="text-sm font-medium text-gray-900">No</span>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-sm text-gray-600">Has CTA:</span>
+                                            <span id="previewHasCta" class="text-sm font-medium text-gray-900">No</span>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-sm text-gray-600">Slide Type:</span>
+                                            <span id="previewType" class="text-sm font-medium text-gray-900">Image</span>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <!-- Content Preview -->
-                                <div id="contentPreview" class="absolute inset-0 flex items-center p-8 hidden">
-                                    <div class="max-w-2xl" id="previewContent">
-                                        <!-- Content will be dynamically added -->
+                                <!-- Preview Controls -->
+                                <div class="flex items-center gap-2 pt-4 border-t border-gray-200">
+                                    <span class="text-sm text-gray-600">Preview Scale:</span>
+                                    <div class="flex-1">
+                                        <input type="range" id="previewScale" min="50" max="100"
+                                            value="100"
+                                            class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
                                     </div>
-                                </div>
-                            </div>
-
-                            <!-- Preview Controls -->
-                            <div class="mt-4 space-y-3">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm font-medium text-gray-700">Content Position:</span>
-                                    <span id="previewPosition" class="text-sm text-gray-600">Left</span>
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm font-medium text-gray-700">Has Content:</span>
-                                    <span id="previewHasContent" class="text-sm text-gray-600">No</span>
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm font-medium text-gray-700">Has CTA:</span>
-                                    <span id="previewHasCta" class="text-sm text-gray-600">No</span>
+                                    <span id="scaleValue"
+                                        class="text-sm font-medium text-gray-900 w-12 text-right">100%</span>
                                 </div>
                             </div>
                         </div>
@@ -407,33 +432,40 @@
 @push('scripts')
     <script>
         // Toggle content fields
-        document.getElementById('hasContent').addEventListener('change', function() {
-            const contentFields = document.getElementById('contentFields');
-            contentFields.classList.toggle('hidden', !this.checked);
+        const hasContentCheckbox = document.getElementById('hasContent');
+        const contentFields = document.getElementById('contentFields');
 
-            // Update preview
+        hasContentCheckbox.addEventListener('change', function() {
+            contentFields.classList.toggle('hidden', !this.checked);
             updatePreview();
         });
 
         // Toggle CTA fields
-        document.getElementById('hasCta').addEventListener('change', function() {
-            const ctaFields = document.getElementById('ctaFields');
-            ctaFields.classList.toggle('hidden', !this.checked);
+        const hasCtaCheckbox = document.getElementById('hasCta');
+        const ctaFields = document.getElementById('ctaFields');
 
-            // Update preview
+        hasCtaCheckbox.addEventListener('change', function() {
+            ctaFields.classList.toggle('hidden', !this.checked);
             updatePreview();
         });
 
         // Handle file upload preview
-        document.getElementById('background').addEventListener('change', function(e) {
+        const backgroundInput = document.getElementById('background');
+        backgroundInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
 
-            const previewContainer = document.getElementById('previewContainer');
-            const placeholder = previewContainer.querySelector('.absolute.inset-0.flex');
+            const previewSlide = document.getElementById('previewSlide');
+            const placeholder = previewSlide.querySelector('.absolute.inset-0.flex');
 
             if (placeholder) {
                 placeholder.remove();
+            }
+
+            // Remove existing background if any
+            const existingBg = previewSlide.querySelector('video, img');
+            if (existingBg) {
+                existingBg.remove();
             }
 
             const url = URL.createObjectURL(file);
@@ -450,20 +482,33 @@
                 mediaElement.src = url;
             } else {
                 mediaElement = document.createElement('img');
-                mediaElement.className = 'absolute inset-0 w-full h-full object-contain lg:object-cover';
+                mediaElement.className = 'absolute inset-0 w-full h-full object-cover object-center';
                 mediaElement.src = url;
             }
 
-            previewContainer.insertBefore(mediaElement, previewContainer.firstChild);
+            previewSlide.insertBefore(mediaElement, previewSlide.firstChild);
 
-            // Show content preview if enabled
+            // Update preview type display
+            document.getElementById('previewType').textContent = type.charAt(0).toUpperCase() + type.slice(1);
+
             updatePreview();
+        });
+
+        // Update preview scale
+        const scaleSlider = document.getElementById('previewScale');
+        const scaleValue = document.getElementById('scaleValue');
+
+        scaleSlider.addEventListener('input', function() {
+            const value = this.value + '%';
+            scaleValue.textContent = value;
+            document.getElementById('heroPreview').style.transform = `scale(${this.value / 100})`;
+            document.getElementById('heroPreview').style.transformOrigin = 'top center';
         });
 
         // Update preview based on form values
         function updatePreview() {
-            const hasContent = document.getElementById('hasContent').checked;
-            const hasCta = document.getElementById('hasCta').checked;
+            const hasContent = hasContentCheckbox.checked;
+            const hasCta = hasCtaCheckbox.checked;
             const contentPosition = document.querySelector('input[name="content_position"]:checked')?.value || 'left';
 
             // Update preview indicators
@@ -472,77 +517,117 @@
             document.getElementById('previewPosition').textContent = contentPosition.charAt(0).toUpperCase() +
                 contentPosition.slice(1);
 
-            const contentPreview = document.getElementById('contentPreview');
-            const previewContent = document.getElementById('previewContent');
+            const previewSlide = document.getElementById('previewSlide');
 
-            if (!hasContent) {
-                contentPreview.classList.add('hidden');
-                return;
+            // Remove existing content if any
+            const existingContent = previewSlide.querySelector('#previewContentContainer');
+            if (existingContent) {
+                existingContent.remove();
             }
 
-            contentPreview.classList.remove('hidden');
+            // Remove existing overlay
+            const existingOverlay = previewSlide.querySelector('.bg-black\\/40');
+            if (existingOverlay) {
+                existingOverlay.remove();
+            }
 
-            // Update content position
-            contentPreview.classList.remove('justify-start', 'justify-center', 'justify-end');
-            if (contentPosition === 'left') {
-                contentPreview.classList.add('justify-start');
-                previewContent.classList.remove('text-center', 'text-right');
-                previewContent.classList.add('text-left');
+            if (!hasContent) return;
+
+            // Add overlay if content is enabled
+            const overlay = document.createElement('div');
+            overlay.className = 'absolute inset-0 bg-black/40';
+            previewSlide.appendChild(overlay);
+
+            // Create content container
+            const contentContainer = document.createElement('div');
+            contentContainer.id = 'previewContentContainer';
+            contentContainer.className = 'absolute inset-0 flex items-center justify-center';
+            previewSlide.appendChild(contentContainer);
+
+            // Create content wrapper
+            const contentWrapper = document.createElement('div');
+            contentWrapper.className = 'container mx-auto px-6 md:px-12 lg:px-16 w-full';
+            contentContainer.appendChild(contentWrapper);
+
+            // Create content
+            const content = document.createElement('div');
+            let positionClass = '';
+            if (contentPosition === 'right') {
+                positionClass = 'ml-auto text-right';
             } else if (contentPosition === 'center') {
-                contentPreview.classList.add('justify-center');
-                previewContent.classList.remove('text-left', 'text-right');
-                previewContent.classList.add('text-center');
+                positionClass = 'mx-auto text-center';
             } else {
-                contentPreview.classList.add('justify-end');
-                previewContent.classList.remove('text-left', 'text-center');
-                previewContent.classList.add('text-right');
+                positionClass = 'text-left';
             }
+            content.className = `max-w-3xl transition-all duration-700 ${positionClass}`;
+            contentWrapper.appendChild(content);
 
-            // Update content
+            // Add badge if exists
             const badge = document.getElementById('badge_en')?.value || '';
-            const title = document.getElementById('title_en')?.value || 'Sample Title';
-            const subtitle = document.getElementById('subtitle_en')?.value ||
-                'Sample subtitle text that describes your offer';
-
-            let html = '';
-
             if (badge) {
-                html +=
-                    `<span class="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">${badge}</span>`;
+                const badgeEl = document.createElement('div');
+                badgeEl.className = 'inline-flex items-center px-3 py-1 bg-white/10 rounded-full mb-4';
+                badgeEl.innerHTML = `<span class="text-xs uppercase font-bold text-white">${badge}</span>`;
+                content.appendChild(badgeEl);
             }
 
-            html += `<h3 class="text-3xl font-bold text-white mb-3">${title}</h3>`;
-            html += `<p class="text-gray-200 mb-6">${subtitle}</p>`;
+            // Add title
+            const title = document.getElementById('title_en')?.value || 'Your Title Here';
+            if (title) {
+                const titleEl = document.createElement('h1');
+                titleEl.className = 'text-4xl font-bold text-white mb-4';
+                titleEl.textContent = title;
+                content.appendChild(titleEl);
+            }
 
+            // Add subtitle
+            const subtitle = document.getElementById('subtitle_en')?.value || '';
+            if (subtitle) {
+                const subtitleEl = document.createElement('p');
+                subtitleEl.className = 'text-lg text-white/80 mb-8';
+                subtitleEl.textContent = subtitle;
+                content.appendChild(subtitleEl);
+            }
+
+            // Add CTA buttons if enabled
             if (hasCta) {
-                html += `<div class="flex flex-wrap gap-3">`;
-                // Get all CTA buttons
-                const ctaInputs = document.querySelectorAll('[name^="cta_buttons"]');
-                let buttonIndex = 0;
-
-                for (let i = 0; i < ctaInputs.length; i += 4) {
-                    const style = ctaInputs[i + 3]?.value || 'primary';
-                    let buttonClass = 'px-6 py-2.5 rounded-lg font-medium transition-colors ';
-
-                    switch (style) {
-                        case 'primary':
-                            buttonClass += 'bg-primary text-white hover:bg-primary/90';
-                            break;
-                        case 'secondary':
-                            buttonClass += 'bg-gray-700 text-white hover:bg-gray-600';
-                            break;
-                        case 'outline':
-                            buttonClass += 'border-2 border-white text-white bg-transparent hover:bg-white/10';
-                            break;
-                    }
-
-                    html += `<button class="${buttonClass}">Button ${buttonIndex + 1}</button>`;
-                    buttonIndex++;
+                const ctaContainer = document.createElement('div');
+                let ctaAlign = '';
+                if (contentPosition === 'center') {
+                    ctaAlign = 'justify-center';
+                } else if (contentPosition === 'right') {
+                    ctaAlign = 'justify-end';
+                } else {
+                    ctaAlign = 'justify-start';
                 }
-                html += `</div>`;
-            }
+                ctaContainer.className = `flex gap-4 ${ctaAlign}`;
 
-            previewContent.innerHTML = html;
+                // Get CTA buttons
+                const buttonContainers = document.querySelectorAll('#ctaButtonsContainer > div');
+                buttonContainers.forEach((container, index) => {
+                    const labelInput = container.querySelector(`[name="cta_buttons[${index}][label_en]"]`);
+                    const urlInput = container.querySelector(`[name="cta_buttons[${index}][url]"]`);
+                    const styleInput = container.querySelector(`[name="cta_buttons[${index}][style]"]`);
+
+                    if (labelInput && labelInput.value) {
+                        const label = labelInput.value || `Button ${index + 1}`;
+                        const url = urlInput?.value || '#';
+                        const style = styleInput?.value || 'primary';
+
+                        const button = document.createElement('a');
+                        button.href = url;
+                        button.className = `px-6 py-3 rounded-lg font-bold transition-colors ${
+                            style === 'primary' 
+                                ? 'bg-white text-black hover:bg-white/90' 
+                                : 'border border-white text-white hover:bg-white/10'
+                        }`;
+                        button.textContent = label;
+                        ctaContainer.appendChild(button);
+                    }
+                });
+
+                content.appendChild(ctaContainer);
+            }
         }
 
         // Listen to form changes for live preview
@@ -552,7 +637,7 @@
         });
 
         // Listen to radio button changes
-        document.querySelectorAll('input[name="content_position"]').forEach(radio => {
+        document.querySelectorAll('input[name="content_position"], input[name="type"]').forEach(radio => {
             radio.addEventListener('change', updatePreview);
         });
 
@@ -623,18 +708,27 @@
             container.appendChild(newButton);
             ctaButtonIndex++;
 
-            // Update preview
+            // Add event listeners to new inputs
+            const newInputs = newButton.querySelectorAll('input, select');
+            newInputs.forEach(input => {
+                input.addEventListener('input', updatePreview);
+                input.addEventListener('change', updatePreview);
+            });
+
             updatePreview();
         }
 
         function removeCtaButton(button) {
-            if (ctaButtonIndex <= 1) return;
+            const containers = document.querySelectorAll('#ctaButtonsContainer > div');
+            if (containers.length <= 1) return;
 
             button.closest('.p-4').remove();
+
             // Reindex remaining buttons
             const buttons = document.querySelectorAll('#ctaButtonsContainer > div');
             buttons.forEach((div, index) => {
                 div.querySelector('h4').textContent = `Button ${index + 1}`;
+
                 // Update input names
                 const inputs = div.querySelectorAll('[name^="cta_buttons["]');
                 inputs.forEach(input => {
@@ -643,9 +737,8 @@
                     input.name = newName;
                 });
             });
-            ctaButtonIndex = buttons.length;
 
-            // Update preview
+            ctaButtonIndex = buttons.length;
             updatePreview();
         }
 

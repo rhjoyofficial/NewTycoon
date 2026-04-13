@@ -3,7 +3,7 @@
     <div class="max-w-8xl mx-auto px-4">
         <!-- Section Header -->
         <div class="text-center max-w-3xl mx-auto mb-12 md:mb-16">
-            <h2 class="text-3xl md:text-5xl font-bold text-gray-900 mb-4 font-quantico">
+            <h2 class="text-3xl md:text-5xl font-bold text-gray-900 mb-4 font-poppins">
                 User Stories in Motion
             </h2>
             <p class="text-lg md:text-xl text-gray-600 font-cambay">
@@ -45,7 +45,7 @@
         <!-- CTA -->
         <div class="text-center mt-12 md:mt-16">
             <button
-                class="inline-flex items-center px-6 py-3 bg-primary text-white rounded-full font-semibold hover:bg-primary-dark transition-all duration-300 transform hover:scale-105 font-quantico">
+                class="inline-flex items-center px-6 py-3 bg-primary text-white rounded-full font-semibold hover:bg-primary-dark transition-all duration-300 transform hover:scale-105 font-poppins">
                 Share Your Story
                 <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -174,7 +174,7 @@
                     video.addEventListener('loadedmetadata', function() {
                         console.log(
                             `Video ${index} metadata loaded - Duration: ${this.duration.toFixed(2)}s`
-                            );
+                        );
                     });
 
                     // Pause other videos when one starts playing

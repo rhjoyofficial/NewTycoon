@@ -49,8 +49,8 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-500">Today</p>
-                            <p class="text-2xl font-bold text-gray-800 mt-2">
-                                ${{ number_format($stats['today']['revenue'], 2) }}
+                            <p class="text-2xl font-bold text-gray-800 mt-2 font-bengali">
+                                ৳{{ number_format($stats['today']['revenue'], 2) }}
                             </p>
                         </div>
                         <div class="p-3 bg-blue-50 rounded-lg">
@@ -81,8 +81,8 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-500">This Month</p>
-                            <p class="text-2xl font-bold text-gray-800 mt-2">
-                                ${{ number_format($stats['this_month']['revenue'], 2) }}</p>
+                            <p class="text-2xl font-bold text-gray-800 mt-2 font-bengali">
+                                ৳{{ number_format($stats['this_month']['revenue'], 2) }}</p>
                         </div>
                         <div class="p-3 bg-green-50 rounded-lg">
                             <svg class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -112,8 +112,8 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-500">Total Revenue</p>
-                            <p class="text-2xl font-bold text-gray-800 mt-2">
-                                ${{ number_format($stats['totals']['revenue'], 2) }}</p>
+                            <p class="text-2xl font-bold text-gray-800 mt-2 font-bengali">
+                                ৳{{ number_format($stats['totals']['revenue'], 2) }}</p>
                         </div>
                         <div class="p-3 bg-purple-50 rounded-lg">
                             <svg class="h-6 w-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -177,12 +177,12 @@
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-lg font-semibold text-gray-800">Sales Overview</h3>
-                        <div class="flex space-x-2">
-                            <button onclick="updateChart('week')"
+                        <div class="flex space-x-2" id="chart-filters">
+                            <button onclick="updateChart('week', event)"
                                 class="text-xs px-2 py-1 rounded bg-gray-100 hover:bg-gray-200">7D</button>
-                            <button onclick="updateChart('month')"
-                                class="text-xs px-2 py-1 rounded bg-primary text-white">30D</button>
-                            <button onclick="updateChart('quarter')"
+                            <button onclick="updateChart('month', event)"
+                                class="text-xs px-2 py-1 rounded bg-gray-100 hover:bg-gray-200">30D</button>
+                            <button onclick="updateChart('quarter', event)"
                                 class="text-xs px-2 py-1 rounded bg-gray-100 hover:bg-gray-200">90D</button>
                         </div>
                     </div>
@@ -209,7 +209,8 @@
                                         <p class="text-sm text-gray-500">{{ $order->customer_name }}</p>
                                     </div>
                                     <div class="text-right">
-                                        <p class="font-medium text-gray-800">${{ number_format($order->total_amount, 2) }}
+                                        <p class="font-medium text-gray-800 font-bengali">
+                                            ৳{{ number_format($order->total_amount, 2) }}
                                         </p>
                                         <span
                                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $order->status_badge_color }}">
@@ -273,8 +274,8 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         {{ $product->total_sold }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        ${{ number_format($product->total_revenue, 2) }}
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 font-bengali">
+                                        ৳{{ number_format($product->total_revenue, 2) }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         @if ($product->track_quantity)
@@ -383,7 +384,7 @@
             });
         }
 
-        async function updateChart(period) {
+        async function updateChart(period, event) {
             try {
                 const response = await fetch(`{{ route('admin.analytics.data.salesOverTime') }}?period=${period}`);
                 const data = await response.json();
@@ -393,14 +394,21 @@
                 salesChart.data.datasets[1].data = data.orders;
                 salesChart.update();
 
-                // Update active button
-                document.querySelectorAll('#salesChart').closest('.bg-white').querySelectorAll('button').forEach(
-                    btn => {
-                        btn.classList.remove('bg-primary', 'text-white');
-                        btn.classList.add('bg-gray-100', 'hover:bg-gray-200');
-                    });
-                event.target.classList.add('bg-primary', 'text-white');
-                event.target.classList.remove('bg-gray-100', 'hover:bg-gray-200');
+                // --- Update active button UI ---
+                const container = document.getElementById('chart-filters');
+                const buttons = container.querySelectorAll('button');
+
+                buttons.forEach(btn => {
+                    btn.classList.remove('bg-primary', 'text-white');
+                    btn.classList.add('bg-gray-100', 'hover:bg-gray-200');
+                });
+
+                // Set the clicked button to active
+                const clickedBtn = event.currentTarget;
+                clickedBtn.classList.remove('bg-gray-100', 'hover:bg-gray-200');
+                clickedBtn.classList.add('bg-primary', 'text-white');
+
+
             } catch (error) {
                 console.error('Error updating chart:', error);
             }

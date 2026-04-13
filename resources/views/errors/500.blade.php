@@ -7,8 +7,8 @@
     <div class="max-w-8xl mx-auto px-4 py-16 min-h-[60vh] flex items-center justify-center">
         <div class="text-center">
             <div class="mb-8">
-                <div class="text-9xl font-bold text-primary/20 mb-4 font-quantico">500</div>
-                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 font-quantico">Server Error</h1>
+                <div class="text-9xl font-bold text-primary/20 mb-4 font-poppins">500</div>
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 font-poppins">Server Error</h1>
                 <p class="text-lg text-gray-600 max-w-xl mx-auto mb-8 font-inter">
                     Something went wrong on our servers. Our team has been notified and is working to fix the issue.
                 </p>
@@ -50,7 +50,7 @@
 
             <!-- Contact Support -->
             <div class="bg-primary/5 rounded-xl p-6">
-                <h3 class="text-xl font-bold text-gray-900 mb-3 font-quantico">Need immediate help?</h3>
+                <h3 class="text-xl font-bold text-gray-900 mb-3 font-poppins">Need immediate help?</h3>
                 <p class="text-gray-600 mb-4 font-inter">If the problem persists, contact our support team.</p>
                 <div class="flex flex-col sm:flex-row gap-3 justify-center">
                     <a href="mailto:support@tycoon.com" class="text-primary hover:text-primary-dark font-medium font-inter">
@@ -65,7 +65,7 @@
 
             <!-- What to Do -->
             <div class="mt-12 pt-8 border-t border-gray-200">
-                <h4 class="text-lg font-bold text-gray-900 mb-4 font-quantico">What you can do:</h4>
+                <h4 class="text-lg font-bold text-gray-900 mb-4 font-poppins">What you can do:</h4>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
                     <div class="text-center">
                         <div

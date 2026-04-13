@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const title = section.querySelector(".featured-products-title");
         const cards = section.querySelectorAll(".featured-product-card");
 
-        // ✅ Initial states
+        // Initial states
         gsap.set(title, { opacity: 0, y: 30 });
         gsap.set(cards, { opacity: 0, y: 40, scale: 0.96 });
 
@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         from: "start",
                     },
                 },
-                "-=0.2"
+                "-=0.2",
             );
     });
 });
@@ -72,7 +72,7 @@ function lazyInitElement(element, callback, options = {}) {
             rootMargin: "0px 0px -20% 0px",
             threshold: 0.1,
             ...options,
-        }
+        },
     );
 
     observer.observe(element);

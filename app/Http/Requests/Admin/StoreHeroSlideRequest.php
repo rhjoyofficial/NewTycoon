@@ -16,7 +16,7 @@ class StoreHeroSlideRequest extends FormRequest
     {
         $rules = [
             'type' => ['required', 'in:image,video'],
-            'background' => ['required', 'mimes:jpg,jpeg,png,webp,mp4,mov,avi', 'max:10240'],
+            'background' => ['required', 'mimes:jpg,jpeg,png,webp,mp4,mov,avi', 'max:20480'],
             'has_content' => ['boolean'],
             'content_position' => ['required_if:has_content,true', 'in:left,center,right'],
 
@@ -33,13 +33,16 @@ class StoreHeroSlideRequest extends FormRequest
             'sort_order' => ['nullable', 'integer'],
         ];
 
-        // CTA buttons validation when has_cta is true
+        // CTA buttons validation ONLY when has_cta is TRUE
         if ($this->boolean('has_cta')) {
             $rules['cta_buttons'] = ['required', 'array', 'min:1', 'max:3'];
             $rules['cta_buttons.*.label_en'] = ['required', 'string', 'max:50'];
             $rules['cta_buttons.*.label_bn'] = ['nullable', 'string', 'max:50'];
             $rules['cta_buttons.*.url'] = ['required', 'string', 'max:255'];
             $rules['cta_buttons.*.style'] = ['required', 'in:primary,secondary,outline'];
+        } else {
+            // When CTA is disabled, make cta_buttons nullable
+            $rules['cta_buttons'] = ['nullable', 'array'];
         }
 
         return $rules;
@@ -53,7 +56,7 @@ class StoreHeroSlideRequest extends FormRequest
 
             'background.required' => 'Background file is required.',
             'background.mimes' => 'Background must be an image (JPG, JPEG, PNG, WEBP) or video (MP4, MOV, AVI).',
-            'background.max' => 'Background file size cannot exceed 10MB.',
+            'background.max' => 'Background file size cannot exceed 20MB.',
 
             'content_position.required_if' => 'Content position is required when content is enabled.',
             'content_position.in' => 'Content position must be left, center, or right.',
@@ -83,7 +86,7 @@ class StoreHeroSlideRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        // Ensure boolean values
+        // Ensure boolean values are properly set
         $booleans = ['has_content', 'has_cta', 'is_active'];
 
         foreach ($booleans as $field) {
@@ -96,29 +99,32 @@ class StoreHeroSlideRequest extends FormRequest
             }
         }
 
-        // Handle CTA buttons - it's already an array from form submission
-        if ($this->has('cta_buttons') && is_array($this->cta_buttons)) {
-            // Clean empty values and remove empty arrays
-            $cleanedButtons = [];
+        // Handle CTA buttons based on has_cta status
+        if ($this->boolean('has_cta')) {
+            // CTA is enabled - clean and validate buttons
+            if ($this->has('cta_buttons') && is_array($this->cta_buttons)) {
+                $cleanedButtons = [];
 
-            foreach ($this->cta_buttons as $button) {
-                // Check if the button has at least required fields
-                if (!empty($button['label_en']) && !empty($button['url'])) {
-                    // Clean the button data
-                    $cleanedButton = [
-                        'label_en' => trim($button['label_en'] ?? ''),
-                        'label_bn' => trim($button['label_bn'] ?? ''),
-                        'url' => trim($button['url'] ?? ''),
-                        'style' => $button['style'] ?? 'primary',
-                    ];
-
-                    $cleanedButtons[] = $cleanedButton;
+                foreach ($this->cta_buttons as $button) {
+                    // Only include buttons with required fields
+                    if (!empty($button['label_en']) && !empty($button['url'])) {
+                        $cleanedButtons[] = [
+                            'label_en' => trim($button['label_en'] ?? ''),
+                            'label_bn' => trim($button['label_bn'] ?? ''),
+                            'url' => trim($button['url'] ?? ''),
+                            'style' => $button['style'] ?? 'primary',
+                        ];
+                    }
                 }
-            }
 
-            $this->merge(['cta_buttons' => $cleanedButtons]);
+                $this->merge(['cta_buttons' => $cleanedButtons]);
+            } else {
+                // CTA enabled but no buttons provided - set empty array (will fail validation)
+                $this->merge(['cta_buttons' => []]);
+            }
         } else {
-            $this->merge(['cta_buttons' => []]);
+            // CTA is disabled - set to null to clear existing buttons
+            $this->merge(['cta_buttons' => null]);
         }
 
         // Set default sort_order if not provided

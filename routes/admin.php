@@ -1,19 +1,23 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\BrandController;
-use App\Http\Controllers\Admin\MediaController;
-use App\Http\Controllers\Admin\OrderController;
-use App\Http\Controllers\Admin\ReviewController;
-use App\Http\Controllers\Admin\ContentController;
-use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\Admin\ProfileController;
-use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\AdBannerController;
 use App\Http\Controllers\Admin\AnalyticsController;
+use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\CatalogController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ContentController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\HeroSlideController;
+use App\Http\Controllers\Admin\MediaController;
+use App\Http\Controllers\Admin\OfferController;
+use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\ReviewController;
+use App\Http\Controllers\Admin\SectionController;
+use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\UserController;
+use Illuminate\Support\Facades\Route;
 
 // ==============================
 // ADMIN ROUTES (Admin Only)
@@ -64,6 +68,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::get('/{product}/edit', [ProductController::class, 'edit'])->name('edit');
         Route::put('/{product}', [ProductController::class, 'update'])->name('update');
         Route::delete('/{product}', [ProductController::class, 'destroy'])->name('destroy');
+        Route::post('/{product}/change-status', [ProductController::class, 'changeStatus'])->name('changeStatus');
 
         // Bulk Actions
         Route::post('/bulk/action', [ProductController::class, 'bulkActon'])->name('bulk-action');
@@ -109,6 +114,18 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::post('/bulk/delete', [CategoryController::class, 'bulkDelete'])->name('bulk.delete');
         Route::post('/bulk/activate', [CategoryController::class, 'bulkActivate'])->name('bulk.activate');
         Route::post('/bulk/deactivate', [CategoryController::class, 'bulkDeactivate'])->name('bulk.deactivate');
+    });
+
+    Route::prefix('offer')->name('offers.')->group(function () {
+        Route::get('/', [OfferController::class, 'index'])->name('index');
+        Route::get('/create', [OfferController::class, 'create'])->name('create');
+        Route::post('/', [OfferController::class, 'store'])->name('store');
+        Route::get('/{offer}', [OfferController::class, 'show'])->name('show');
+        Route::get('/{offer}/edit', [OfferController::class, 'edit'])->name('edit');
+        Route::put('/{offer}', [OfferController::class, 'update'])->name('update');
+        Route::delete('/{offer}', [OfferController::class, 'destroy'])->name('destroy');
+        Route::post('{offer}/toggle-status', [OfferController::class, 'toggleStatus'])->name('toggle-status');
+        Route::post('reorder', [OfferController::class, 'reorder'])->name('reorder');
     });
 
     // Orders Management
@@ -183,6 +200,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Content Management
     Route::prefix('content')->name('content.')->group(function () {
         Route::get('/', [ContentController::class, 'index'])->name('index');
+
+        Route::resource('ad-banners', AdBannerController::class)->except('show');
+        Route::resource('sections', SectionController::class)->except('show');
+        Route::resource('catalogs', CatalogController::class);
 
         // Pages
         Route::prefix('pages')->name('pages.')->group(function () {

@@ -22,8 +22,12 @@ class FooterSeeder extends Seeder
             'Your premier destination for cutting-edge technology and electronics. We bring you the latest innovations with exceptional quality and service.',
             'brand_description_bn' =>
             'আধুনিক প্রযুক্তি ও ইলেকট্রনিক্সের জন্য আপনার বিশ্বস্ত গন্তব্য। আমরা সর্বশেষ উদ্ভাবন এবং সেরা মানের সেবা প্রদান করি।',
-            'product_image' => 'images/cat/pressure-cooker.png',
-            'product_link'  => '/products/featured',
+            'contact_info' => [
+                "hotline_1" => "+8801234567890",
+                "hotline_2" => "+8801987654321",
+                "email_1" => "info@example.com",
+                "email_2" => "support@example.com"
+            ],
             'payment_methods' => [
                 'https://cdn-icons-png.flaticon.com/512/196/196578.png',
                 'https://cdn-icons-png.flaticon.com/512/196/196561.png',
@@ -56,17 +60,6 @@ class FooterSeeder extends Seeder
                     ['en' => 'Quality & Certifications', 'bn' => 'গুণগত মান ও সার্টিফিকেশন', 'url' => '/certifications'],
                     ['en' => 'Brand Partners', 'bn' => 'ব্র্যান্ড পার্টনার', 'url' => '/partners'],
                     ['en' => 'Sustainability', 'bn' => 'টেকসই উন্নয়ন', 'url' => '/sustainability'],
-                ],
-            ],
-            [
-                'title_en' => 'Support & Service',
-                'title_bn' => 'সহায়তা ও সেবা',
-                'links' => [
-                    ['en' => 'Contact Support', 'bn' => 'সাপোর্টে যোগাযোগ', 'url' => '/support'],
-                    ['en' => 'Warranty Policy', 'bn' => 'ওয়ারেন্টি নীতি', 'url' => '/warranty'],
-                    ['en' => 'Service Centers', 'bn' => 'সার্ভিস সেন্টার', 'url' => '/service-centers'],
-                    ['en' => 'Product Manuals', 'bn' => 'প্রোডাক্ট ম্যানুয়াল', 'url' => '/manuals'],
-                    ['en' => 'Spare Parts', 'bn' => 'স্পেয়ার পার্টস', 'url' => '/spare-parts'],
                 ],
             ],
             [

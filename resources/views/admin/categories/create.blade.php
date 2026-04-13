@@ -91,10 +91,10 @@
                                     @foreach ($parentCategories as $parent)
                                         <option value="{{ $parent->id }}"
                                             {{ old('parent_id') == $parent->id ? 'selected' : '' }}>
-                                            {{ $parent->name_en }}
-                                            @if ($parent->name_bn)
+                                            {{ $parent->full_name  }}
+                                            {{-- @if ($parent->name_bn)
                                                 ({{ $parent->name_bn }})
-                                            @endif
+                                            @endif --}}
                                         </option>
                                     @endforeach
                                 </select>

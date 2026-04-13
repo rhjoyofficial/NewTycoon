@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Services\Search\ProductSearchService;
 use App\Services\Search\CategorySearchService;
-use App\Http\Resources\ProductCardViewResource;
 
 class SearchController extends Controller
 {
@@ -29,6 +28,7 @@ class SearchController extends Controller
                 return response()->json([]);
             }
 
+            // Track search first
             if ($query) {
                 SearchTerm::updateOrCreate(
                     ['term' => $query],
@@ -39,21 +39,27 @@ class SearchController extends Controller
                 );
             }
 
-            // Search products
+            // ISSUE: Using 'name' instead of bilingual fields
             $products = Product::active()
                 ->where(function ($q) use ($query) {
-                    $q->where('name', 'LIKE', "%{$query}%")
+                    $q->where('name_en', 'LIKE', "%{$query}%")
+                        ->orWhere('name_bn', 'LIKE', "%{$query}%")
                         ->orWhere('sku', 'LIKE', "%{$query}%")
-                        ->orWhere('short_description', 'LIKE', "%{$query}%");
+                        ->orWhere('model_number', 'LIKE', "%{$query}%");
+                    // ->orWhere('short_description_en', 'LIKE', "%{$query}%")
+                    // ->orWhere('short_description_bn', 'LIKE', "%{$query}%");
                 })
                 ->limit(8)
-                ->get(['id', 'name', 'slug', 'price', 'featured_images', 'stock_status', 'is_new', 'discount_percentage']);
+                ->get(['id', 'name_en', 'name_bn', 'slug', 'price', 'featured_images', 'stock_status', 'is_new', 'discount_percentage']);
 
-            // Search categories
+            // ISSUE: Using 'name' instead of bilingual fields
             $categories = Category::active()
-                ->where('name', 'LIKE', "%{$query}%")
+                ->where(function ($q) use ($query) {
+                    $q->where('name_en', 'LIKE', "%{$query}%")
+                        ->orWhere('name_bn', 'LIKE', "%{$query}%");
+                })
                 ->limit(5)
-                ->get(['id', 'name', 'slug']);
+                ->get(['id', 'name_en', 'name_bn', 'slug']);
 
             $suggestions = [];
 
@@ -62,10 +68,10 @@ class SearchController extends Controller
                 $suggestions[] = [
                     'type' => 'product',
                     'id' => $product->id,
-                    'name' => $product->name,
+                    'name' => $product->name, // This will use accessor
                     'url' => route('product.show', $product->slug),
                     'price' => number_format($product->price, 2),
-                    'image' => $this->getImageUrl($product->featured_images[0]),
+                    'image' => $this->getImageUrl($product->featured_images[0] ?? null),
                     'in_stock' => $product->stock_status === 'in_stock',
                     'is_new' => $product->is_new,
                     'discount_percentage' => $product->discount_percentage,
@@ -78,7 +84,7 @@ class SearchController extends Controller
                 $suggestions[] = [
                     'type' => 'category',
                     'id' => $category->id,
-                    'name' => $category->name,
+                    'name' => $category->name, // This will use accessor
                     'url' => route('categories.show', $category->slug),
                     'highlight' => $this->highlightText($category->name, $query)
                 ];
@@ -86,7 +92,6 @@ class SearchController extends Controller
 
             return response()->json($suggestions);
         } catch (\Exception $e) {
-            flash('Search suggestion error', 'error');
             Log::error('Search suggestion error', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
@@ -94,7 +99,7 @@ class SearchController extends Controller
 
             return response()->json([
                 'error' => 'An error occurred while searching',
-                'message' => env('APP_DEBUG') ? $e->getMessage() : null
+                'message' => config('app.debug') ? $e->getMessage() : null
             ], 500);
         }
     }
@@ -102,10 +107,10 @@ class SearchController extends Controller
     private function getImageUrl($imagePath)
     {
         if (!$imagePath) {
-            return asset('images/products/fr-06.jpg');
+            return asset('images/products/default.jpg'); // Use proper default
         }
 
-        if (strpos($imagePath, 'http') === 0) {
+        if (str_starts_with($imagePath, 'http')) {
             return $imagePath;
         }
 
@@ -138,16 +143,20 @@ class SearchController extends Controller
             $currentCategory = Category::find($request->category);
         }
 
-        $categoryIds = $this->categoryService->resolveCategoryIds($search);
+        if ($category) {
+            $categoryIds = $this->categoryService->getCategoryChilednsIds($category);
+        } else {
+            $categoryIds = $this->categoryService->resolveCategoryIds($search);
+        }
 
         $productQuery = $this->productService->buildQuery(
             $search,
-            $category,
             $minPrice,
             $maxPrice,
             $status,
             $categoryIds
         );
+        // dd($productQuery->toSql(), $productQuery->getBindings());
         $this->applySorting($productQuery, $sort);
 
         // Track search term
@@ -161,9 +170,7 @@ class SearchController extends Controller
             );
         }
 
-        $products = ProductCardViewResource::collection(
-            $productQuery->paginate(12)->withQueryString()
-        );
+        $products = $productQuery->paginate(12)->withQueryString();
 
         $categories = $this->categoryService->getCategoriesWithProductCounts($search);
 
@@ -198,7 +205,7 @@ class SearchController extends Controller
 
         return response()->json($terms);
     }
-    
+
     /**
      * Get all products count for search
      */

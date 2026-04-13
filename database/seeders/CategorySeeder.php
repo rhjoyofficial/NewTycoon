@@ -12,339 +12,491 @@ class CategorySeeder extends Seeder
      * Image mapping for categories
      */
     private $imageMapping = [
-        // Parent categories (Level 1)
-        'air-conditioner' => 'ac',
-        'fan' => 'fan',
-        'room-comforter' => 'comforter',
-        'cookware' => 'cookware',
-        'gas-burner' => 'gas-burner',
-        'pressure-cooker' => 'pressure-cooker',
-        'rice-cooker' => 'rice-cooker',
-        'electric-kettle' => 'kettle',
-        'mixer-grinder' => 'mixer',
-        'led-tv' => 'led-tv',
-        'monitor' => 'monitor',
-        'refrigerator' => 'refrigerator',
+        'rice-cooker' => 'categories/rice-cooker.png',
+        'pressure-cooker' => 'categories/pressure-cooker.png',
+        'mixer-grinder' => 'categories/mixer.png',
+        'cookware' => 'categories/cookware.png',
+        'electric-kettle' => 'categories/kettle.png',
+        'electric-cooker' => 'categories/induction.png',
+        'ceiling-fan' => 'categories/fan.png',
+        'rechargeable-fan' => 'categories/rechargeable-fan.png',
+        'gas-stove' => 'categories/gas-burner.png',
+        'room-comforter' => 'categories/comforter.png',
+        'microwave-oven' => 'categories/microwave.png',
+        'air-conditioner' => 'categories/ac.png',
+        'led-tv' => 'categories/led-tv.png',
+        'washing-machine' => 'categories/washing-machine.png',
+        'refrigerator' => 'categories/refrigerator.png',
+        'home-appliance' => 'categories/home-appliance.png',
+        'kitchen-appliance' => 'categories/kitchen-appliance.png',
+        'fan' => 'categories/fan.png',
+        'gas-burner' => 'categories/gas-burner.png',
     ];
 
     public function run(): void
     {
-        // Define the category structure
-        $categories = [
+        // Create ROOT CATEGORIES first
+
+        // =============================================
+        // ROOT CATEGORY 1: HOME APPLIANCE
+        // =============================================
+        $homeAppliance = Category::updateOrCreate(
+            ['slug' => 'home-appliance'],
+            [
+                'name_en' => 'Home Appliance',
+                'name_bn' => 'হোম অ্যাপ্লায়েন্স',
+                'description_en' => 'Essential home appliances for modern living including fans, mixers, and more.',
+                'description_bn' => 'আধুনিক জীবনের জন্য প্রয়োজনীয় হোম অ্যাপ্লায়েন্স including ফ্যান, মিক্সার এবং আরও অনেক কিছু।',
+                'image' => 'categories/home-appliance.png',
+                'parent_id' => null,
+                'depth' => 1,
+                'order' => 1,
+                'nav_order' => 1,
+                'show_in_nav' => true,
+                'is_featured' => false,
+                'is_active' => true,
+                'meta_title' => 'Home Appliances - Best Products Online',
+                'meta_description' => 'Shop for home appliances at best prices in Bangladesh.',
+                'meta_keywords' => 'home appliances, fans, mixer grinder, home electronics',
+            ]
+        );
+
+        // =============================================
+        // ROOT CATEGORY 2: KITCHEN APPLIANCE
+        // =============================================
+        $kitchenAppliance = Category::updateOrCreate(
+            ['slug' => 'kitchen-appliance'],
+            [
+                'name_en' => 'Kitchen Appliance',
+                'name_bn' => 'কিচেন অ্যাপ্লায়েন্স',
+                'description_en' => 'Modern kitchen appliances for efficient cooking including cookware, gas burners, pressure cookers, and rice cookers.',
+                'description_bn' => 'দক্ষ রান্নার জন্য আধুনিক কিচেন অ্যাপ্লায়েন্স including কুকওয়্যার, গ্যাস বার্নার, প্রেসার কুকার এবং রাইস কুকার।',
+                'image' => 'categories/kitchen-appliance.png',
+                'parent_id' => null,
+                'depth' => 1,
+                'order' => 2,
+                'nav_order' => 2,
+                'show_in_nav' => true,
+                'is_featured' => false,
+                'is_active' => true,
+                'meta_title' => 'Kitchen Appliances - Best Products Online',
+                'meta_description' => 'Shop for kitchen appliances at best prices in Bangladesh.',
+                'meta_keywords' => 'kitchen appliances, cookware, gas burner, pressure cooker, rice cooker',
+            ]
+        );
+
+        $order = 3; // Start from 3 since we've used 1 and 2 for root categories
+
+        // =============================================
+        // HOME APPLIANCE CHILDREN
+        // =============================================
+
+        // Fan category under Home Appliance
+        $fan = Category::updateOrCreate(
+            ['slug' => 'fan'],
+            [
+                'name_en' => 'Fan',
+                'name_bn' => 'ফ্যান',
+                'description_en' => 'Decorative ceiling fans and rechargeable emergency fans with high air delivery and energy efficiency.',
+                'description_bn' => 'উচ্চ বায়ু প্রবাহ এবং শক্তি দক্ষতা সহ ডেকোরেটিভ সিলিং ফ্যান এবং রিচার্জেবল ইমার্জেন্সি ফ্যান।',
+                'image' => 'categories/fan.png',
+                'parent_id' => $homeAppliance->id,
+                'depth' => 2,
+                'order' => 1,
+                'nav_order' => 999,
+                'show_in_nav' => false,
+                'is_featured' => true,
+                'is_active' => true,
+                'meta_title' => 'Fan - Best Products Online',
+                'meta_description' => 'Shop for fans at best prices in Bangladesh.',
+                'meta_keywords' => 'fan, ceiling fan, rechargeable fan',
+            ]
+        );
+
+        // Fan child categories
+        $fanChildren = [
+            ['name' => 'Ceiling Fan 56 inch', 'bn_name' => '৫৬ ইঞ্চি সিলিং ফ্যান', 'slug' => 'ceiling-fan-56-inch'],
+            ['name' => 'Rechargeable Fan', 'bn_name' => 'রিচার্জেবল ফ্যান', 'slug' => 'rechargeable-fan'],
+        ];
+
+        $childOrder = 1;
+        foreach ($fanChildren as $child) {
+            Category::updateOrCreate(
+                [
+                    'slug' => $child['slug'],
+                    'parent_id' => $fan->id
+                ],
+                [
+                    'name_en' => $child['name'],
+                    'name_bn' => $child['bn_name'],
+                    'description_en' => $this->getLeafDescription($child['name']),
+                    'description_bn' => $this->translateDescription($this->getLeafDescription($child['name'])),
+                    'image' => $this->imageMapping[$child['slug']] ?? $this->imageMapping['fan'] ?? 'categories/default.png',
+                    'depth' => 3,
+                    'order' => $childOrder++,
+                    'show_in_nav' => false,
+                    'is_featured' => false,
+                    'is_active' => true,
+                    'meta_title' => $child['name'] . ' - Buy Online',
+                    'meta_description' => 'Buy ' . strtolower($child['name']) . ' at best price in Bangladesh.',
+                ]
+            );
+        }
+
+
+        // Mixer Grinder under Home Appliance
+        $mixerGrinder = Category::updateOrCreate(
+            ['slug' => 'mixer-grinder'],
+            [
+                'name_en' => 'Mixer Grinder',
+                'name_bn' => 'মিক্সার গ্রাইন্ডার',
+                'description_en' => 'Powerful mixer grinders with multiple jars and speeds ranging from 750W to 1500W for all kitchen grinding needs.',
+                'description_bn' => 'সমস্ত রান্নার পেষার প্রয়োজনের জন্য ৭৫০W থেকে ১৫০০W পর্যন্ত একাধিক জার এবং গতি সহ শক্তিশালী মিক্সার গ্রাইন্ডার।',
+                'image' => 'categories/mixer.png',
+                'parent_id' => $homeAppliance->id,
+                'depth' => 2,
+                'order' => 2,
+                'nav_order' => 3,
+                'show_in_nav' => true,
+                'is_featured' => true,
+                'is_active' => true,
+                'meta_title' => 'Mixer Grinder - Best Products Online',
+                'meta_description' => 'Shop for mixer grinders at best prices in Bangladesh.',
+                'meta_keywords' => 'mixer grinder, blender, juicer mixer grinder',
+            ]
+        );
+
+        // =============================================
+        // KITCHEN APPLIANCE CHILDREN
+        // =============================================
+
+        // Cookware under Kitchen Appliance
+        $cookware = Category::updateOrCreate(
+            ['slug' => 'cookware'],
+            [
+                'name_en' => 'Cookware',
+                'name_bn' => 'রান্নার পাত্র',
+                'description_en' => 'Non-stick cookware sets and stainless steel pans, woks, soup bowls and kitchen accessories.',
+                'description_bn' => 'নন-স্টিক কুকওয়্যার সেট এবং স্টেইনলেস স্টিলের প্যান, ওয়াক, স্যুপ বোল এবং রান্নাঘরের জিনিসপত্র।',
+                'image' => 'categories/cookware.png',
+                'parent_id' => $kitchenAppliance->id,
+                'depth' => 2,
+                'order' => 1,
+                'nav_order' => 4,
+                'show_in_nav' => true,
+                'is_featured' => true,
+                'is_active' => true,
+                'meta_title' => 'Cookware - Best Products Online',
+                'meta_description' => 'Shop for cookware at best prices in Bangladesh.',
+                'meta_keywords' => 'cookware, non-stick cookware, pans, woks',
+            ]
+        );
+
+        // Gas Burner under Kitchen Appliance
+        $gasBurner = Category::updateOrCreate(
+            ['slug' => 'gas-burner'],
+            [
+                'name_en' => 'Gas Burner',
+                'name_bn' => 'গ্যাস বার্নার',
+                'description_en' => 'Double burner glass top LPG stoves with safety features, auto ignition and printed designs.',
+                'description_bn' => 'নিরাপত্তা বৈশিষ্ট্য, অটো ইগনিশন এবং প্রিন্টেড ডিজাইন সহ ডাবল বার্নার গ্লাস টপ এলপিজি স্টোভ।',
+                'image' => 'categories/gas-burner.png',
+                'parent_id' => $kitchenAppliance->id,
+                'depth' => 2,
+                'order' => 2,
+                'nav_order' => 999,
+                'show_in_nav' => false,
+                'is_featured' => true,
+                'is_active' => true,
+                'meta_title' => 'Gas Burner - Best Products Online',
+                'meta_description' => 'Shop for gas burners at best prices in Bangladesh.',
+                'meta_keywords' => 'gas burner, gas stove, LPG stove',
+            ]
+        );
+
+        // Pressure Cooker under Kitchen Appliance
+        $pressureCooker = Category::updateOrCreate(
+            ['slug' => 'pressure-cooker'],
+            [
+                'name_en' => 'Pressure Cooker',
+                'name_bn' => 'প্রেসার কুকার',
+                'description_en' => 'Aluminum and stainless steel pressure cookers with safety features for fast and efficient cooking.',
+                'description_bn' => 'দ্রুত এবং দক্ষ রান্নার জন্য নিরাপত্তা বৈশিষ্ট্য সহ অ্যালুমিনিয়াম এবং স্টেইনলেস স্টিলের প্রেসার কুকার।',
+                'image' => 'categories/pressure-cooker.png',
+                'parent_id' => $kitchenAppliance->id,
+                'depth' => 2,
+                'order' => 3,
+                'nav_order' => 2,
+                'show_in_nav' => true,
+                'is_featured' => true,
+                'is_active' => true,
+                'meta_title' => 'Pressure Cooker - Best Products Online',
+                'meta_description' => 'Shop for pressure cookers at best prices in Bangladesh.',
+                'meta_keywords' => 'pressure cooker, aluminum pressure cooker, SS pressure cooker',
+            ]
+        );
+
+
+        // Rice Cooker under Kitchen Appliance
+        $riceCooker = Category::updateOrCreate(
+            ['slug' => 'rice-cooker'],
+            [
+                'name_en' => 'Rice Cooker',
+                'name_bn' => 'রাইস কুকার',
+                'description_en' => 'Electric rice cookers and multi cookers with auto shut-off, keep warm function and non-stick pots for perfectly cooked rice.',
+                'description_bn' => 'নিখুঁতভাবে রান্না করা চালের জন্য অটো শাট-অফ, গরম রাখার ফাংশন এবং নন-স্টিক পাত্র সহ ইলেকট্রিক রাইস কুকার এবং মাল্টি কুকার।',
+                'image' => 'categories/rice-cooker.png',
+                'parent_id' => $kitchenAppliance->id,
+                'depth' => 2,
+                'order' => 4,
+                'nav_order' => 1,
+                'show_in_nav' => true,
+                'is_featured' => true,
+                'is_active' => true,
+                'meta_title' => 'Rice Cooker - Best Products Online',
+                'meta_description' => 'Shop for rice cookers at best prices in Bangladesh.',
+                'meta_keywords' => 'rice cooker, multi cooker, electric rice cooker',
+            ]
+        );
+
+        // =============================================
+        // REMAINING CATEGORIES (Unchanged from original)
+        // These will be Level 1 categories without a parent
+        // =============================================
+
+        $remainingCategories = [
+            // =============================================
+            // FEATURED CATEGORY: ELECTRIC KETTLE
+            // =============================================
+            'Electric Kettle' => [
+                'bn_name' => 'ইলেকট্রিক কেটলি',
+                'show_in_nav' => true,
+                'is_featured' => true,
+                'nav_order' => 5,
+                'description' => 'Stainless steel electric kettles with auto shut-off, boil-dry protection and fast heating from 1.8L to 3.0L capacity.',
+                'children' => [
+                    ['name' => '1.8L Electric Kettle', 'bn_name' => '১.৮ লিটার কেটলি', 'slug' => '1.8l-electric-kettle'],
+                    ['name' => '2.0L Electric Kettle', 'bn_name' => '২.০ লিটার কেটলি', 'slug' => '2.0l-electric-kettle'],
+                    ['name' => '3.0L Electric Kettle', 'bn_name' => '৩.০ লিটার কেটলি', 'slug' => '3.0l-electric-kettle'],
+                ]
+            ],
+
+            // =============================================
+            // FEATURED CATEGORY: ELECTRIC COOKER
+            // =============================================
+            'Electric Cooker' => [
+                'bn_name' => 'ইলেকট্রিক কুকার',
+                'show_in_nav' => false,
+                'is_featured' => true,
+                'nav_order' => 999,
+                'description' => 'Induction and infrared cookers with standard and inverter technology for efficient and fast cooking.',
+                'children' => [
+                    ['name' => 'Induction Cooker', 'bn_name' => 'ইন্ডাকশন কুকার', 'slug' => 'induction-cooker'],
+                    ['name' => 'Inverter Induction', 'bn_name' => 'ইনভার্টার ইন্ডাকশন', 'slug' => 'inverter-induction'],
+                    ['name' => 'Infrared Cooker', 'bn_name' => 'ইনফ্রারেড কুকার', 'slug' => 'infrared-cooker'],
+                    ['name' => 'Inverter Infrared', 'bn_name' => 'ইনভার্টার ইনফ্রারেড', 'slug' => 'inverter-infrared'],
+                ]
+            ],
+
+            // =============================================
+            // FEATURED CATEGORY: GAS STOVE (as single category)
+            // =============================================
+            'Gas Stove' => [
+                'bn_name' => 'গ্যাস স্টোভ',
+                'show_in_nav' => false,
+                'is_featured' => true,
+                'nav_order' => 999,
+                'description' => 'Double burner glass top LPG stoves with safety features, auto ignition and printed designs.',
+                'has_children' => false,
+            ],
+
+            // =============================================
+            // FEATURED CATEGORY: ROOM COMFORTER
+            // =============================================
+            'Room Comforter' => [
+                'bn_name' => 'রুম কম্ফোর্টার',
+                'show_in_nav' => false,
+                'is_featured' => true,
+                'nav_order' => 999,
+                'description' => 'Electric room heaters for winter comfort with self-rotation feature and safety protection.',
+                'has_children' => false,
+            ],
+
+            // =============================================
+            // FEATURED CATEGORY: MICROWAVE OVEN
+            // =============================================
+            'Microwave Oven' => [
+                'bn_name' => 'মাইক্রোওয়েভ ওভেন',
+                'show_in_nav' => false,
+                'is_featured' => true,
+                'nav_order' => 999,
+                'description' => 'Convection microwave ovens 30L with multi-cooking functions for baking, grilling and heating.',
+                'has_children' => false,
+            ],
+
+            // =============================================
+            // FEATURED CATEGORY: AIR CONDITIONER
+            // =============================================
             'Air Conditioner' => [
                 'bn_name' => 'এয়ার কন্ডিশনার',
-                'children' => [
-                    'Split AC' => [
-                        'bn_name' => 'স্প্লিট এয়ার কন্ডিশনার',
-                        'children' => [
-                            ['name' => '1 Ton Split AC', 'bn_name' => '১ টন স্প্লিট এসি'],
-                            ['name' => '1.5 Ton Split AC', 'bn_name' => '১.৫ টন স্প্লিট এসি'],
-                            ['name' => '2 Ton Split AC', 'bn_name' => '২ টন স্প্লিট এসি'],
-                            ['name' => 'Inverter Split AC', 'bn_name' => 'ইনভার্টার স্প্লিট এসি'],
-                        ]
-                    ],
-                    'Window AC' => [
-                        'bn_name' => 'উইন্ডো এসি',
-                        'children' => [
-                            ['name' => '1 Ton Window AC', 'bn_name' => '১ টন উইন্ডো এসি'],
-                            ['name' => '1.5 Ton Window AC', 'bn_name' => '১.৫ টন উইন্ডো এসি'],
-                            ['name' => '2 Ton Window AC', 'bn_name' => '২ টন উইন্ডো এসি'],
-                        ]
-                    ],
-                ]
+                'show_in_nav' => false,
+                'is_featured' => true,
+                'nav_order' => 999,
+                'description' => 'Energy efficient inverter air conditioners with hot & cool function and WiFi smart control.',
+                'has_children' => false,
             ],
 
-            'Fan' => [
-                'bn_name' => 'পাখা',
-                'children' => [
-                    'Ceiling Fan' => [
-                        'bn_name' => 'সিলিং ফ্যান',
-                        'children' => [
-                            ['name' => 'Premium Ceiling Fans', 'bn_name' => 'প্রিমিয়াম সিলিং ফ্যান'],
-                            ['name' => 'Energy Saving Fans', 'bn_name' => 'এনার্জি সেভিং ফ্যান'],
-                            ['name' => 'Remote Control Fans', 'bn_name' => 'রিমোট কন্ট্রোল ফ্যান'],
-                        ]
-                    ],
-                    'Table Fan' => [
-                        'bn_name' => 'টেবিল ফ্যান',
-                        'children' => [
-                            ['name' => 'USB Table Fans', 'bn_name' => 'ইউএসবি টেবিল ফ্যান'],
-                            ['name' => 'Rechargeable Fans', 'bn_name' => 'রিচার্জেবল ফ্যান'],
-                            ['name' => 'High Speed Fans', 'bn_name' => 'হাই স্পিড ফ্যান'],
-                        ]
-                    ],
-                ]
-            ],
-
-            'Refrigerator' => [
-                'bn_name' => 'রেফ্রিজারেটর',
-                'children' => [
-                    'Single Door Fridges' => [
-                        'bn_name' => 'সিঙ্গেল ডোর ফ্রিজ',
-                        'children' => [
-                            ['name' => '165 Liter Refrigerator', 'bn_name' => '১৬৫ লিটার রেফ্রিজারেটর'],
-                            ['name' => '190 Liter Refrigerator', 'bn_name' => '১৯০ লিটার রেফ্রিজারেটর'],
-                            ['name' => '230 Liter Refrigerator', 'bn_name' => '২৩০ লিটার রেফ্রিজারেটর'],
-                        ]
-                    ],
-                    'Double Door Fridges' => [
-                        'bn_name' => 'ডাবল ডোর ফ্রিজ',
-                        'children' => [
-                            ['name' => '250 Liter Refrigerator', 'bn_name' => '২৫০ লিটার রেফ্রিজারেটর'],
-                            ['name' => '300 Liter Refrigerator', 'bn_name' => '৩০০ লিটার রেফ্রিজারেটর'],
-                            ['name' => '350 Liter Refrigerator', 'bn_name' => '৩৫০ লিটার রেফ্রিজারেটর'],
-                        ]
-                    ],
-                ]
-            ],
-
+            // =============================================
+            // FEATURED CATEGORY: LED TV
+            // =============================================
             'LED TV' => [
                 'bn_name' => 'এলইডি টিভি',
+                'show_in_nav' => false,
+                'is_featured' => true,
+                'nav_order' => 999,
+                'description' => 'Frameless smart LED TVs with voice control, Google OS, Android OS and built-in streaming apps.',
                 'children' => [
-                    'Smart TVs' => [
-                        'bn_name' => 'স্মার্ট টিভি',
-                        'children' => [
-                            ['name' => '32 inch Smart TV', 'bn_name' => '৩২ ইঞ্চি স্মার্ট টিভি'],
-                            ['name' => '43 inch Smart TV', 'bn_name' => '৪৩ ইঞ্চি স্মার্ট টিভি'],
-                            ['name' => '55 inch Smart TV', 'bn_name' => '৫৫ ইঞ্চি স্মার্ট টিভি'],
-                        ]
-                    ],
-                    'Android TVs' => [
-                        'bn_name' => 'অ্যান্ড্রয়েড টিভি',
-                        'children' => [
-                            ['name' => 'Android 11 TV', 'bn_name' => 'অ্যান্ড্রয়েড ১১ টিভি'],
-                            ['name' => 'Google TV', 'bn_name' => 'গুগল টিভি'],
-                            ['name' => 'Built-in Netflix TV', 'bn_name' => 'নেটফ্লিক্স সহ টিভি'],
-                        ]
-                    ],
+                    ['name' => '32 inch LED TV', 'bn_name' => '৩২ ইঞ্চি এলইডি টিভি', 'slug' => '32-inch-led-tv'],
+                    ['name' => '43 inch LED TV', 'bn_name' => '৪৩ ইঞ্চি এলইডি টিভি', 'slug' => '43-inch-led-tv'],
                 ]
             ],
 
-            'Mixer Grinder' => [
-                'bn_name' => 'মিক্সার গ্রাইন্ডার',
+            // =============================================
+            // FEATURED CATEGORY: WASHING MACHINE
+            // =============================================
+            'Washing Machine' => [
+                'bn_name' => 'ওয়াশিং মেশিন',
+                'show_in_nav' => false,
+                'is_featured' => true,
+                'nav_order' => 999,
+                'description' => 'Fully automatic top loading washing machines 8KG with multiple wash programs and energy efficiency.',
+                'has_children' => false,
+            ],
+
+            // =============================================
+            // FEATURED CATEGORY: REFRIGERATOR
+            // =============================================
+            'Refrigerator' => [
+                'bn_name' => 'রেফ্রিজারেটর',
+                'show_in_nav' => false,
+                'is_featured' => true,
+                'nav_order' => 999,
+                'description' => 'Direct cool and bottom mount refrigerators with 3D cooling technology and decorative printed designs.',
                 'children' => [
-                    'Heavy Duty Mixers' => [
-                        'bn_name' => 'হেভি ডিউটি মিক্সার',
-                        'children' => [
-                            ['name' => '1000W Mixer Grinder', 'bn_name' => '১০০০ ওয়াট মিক্সার গ্রাইন্ডার'],
-                            ['name' => '750W Mixer Grinder', 'bn_name' => '৭৫০ ওয়াট মিক্সার গ্রাইন্ডার'],
-                            ['name' => 'Commercial Mixers', 'bn_name' => 'কমার্শিয়াল মিক্সার'],
-                        ]
-                    ],
-                    'Compact Mixers' => [
-                        'bn_name' => 'কমপ্যাক্ট মিক্সার',
-                        'children' => [
-                            ['name' => '3 Jar Mixer', 'bn_name' => '৩ জার মিক্সার'],
-                            ['name' => '500W Mixer Grinder', 'bn_name' => '৫০০ ওয়াট মিক্সার গ্রাইন্ডার'],
-                            ['name' => 'Mini Mixer Grinder', 'bn_name' => 'মিনি মিক্সার গ্রাইন্ডার'],
-                        ]
-                    ],
+                    ['name' => '202L Refrigerator', 'bn_name' => '২০২ লিটার রেফ্রিজারেটর', 'slug' => '202l-refrigerator'],
+                    ['name' => '235L Refrigerator', 'bn_name' => '২৩৫ লিটার রেফ্রিজারেটর', 'slug' => '235l-refrigerator'],
+                    ['name' => '252L Refrigerator', 'bn_name' => '২৫২ লিটার রেফ্রিজারেটর', 'slug' => '252l-refrigerator'],
+                    ['name' => '302L Refrigerator', 'bn_name' => '৩০২ লিটার রেফ্রিজারেটর', 'slug' => '302l-refrigerator'],
+                    ['name' => 'Bottom Mount Refrigerator', 'bn_name' => 'বটম মাউন্ট রেফ্রিজারেটর', 'slug' => 'bottom-mount-refrigerator'],
                 ]
             ],
         ];
 
-        $order = 1;
-
-        foreach ($categories as $name => $data) {
+        foreach ($remainingCategories as $name => $data) {
             $slug = Str::slug($name);
             $bnName = $data['bn_name'] ?? '';
+            $showInNav = $data['show_in_nav'] ?? false;
+            $isFeatured = $data['is_featured'] ?? false;
+            $navOrder = $data['nav_order'] ?? 999;
+            $description = $data['description'] ?? '';
+            $hasChildren = $data['has_children'] ?? true;
 
-            // Create main category (Level 1)
+            // Create main category (Level 1) - no parent
             $mainCategory = Category::updateOrCreate(
                 ['slug' => $slug],
                 [
-                    // 'name' => $name,
                     'name_en' => $name,
                     'name_bn' => $bnName,
-                    // 'description' => $this->getDescription($name),
-                    'description_en' => $this->getDescription($name),
-                    'description_bn' => $this->getBanglaDescription($name),
-                    'image' => $this->getCategoryImage($slug),
+                    'description_en' => $description,
+                    'description_bn' => $this->translateDescription($description),
+                    'image' => $this->imageMapping[$slug] ?? 'categories/default.png',
                     'parent_id' => null,
+                    'depth' => 1,
                     'order' => $order++,
-                    'nav_order' => $order,
-                    'show_in_nav' => true,
-                    'is_featured' => in_array($name, ['Air Conditioner', 'Refrigerator', 'LED TV']),
+                    'nav_order' => $navOrder,
+                    'show_in_nav' => $showInNav,
+                    'is_featured' => $isFeatured,
                     'is_active' => true,
                     'meta_title' => $name . ' - Best Products Online',
-                    'meta_description' => 'Shop for ' . strtolower($name) . ' at best prices. Top brands available.',
-                    'meta_keywords' => $this->getKeywords($name),
+                    'meta_description' => 'Shop for ' . strtolower($name) . ' at best prices in Bangladesh.',
+                    'meta_keywords' => $this->generateKeywords($name),
                 ]
             );
 
-            // Create Level 2 categories (children)
-            if (isset($data['children']) && is_array($data['children'])) {
+            // Create Level 2 categories (LEAF NODES) if has children
+            if ($hasChildren && isset($data['children']) && is_array($data['children'])) {
                 $childOrder = 1;
-                foreach ($data['children'] as $childName => $childData) {
-                    $childSlug = Str::slug($childName);
-                    $childBnName = $childData['bn_name'] ?? '';
+                foreach ($data['children'] as $child) {
+                    $childName = $child['name'];
+                    $childBnName = $child['bn_name'] ?? '';
+                    $childSlug = $child['slug'] ?? Str::slug($childName);
 
-                    $childCategory = Category::updateOrCreate(
+                    Category::updateOrCreate(
                         [
                             'slug' => $childSlug,
                             'parent_id' => $mainCategory->id
                         ],
                         [
-                            // 'name' => $childName,
                             'name_en' => $childName,
                             'name_bn' => $childBnName,
-                            // 'description' => $this->getDescription($childName),
-                            'description_en' => $this->getDescription($childName),
-                            'description_bn' => $this->getBanglaDescription($childName),
-                            'image' => $this->getCategoryImage($childSlug),
+                            'description_en' => $this->getLeafDescription($childName),
+                            'description_bn' => $this->translateDescription($this->getLeafDescription($childName)),
+                            'image' => $this->imageMapping[$childSlug] ?? $this->imageMapping[$slug] ?? 'categories/default.png',
+                            'depth' => 2,
                             'order' => $childOrder++,
-                            'show_in_nav' => true,
+                            'show_in_nav' => false,
                             'is_featured' => false,
                             'is_active' => true,
-                            'meta_title' => $childName . ' - ' . $name,
-                            'meta_description' => 'Best ' . strtolower($childName) . ' under ' . $name . ' category.',
+                            'meta_title' => $childName . ' - Buy Online',
+                            'meta_description' => 'Buy ' . strtolower($childName) . ' at best price in Bangladesh.',
                         ]
                     );
-
-                    // Create Level 3 categories (grandchildren)
-                    if (isset($childData['children']) && is_array($childData['children'])) {
-                        $grandChildOrder = 1;
-                        foreach ($childData['children'] as $grandChild) {
-                            $grandChildName = $grandChild['name'];
-                            $grandChildBnName = $grandChild['bn_name'] ?? '';
-                            $grandChildSlug = Str::slug($grandChildName);
-
-                            Category::updateOrCreate(
-                                [
-                                    'slug' => $grandChildSlug,
-                                    'parent_id' => $childCategory->id
-                                ],
-                                [
-                                    // 'name' => $grandChildName,
-                                    'name_en' => $grandChildName,
-                                    'name_bn' => $grandChildBnName,
-                                    // 'description' => $this->getDescription($grandChildName),
-                                    'description_en' => $this->getDescription($grandChildName),
-                                    'description_bn' => $this->getBanglaDescription($grandChildName),
-                                    'image' => $this->getCategoryImage($grandChildSlug, $childSlug),
-                                    'order' => $grandChildOrder++,
-                                    'show_in_nav' => false,
-                                    'is_featured' => false,
-                                    'is_active' => true,
-                                    'meta_title' => $grandChildName . ' - ' . $childName,
-                                    'meta_description' => 'Find ' . strtolower($grandChildName) . ' in ' . $childName . ' section.',
-                                ]
-                            );
-                        }
-                    }
                 }
             }
         }
 
         $this->command->info('✅ Categories seeded successfully!');
-        $this->command->info('📁 Total categories created: ' . Category::count());
-        $this->command->info('📁 Level 1 (Parent) categories: ' . Category::whereNull('parent_id')->count());
-        $this->command->info('📁 Level 2 (Child) categories: ' . Category::whereNotNull('parent_id')->whereDoesntHave('children')->count());
-        $this->command->info('📁 Level 3 (Grandchild) categories: ' . Category::whereHas('parent', function ($q) {
-            $q->whereNotNull('parent_id');
-        })->count());
+        $this->command->info('📁 Total categories: ' . Category::count());
+        $this->command->info('📁 Level 1 (Parent): ' . Category::whereNull('parent_id')->count());
+        $this->command->info('📁 Level 2: ' . Category::where('depth', 2)->count());
+        $this->command->info('📁 Level 3 (Leaf): ' . Category::where('depth', 3)->count());
+        $this->command->info('⭐ Featured categories: ' . Category::where('is_featured', true)->count());
+        $this->command->info('🧭 Navigation categories: ' . Category::where('show_in_nav', true)->count());
     }
 
-    /**
-     * Get image for category based on slug
-     */
-    private function getCategoryImage(string $slug, ?string $parentSlug = null): ?string
+    private function getLeafDescription(string $name): string
     {
-        // Check if we have a direct mapping
-        if (isset($this->imageMapping[$slug])) {
-            return 'categories/' . $this->imageMapping[$slug] . '.png';
-        }
-
-        // Try parent image with suffix if available
-        if ($parentSlug && isset($this->imageMapping[$parentSlug])) {
-            $parentImage = $this->imageMapping[$parentSlug];
-            return 'categories/' . $parentImage . '-item.png';
-        }
-
-        // Fallback to generic image
-        return 'categories/electronics.png';
+        return "High quality {$name} with warranty and fast delivery across Bangladesh at competitive prices.";
     }
 
-    /**
-     * Get English description for category
-     */
-    private function getDescription(string $categoryName): string
+    private function translateDescription(string $text): string
     {
-        $descriptions = [
-            'Air Conditioner' => 'Cooling solutions including split AC, window AC, and portable AC with energy-saving technology.',
-            'Fan' => 'Wide range of fans including ceiling fans, tower fans, and table fans for all cooling needs.',
-            'Refrigerator' => 'Refrigerators including single door, double door, and side-by-side models with advanced cooling technology.',
-            'LED TV' => 'LED TVs including Smart TVs, Android TVs, OLED, and 4K Ultra HD models with latest display technology.',
-            'Mixer Grinder' => 'Mixer grinders, blenders, and food processors for all kitchen needs with powerful motors.',
-            'Split AC' => 'Energy efficient split air conditioners for home and office cooling.',
-            'Window AC' => 'Compact window air conditioners for easy installation and space saving.',
-            'Ceiling Fan' => 'Ceiling fans with various designs and energy saving features.',
-            'Table Fan' => 'Portable table fans for personal cooling needs.',
-            'Single Door Fridges' => 'Single door refrigerators perfect for small families and apartments.',
-            'Double Door Fridges' => 'Double door refrigerators with separate freezer compartments.',
-            'Smart TVs' => 'Smart televisions with built-in streaming apps and internet connectivity.',
-            'Android TVs' => 'Android based smart TVs with access to Google Play Store.',
-            'Heavy Duty Mixers' => 'Powerful mixer grinders for heavy kitchen use.',
-            'Compact Mixers' => 'Compact mixer grinders for small families and occasional use.',
+        $translations = [
+            'High quality' => 'উচ্চ মানের',
+            'with' => 'সহ',
+            'and' => 'এবং',
+            'Electric' => 'ইলেকট্রিক',
+            'Stainless steel' => 'স্টেইনলেস স্টিল',
+            'Fan' => 'ফ্যান',
+            'Mixer Grinder' => 'মিক্সার গ্রাইন্ডার',
+            'Cookware' => 'কুকওয়্যার',
+            'Gas Burner' => 'গ্যাস বার্নার',
+            'Pressure Cooker' => 'প্রেসার কুকার',
+            'Rice Cooker' => 'রাইস কুকার',
+            'Home Appliance' => 'হোম অ্যাপ্লায়েন্স',
+            'Kitchen Appliance' => 'কিচেন অ্যাপ্লায়েন্স',
         ];
 
-        // Try exact match first
-        if (isset($descriptions[$categoryName])) {
-            return $descriptions[$categoryName];
+        $translated = $text;
+        foreach ($translations as $en => $bn) {
+            $translated = str_replace($en, $bn, $translated);
         }
-
-        // Generic description
-        return $categoryName . ' products with best quality and competitive prices.';
+        return $translated;
     }
 
-    /**
-     * Get Bangla description for category
-     */
-    private function getBanglaDescription(string $categoryName): string
+    private function generateKeywords(string $name): string
     {
-        $descriptions = [
-            'Air Conditioner' => 'এনার্জি সেভিং টেকনোলজি সহ স্প্লিট এসি, উইন্ডো এসি এবং পোর্টেবল এসি সহ কুলিং সমাধান।',
-            'Fan' => 'সব কুলিং চাহিদার জন্য সিলিং ফ্যান, টাওয়ার ফ্যান এবং টেবিল ফ্যান সহ ফ্যানের বিস্তৃত পরিসর।',
-            'Refrigerator' => 'উন্নত কুলিং প্রযুক্তি সহ সিঙ্গেল ডোর, ডাবল ডোর এবং সাইড বাই সাইড মডেল সহ রেফ্রিজারেটর।',
-            'LED TV' => 'স্মার্ট টিভি, অ্যান্ড্রয়েড টিভি, ওএলইডি এবং ৪কে আলট্রা এইচডি মডেল সহ এলইডি টিভি।',
-            'Mixer Grinder' => 'শক্তিশালী মোটর সহ সমস্ত রান্নাঘরের প্রয়োজনের জন্য মিক্সার গ্রাইন্ডার, ব্লেন্ডার এবং ফুড প্রসেসর।',
-            'Split AC' => 'বাড়ি এবং অফিসের কুলিংয়ের জন্য শক্তি-দক্ষ স্প্লিট এয়ার কন্ডিশনার।',
-            'Window AC' => 'সহজ ইনস্টলেশন এবং স্পেস সেভিংয়ের জন্য কমপ্যাক্ট উইন্ডো এয়ার কন্ডিশনার।',
-            'Ceiling Fan' => 'বিভিন্ন ডিজাইন এবং শক্তি সঞ্চয় বৈশিষ্ট্য সহ সিলিং ফ্যান।',
-            'Table Fan' => 'ব্যক্তিগত কুলিং চাহিদার জন্য পোর্টেবল টেবিল ফ্যান।',
-            'Single Door Fridges' => 'ছোট পরিবার এবং অ্যাপার্টমেন্টের জন্য উপযুক্ত সিঙ্গেল ডোর রেফ্রিজারেটর।',
-            'Double Door Fridges' => 'পৃথক ফ্রিজার কম্পার্টমেন্ট সহ ডাবল ডোর রেফ্রিজারেটর।',
-            'Smart TVs' => 'বিল্ট-ইন স্ট্রিমিং অ্যাপস এবং ইন্টারনেট সংযোগ সহ স্মার্ট টেলিভিশন।',
-            'Android TVs' => 'গুগল প্লে স্টোরের অ্যাক্সেস সহ অ্যান্ড্রয়েড ভিত্তিক স্মার্ট টিভি।',
-            'Heavy Duty Mixers' => 'ভারী রান্নাঘরের ব্যবহারের জন্য শক্তিশালী মিক্সার গ্রাইন্ডার।',
-            'Compact Mixers' => 'ছোট পরিবার এবং মাঝে মাঝে ব্যবহারের জন্য কমপ্যাক্ট মিক্সার গ্রাইন্ডার।',
-        ];
-
-        // Try exact match first
-        if (isset($descriptions[$categoryName])) {
-            return $descriptions[$categoryName];
-        }
-
-        // Generic Bangla description
-        return 'সেরা গুণমান এবং প্রতিযোগিতামূলক মূল্যে ' . $categoryName . ' পণ্য।';
-    }
-
-    /**
-     * Get SEO keywords for category
-     */
-    private function getKeywords(string $categoryName): string
-    {
-        $keywordsMap = [
-            'Air Conditioner' => 'ac, air conditioning, cooling, split ac, window ac',
-            'Fan' => 'ceiling fan, table fan, tower fan, wall fan, cooling fan',
-            'Refrigerator' => 'fridge, refrigerator, cooling appliance, freezer',
-            'LED TV' => 'television, smart tv, led television, android tv',
-            'Mixer Grinder' => 'mixer, grinder, blender, food processor, kitchen appliance',
-        ];
-
-        $baseKeywords = strtolower($categoryName);
-        $additional = $keywordsMap[$categoryName] ?? 'home appliance, electronics, gadgets';
-
-        return $baseKeywords . ', ' . $additional;
+        $base = strtolower($name);
+        return "{$base}, buy {$base}, {$base} price bangladesh, best {$base}, {$base} online";
     }
 }

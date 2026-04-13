@@ -12,8 +12,7 @@ class Address extends Model
     protected $fillable = [
         'user_id',
         'type',
-        'first_name',
-        'last_name',
+        'name',
         'email',
         'phone',
         'address_line_1',
@@ -22,8 +21,9 @@ class Address extends Model
         'state',
         'postal_code',
         'country',
-        'is_default'
+        'is_default',
     ];
+
 
     protected $casts = [
         'is_default' => 'boolean'

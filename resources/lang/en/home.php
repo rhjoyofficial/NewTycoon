@@ -6,4 +6,9 @@ return [
     'recommended' => 'Recommended for You',
     'new-arrivals' => 'New Arrivals',
     'special-offer-products' => 'Special Offer Products',
+    'catalogs' => 'Catalogs',
+    'cat-button' => 'View All Categories',
+    'all-categories' => 'All Categories',
+    'popular-searches' => 'Popular Searches',
+    'search' => 'Search',
 ];

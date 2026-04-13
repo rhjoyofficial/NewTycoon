@@ -8,6 +8,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules;
@@ -27,59 +28,60 @@ class RegisteredUserController extends Controller
     /**
      * Handle registration.
      */
+
     public function store(Request $request): RedirectResponse
     {
+        // 1. Validation (Keep outside transaction)
         try {
             $request->validate([
-                'name' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+                'name' => ['required',  'string',  'max:255',  'regex:/^[a-zA-Z\s]+$/'],
+                'email' => ['required',  'string',  'lowercase',  'email:rfc,dns',  'max:255',  'unique:' . User::class],
                 'password' => ['required', 'confirmed', Rules\Password::defaults()],
             ]);
         } catch (Throwable $e) {
-            Log::error('Registration validation failed', [
-                'input' => $request->all(),
-                'error' => $e->getMessage(),
-            ]);
+            Log::error('Registration validation failed', ['error' => $e->getMessage()]);
             throw $e;
         }
 
+        // Start the Transaction
+        DB::beginTransaction();
+
         try {
+            // 2. Create User & Auto-Verify
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
             ]);
-        } catch (Throwable $e) {
-            Log::error('User creation failed', [
-                'input' => $request->all(),
-                'error' => $e->getMessage(),
-            ]);
-            throw $e;
-        }
+            $user->markEmailAsVerified();
 
-        try {
+            // 3. Assign Role
             $user->assignRole('customer');
-        } catch (Throwable $e) {
-            Log::error('Assigning default role failed', [
-                'user_id' => $user->id ?? null,
-                'error' => $e->getMessage(),
-            ]);
-            throw $e;
-        }
 
-        try {
+            // 4. Create Profile
             $user->profile()->create([]);
+
+            // If we reach here, everything worked!
+            DB::commit();
+
+            Auth::login($user);
+
+            // Custom flash message: flash(message, action, time)
+            flash('Welcome! Your account has been created successfully.', 'success', 2000);
+
+            return redirect()->route('home');
         } catch (Throwable $e) {
-            Log::error('Creating empty user profile failed', [
-                'user_id' => $user->id ?? null,
+            // Something went wrong, undo everything in the DB
+            DB::rollBack();
+
+            Log::error('Registration failed at some point', [
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
-            throw $e;
+
+            flash('Registration failed. Please try again.', 'error', 5000);
+
+            return redirect()->back()->withInput();
         }
-
-        event(new Registered($user));
-        Auth::login($user);
-
-        return redirect()->route('home');
     }
 }

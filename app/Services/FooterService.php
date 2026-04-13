@@ -32,11 +32,11 @@ class FooterService
             'brand' => [
                 'name'        => $settings?->brand_name ?? 'TYCOON',
                 'description' => $settings?->brand_description ?? '',
-                'productImage' => $settings?->product_image ?? null,
-                'productLink' => $settings?->product_link ?? '/',
+                'address'     => $settings?->address ?? '',
             ],
             'payments' => $settings?->payment_methods ?? [],
             'social_links' => $settings?->social_links ?? [],
+            'contact_info' => $settings?->contact_info ?? [],
         ];
     }
 }

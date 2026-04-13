@@ -1,10 +1,9 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Frontend\CartController;
+use App\Http\Controllers\Frontend\CatalogController;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\OrderController;
 use App\Http\Controllers\Frontend\ReviewController;
@@ -31,13 +30,24 @@ Route::get('/language/{locale}', function ($locale) {
     session(['locale' => $locale]);
     cookie()->queue('locale', $locale, 60 * 24 * 30);
 
-    return redirect()->back();
+    return redirect()->back()->withHeaders([
+        'X-Frame-Options' => 'DENY',
+        'X-Content-Type-Options' => 'nosniff'
+    ]);
 });
 
 
 // Products
-Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-Route::get('/products/category/{category:slug}', [ProductController::class, 'category'])->name('products.category');
+Route::prefix('products')->name('products.')->controller(ProductController::class)->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::get('/category/{category:slug}', 'category')->name('category');
+    Route::get('/featured-products', 'featured')->name('featured');
+    Route::get('/new-arrivals', 'newArrivals')->name('new-arrivals');
+    Route::get('/best-selling', 'bestSelling')->name('best-selling');
+    Route::get('/recommended', 'recommended')->name('recommended');
+    Route::get('/offers', 'offers')->name('offers');
+});
+
 Route::get('/product/{product:slug}', [ProductController::class, 'show'])->name('product.show');
 
 // Categories
@@ -48,10 +58,11 @@ Route::get('/category/{category:slug}', [CategoryController::class, 'show'])->na
 Route::get('/brands', [ProductController::class, 'brands'])->name('brands.index');
 
 // Search Routes
-Route::get('/search/suggest', [SearchController::class, 'suggest'])->name('search.suggest');
-Route::get('/search', [SearchController::class, 'search'])->name('search');
-Route::get('/search/popular', [SearchController::class, 'popular'])->name('search.popular');
-
+Route::middleware(['throttle:60,1'])->group(function () {
+    Route::get('/search/suggest', [SearchController::class, 'suggest'])->name('search.suggest');
+    Route::get('/search', [SearchController::class, 'search'])->name('search');
+    Route::get('/search/popular', [SearchController::class, 'popular'])->name('search.popular');
+});
 
 // Cart Routes (available for guests and user)
 Route::prefix('cart')->name('cart.')->group(function () {
@@ -72,9 +83,19 @@ Route::middleware('auth')->prefix('wishlist')->name('wishlist.')->group(function
 
 // Checkout (guest + user)
 Route::prefix('checkout')->name('checkout.')->group(function () {
+    // Cart checkout
     Route::get('/', [CheckoutController::class, 'index'])->name('index');
+
+    // Buy Now checkout
+    Route::post('/buy-now/{product}', [CheckoutController::class, 'buyNow'])->name('buy-now');
+    Route::get('/buy-now', [CheckoutController::class, 'buyNowCheckout'])->name('buy-now-checkout');
+
+    // Process checkout (handles both)
     Route::post('/process', [CheckoutController::class, 'process'])->name('process');
-    Route::get('/success/{order}', [CheckoutController::class, 'success'])->name('success');
+
+    // Success, failed, cancel
+    Route::get('/success/{orderNumber}', [CheckoutController::class, 'success'])->name('success');
+    Route::get('/failed', [CheckoutController::class, 'failed'])->name('failed');
     Route::get('/cancel', [CheckoutController::class, 'cancel'])->name('cancel');
 });
 
@@ -115,8 +136,11 @@ Route::view('/technology-and-innovation', 'frontend.pages.technology')->name('te
 Route::view('/certifications', 'frontend.pages.certifications')->name('certifications');
 Route::view('/partners', 'frontend.pages.partners')->name('partners');
 Route::view('/sustainability', 'frontend.pages.sustainability')->name('sustainability');
+Route::get('/catalogs', [CatalogController::class, 'index'])->name('catalogs');
+Route::get('/catalog/view/{catalog}', [CatalogController::class, 'view'])->name('catalog.view');
+Route::view('/careers', 'frontend.pages.careers')->name('careers');
 
-// =========================
+// =========================    
 // Support & Service
 // =========================
 Route::view('/contact', 'frontend.pages.contact')->name('contact');
@@ -146,9 +170,10 @@ Route::view('/privacy', 'frontend.pages.privacy')->name('privacy');
 Route::post('/contact', [HomeController::class, 'contactSubmit'])->name('contact.submit');
 
 // Newsletter routes
-Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
-Route::post('/newsletter/unsubscribe', [NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
-
+Route::middleware(['throttle:60,1'])->group(function () {
+    Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+    Route::post('/newsletter/unsubscribe', [NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
+});
 // ==============================
 // AUTHENTICATED USER DASHBOARD
 // ==============================
@@ -156,7 +181,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [ProfileController::class, 'dashboard'])->name('dashboard');
 
     // User Orders
-    Route::get('/my-orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/my-orders', [OrderController::class, 'index'])->name('account.orders');
     Route::get('/my-orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('/my-orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
     Route::post('/my-orders/{order}/return', [OrderController::class, 'return'])->name('orders.return');
@@ -165,25 +190,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/downloads', [ProfileController::class, 'downloads'])->name('downloads');
     // User Profile Management
     Route::get('/profile', [ProfileController::class, 'profile'])->name('profile');
-    Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/update', [ProfileController::class, 'updateProfile']);
     Route::put('/profile/password', [ProfileController::class, 'updateProfilePassword'])->name('profile.password.update');
-    Route::delete('/profile/delete', [ProfileController::class, 'deleteAccount'])->name('profile.delete');
-});
-
-// ==============================
-// TESTING WER ROUTES
-// ==============================
-Route::get('/test-flash', function () {
-    flash('Success! Progress bar should work now.', 'success', 8000);
-    flash('Error test with longer description.', 'error', 6000, 'Detailed error message here');
-    flash('Warning message', 'warning', 4000);
-    flash('Info message', 'info', 10000, 'This should show a progress bar');
-
-    return view('test-flash');
-});
-
-Route::get('/test-flash-ajax', function () {
-    return response()->json(['success' => true]);
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::delete('/profile/delete', [ProfileController::class, 'deleteAccount']);
 });
 
 // ==============================

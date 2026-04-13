@@ -1,60 +1,56 @@
 <!-- resources/views/components/hero-swiper.blade.php -->
 <section class="relative w-full overflow-hidden">
-    <div
-        class="swiper heroSwiper w-full aspect-video md:aspect-auto md:h-[70vh] lg:h-[80vh] max-h-[850px] overflow-hidden bg-gray-900">
+    <div class="swiper heroSwiper w-full aspect-[16/9] lg:aspect-[64/25] max-h-[850px] overflow-hidden bg-gray-900/50">
         <div class="swiper-wrapper">
             @foreach ($heroSlides as $slide)
                 <div class="swiper-slide relative w-full h-full">
 
-                    @if ($slide['type'] === 'video')
+                    @if ($slide->type === 'video')
                         <video class="absolute inset-0 w-full h-full object-cover" autoplay muted loop playsinline>
-                            <source src="{{ asset('storage/' . $slide['background']) }}" type="video/mp4">
+                            <source src="{{ asset('storage/' . $slide->background) }}" type="video/mp4">
                         </video>
                     @else
-                        <img src="{{ asset('storage/' . $slide['background']) }}" alt="{{ $slide['title'] ?? '' }}"
-                            class="absolute inset-0 w-full h-full object-contain lg:object-cover">
+                        <img src="{{ asset('storage/' . $slide->background) }}" alt="{{ $slide->title ?? '' }}"
+                            class="absolute inset-0 w-full h-full object-cover object-center">
                     @endif
 
-                    <div class="absolute inset-0 bg-black/40 {{ $slide['has_content'] ? '' : 'hidden' }}"></div>
+                    <div class="absolute inset-0 bg-black/40 {{ $slide->has_content ? '' : 'hidden' }}"></div>
 
                     @if ($slide->has_content)
                         <div class="absolute inset-0 flex items-center justify-center">
                             <div class="container mx-auto px-6 md:px-12 lg:px-16 w-full">
                                 <div
-                                    class="max-w-3xl transition-all duration-700 {{ $slide->content_position === 'right' ? 'ml-auto text-right' : ($slide->content_position === 'center' ? 'mx-auto text-center' : 'text-left') }}">
+                                    class="max-w-3xl transition-all duration-700 
+                                    {{ $slide->content_position === 'right' ? 'ml-auto text-right' : ($slide->content_position === 'center' ? 'mx-auto text-center' : 'text-left') }}">
 
-                                    @if ($slide->badge)
+                                    @if ($slide->badge_en || $slide->badge_bn)
                                         <div class="inline-flex items-center px-3 py-1 bg-white/10 rounded-full mb-4">
                                             <span class="text-xs uppercase font-bold text-white">
-                                                {{ $slide->badge }}
+                                                {{ app()->getLocale() === 'bn' ? $slide->badge_bn ?? $slide->badge_en : $slide->badge_en }}
                                             </span>
                                         </div>
                                     @endif
 
-                                    @if ($slide->title)
+                                    @if ($slide->title_en || $slide->title_bn)
                                         <h1 class="text-4xl md:text-6xl font-bold text-white mb-4">
-                                            {!! $slide->title !!}
+                                            {!! app()->getLocale() === 'bn' ? $slide->title_bn ?? $slide->title_en : $slide->title_en !!}
                                         </h1>
                                     @endif
 
-                                    @if ($slide->subtitle)
+                                    @if ($slide->subtitle_en || $slide->subtitle_bn)
                                         <p class="text-lg text-white/80 mb-8">
-                                            {{ $slide->subtitle }}
+                                            {{ app()->getLocale() === 'bn' ? $slide->subtitle_bn ?? $slide->subtitle_en : $slide->subtitle_en }}
                                         </p>
                                     @endif
 
                                     @if ($slide->has_cta && !empty($slide->cta_buttons))
                                         <div
-                                            class="flex gap-4
-                        {{ $slide->content_position === 'center'
-                            ? 'justify-center'
-                            : ($slide->content_position === 'right'
-                                ? 'justify-end'
-                                : 'justify-start') }}">
+                                            class="flex gap-4 
+                                            {{ $slide->content_position === 'center' ? 'justify-center' : ($slide->content_position === 'right' ? 'justify-end' : 'justify-start') }}">
                                             @foreach ($slide->cta_buttons as $button)
                                                 <a href="{{ $button['url'] }}"
-                                                    class="px-6 py-3 rounded-lg font-bold
-                               {{ $button['style'] === 'primary' ? 'bg-white text-black' : 'border border-white text-white' }}">
+                                                    class="px-6 py-3 rounded-lg font-bold transition-colors
+                                                    {{ $button['style'] === 'primary' ? 'bg-white text-black hover:bg-white/90' : 'border border-white text-white hover:bg-white/10' }}">
                                                     {{ app()->getLocale() === 'bn' ? $button['label_bn'] ?? $button['label_en'] : $button['label_en'] }}
                                                 </a>
                                             @endforeach
@@ -69,49 +65,34 @@
             @endforeach
         </div>
 
-        <!-- Progress Bar Container -->
+        <!-- Progress Bar and Controls -->
         <div
             class="hidden md:block absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10 w-full max-w-xl px-4 md:px-8">
             <div class="flex items-center gap-4 md:gap-6">
-                <!-- Progress Bar -->
                 <div class="flex-1 h-2 bg-white/20 rounded-full overflow-hidden relative group">
-                    <!-- Background Track -->
                     <div class="absolute inset-0 bg-white/10 rounded-full"></div>
-
-                    <!-- Progress Fill with Gradient -->
                     <div
                         class="swiper-progress-fill absolute inset-0 rounded-full bg-gradient-to-r from-primary to-accent transform origin-left scale-x-0 transition-transform duration-100 ease-linear">
                     </div>
-
-                    <!-- Individual Slide Segments (Optional) -->
                     <div class="absolute inset-0 flex">
                         @for ($i = 0; $i < count($heroSlides); $i++)
                             <div class="flex-1 border-r border-white/10 last:border-r-0"></div>
                         @endfor
                     </div>
-
-                    <!-- Hover Indicator -->
-                    <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <div
-                            class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-[shimmer_2s_infinite]">
-                        </div>
-                    </div>
                 </div>
 
-                <!-- Slide Counter -->
                 <div class="flex items-center gap-2">
-                    <div class="text-white font-semibold text-sm md:text-base min-w-[70px] text-center">
+                    <div class="text-black font-semibold text-sm md:text-base min-w-[70px] text-center">
                         <span class="swiper-current-slide">1</span> / <span
                             class="swiper-total-slides">{{ count($heroSlides) }}</span>
                     </div>
 
-                    <!-- Autoplay Toggle -->
                     <button
-                        class="swiper-autoplay-toggle w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-300">
-                        <svg class="w-4 h-4 text-white swiper-play-icon" fill="currentColor" viewBox="0 0 24 24">
+                        class="swiper-autoplay-toggle w-8 h-8 flex items-center justify-center rounded-full bg-black/10 hover:bg-black/20 transition-colors duration-300">
+                        <svg class="w-4 h-4 text-black swiper-play-icon" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M6 4l12 8-12 8z" />
                         </svg>
-                        <svg class="w-4 h-4 text-white swiper-pause-icon hidden" fill="currentColor"
+                        <svg class="w-4 h-4 text-black swiper-pause-icon hidden" fill="currentColor"
                             viewBox="0 0 24 24">
                             <path d="M6 4h4v16H6zm8 0h4v16h-4z" />
                         </svg>
@@ -120,14 +101,13 @@
             </div>
         </div>
 
-        <!-- Swiper Navigation -->
+        <!-- Navigation -->
         <div
             class="hidden md:flex absolute inset-y-0 left-4 xl:left-5 2xl:left-8 items-center z-20 pointer-events-none">
             <button type="button" aria-label="Previous slide"
-                class="swiper-button-prev pointer-events-auto w-6 h-6 xl:w-8 xl:h-8 2xl:w-12 2xl:h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 hover:border-primary/30 transition-all duration-300 flex items-center justify-center group active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed">
-
+                class="swiper-button-prev pointer-events-auto w-6 h-6 xl:w-8 xl:h-8 2xl:w-12 2xl:h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 hover:border-primary/30 transition-all duration-300 flex items-center justify-center group">
                 <svg class="w-3 h-3 2xl:w-5 2xl:h-5 text-gray-700 group-hover:text-primary transition-colors"
-                    viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    viewBox="0 0 24 24" fill="currentColor">
                     <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
                 </svg>
             </button>
@@ -136,18 +116,18 @@
         <div
             class="hidden md:flex absolute inset-y-0 right-4 xl:right-5 2xl:right-8 items-center z-20 pointer-events-none">
             <button type="button" aria-label="Next slide"
-                class="swiper-button-next pointer-events-auto w-6 h-6 xl:w-8 xl:h-8 2xl:w-12 2xl:h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 hover:border-primary/30 transition-all duration-300 flex items-center justify-center group active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed">
-
+                class="swiper-button-next pointer-events-auto w-6 h-6 xl:w-8 xl:h-8 2xl:w-12 2xl:h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 hover:border-primary/30 transition-all duration-300 flex items-center justify-center group">
                 <svg class="w-3 h-3 2xl:w-5 2xl:h-5 text-gray-700 group-hover:text-primary transition-colors"
-                    viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    viewBox="0 0 24 24" fill="currentColor">
                     <path d="M8.59 16.59 10 18l6-6-6-6-1.41 1.41L13.17 12z" />
                 </svg>
             </button>
         </div>
-        <!-- Bullet Indicators (Optional - Removed if you want only progress bar) -->
+
         <div class="md:hidden swiper-pagination"></div>
     </div>
 </section>
+
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
