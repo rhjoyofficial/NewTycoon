@@ -20,7 +20,7 @@
                     <h2 class="text-white text-3xl md:text-3xl font-bold font-poppins mb-2">
                         {{ $offer->title }}
                     </h2>
-                    <p class="text-white/90 text-base md:text-lg font-cambay max-w-xl">
+                    <p class="text-white/90 text-base md:text-lg font-sans max-w-xl">
                         {{ $offer->subtitle }}
                     </p>
                 </div>

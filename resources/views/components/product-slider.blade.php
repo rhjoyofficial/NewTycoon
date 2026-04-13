@@ -58,6 +58,9 @@
 </section>
 
 @php
+    // $spaceBetween is not passed as a prop; use a sensible default.
+    $spaceBetween = $spaceBetween ?? 16;
+
     if ($totalSlides > 2) {
         $sliderConfig = [
             'loop' => $totalSlides > 1,
@@ -67,10 +70,10 @@
             'speed' => 600,
             'effect' => 'slide',
             'breakpoints' => [
-                320 => ['slidesPerView' => min(1, $totalSlides), 'spaceBetween' => 8],
-                480 => ['slidesPerView' => min(2, $totalSlides), 'spaceBetween' => 10],
-                768 => ['slidesPerView' => min(3, $totalSlides), 'spaceBetween' => 12],
-                1024 => ['slidesPerView' => min($slidesPerView - 1, $totalSlides), 'spaceBetween' => $spaceBetween],
+                320  => ['slidesPerView' => min(1, $totalSlides), 'spaceBetween' => 8],
+                480  => ['slidesPerView' => min(2, $totalSlides), 'spaceBetween' => 10],
+                768  => ['slidesPerView' => min(3, $totalSlides), 'spaceBetween' => 12],
+                1024 => ['slidesPerView' => min(max(1, $slidesPerView - 1), $totalSlides), 'spaceBetween' => $spaceBetween],
                 1280 => ['slidesPerView' => min($slidesPerView, $totalSlides), 'spaceBetween' => $spaceBetween],
             ],
         ];

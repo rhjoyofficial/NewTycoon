@@ -9,7 +9,7 @@
         <h3 class="text-3xl md:text-4xl font-bold text-white mb-4 font-poppins tracking-tight">
             {{ __('newsletter.subscribe-title') }}
         </h3>
-        <p class="text-white/80 text-lg mb-8 max-w-2xl mx-auto font-cambay leading-relaxed">
+        <p class="text-white/80 text-lg mb-8 max-w-2xl mx-auto font-sans leading-relaxed">
             {{ __('newsletter.subscribe') }}
         </p>
 

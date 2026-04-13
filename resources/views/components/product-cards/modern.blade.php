@@ -66,7 +66,7 @@
         <div class="p-4 flex-grow flex flex-col">
             <!-- Product Name -->
             <h3 title="{{ $productName }}"
-                class="font-medium text-gray-900 text-sm mb-3 line-clamp-2 group-hover:text-primary transition-colors duration-200 font-cambay flex-grow">
+                class="font-medium text-gray-900 text-sm mb-3 line-clamp-2 group-hover:text-primary transition-colors duration-200 font-sans flex-grow">
                 {{ $productName }}
             </h3>
 
