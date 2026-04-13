@@ -147,19 +147,16 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->roles->contains('id', $role->id);
     }
 
-    public function hasAnyRole($roles)
+    public function hasAnyRole($roles): bool
     {
-        if (!auth()->check()) return false;
-
         // Eager load roles to avoid N+1 queries
         $this->loadMissing('roles');
 
         if (is_string($roles)) {
-            // Handle pipe-separated string: 'admin|staff'
+            // Handle pipe-separated string: 'admin|moderator'
             $roles = explode('|', $roles);
         }
 
-        // Handle both array and multiple arguments
         if (!is_array($roles)) {
             $roles = func_get_args();
         }

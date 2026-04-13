@@ -27,7 +27,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/', function () {
-        return redirect()->route('dashboard');
+        return redirect()->route('admin.dashboard');
     });
 
     // Users Management
