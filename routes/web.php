@@ -1,9 +1,7 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Frontend\CartController;
 use App\Http\Controllers\Frontend\CatalogController;
 use App\Http\Controllers\Frontend\HomeController;
@@ -195,29 +193,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/update', [ProfileController::class, 'updateProfile']);
     Route::put('/profile/password', [ProfileController::class, 'updateProfilePassword'])->name('profile.password.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.delete');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::delete('/profile/delete', [ProfileController::class, 'deleteAccount']);
 });
 
-// ==============================
-// TESTING WER ROUTES
-// ==============================
-Route::get('/test-flash', function () {
-    flash('Success! Progress bar should work now.', 'success', 8000);
-    flash('Error test with longer description.', 'error', 6000, 'Detailed error message here');
-    flash('Warning message', 'warning', 4000);
-    flash('Info message', 'info', 10000, 'This should show a progress bar');
-
-    return view('test-flash');
-});
-
-Route::get('/test-flash-ajax', function () {
-    return response()->json(['success' => true]);
-});
-
-Route::get('/current-session', function () {
-    return session()->all();
-});
 // ==============================
 // AUTH ROUTES
 // ==============================

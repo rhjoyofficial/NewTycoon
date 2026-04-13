@@ -56,7 +56,7 @@
 
                 <!-- Card Content -->
                 <div class="px-6 py-8">
-                    <!-- Main Content -->
+                    <!-- Main Content -->                  
                     @yield('content')
                 </div>
 

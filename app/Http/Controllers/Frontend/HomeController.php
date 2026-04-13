@@ -86,17 +86,12 @@ class HomeController extends Controller
 
             return $section;
         });
-
+        // dd($this->activeProductService->getActiveNewArrivals($limit = 50));
         return view('frontend.home', compact(
             'heroSlides',
             'categories',
             'featuredProducts',
             'products',
-            // 'newArrivals',
-            // 'bestsells',
-            // 'recommendedProducts',
-            // 'adsBanners',
-            // 'adsAnotherBanners',
             'offer',
             'offerProducts',
             'sections'

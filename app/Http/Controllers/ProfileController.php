@@ -15,14 +15,14 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    public function dashboard(): RedirectResponse
+    public function dashboard()
     {
-        return Redirect::route('account.orders');
+        return view('customer.dashboard');
     }
 
-    public function index(): RedirectResponse
+    public function index()
     {
-        return Redirect::route('profile');
+        return view('customer.profile');
     }
 
     public function profile(Request $request): View

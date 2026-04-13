@@ -85,13 +85,13 @@
                         My Profile
                     </a>
 
-                    @if (auth()->user()->hasPermission('manage_settings'))
+                    {{-- @if (auth()->user()->hasPermission('manage_settings'))
                         <a href="{{ route('admin.settings.index') }}"
                             class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200">
                             <i class="fas fa-cog mr-3 text-gray-400"></i>
                             Settings
                         </a>
-                    @endif
+                    @endif --}}
 
                     <a href="{{ route('home') }}" target="_blank"
                         class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200 border-t border-gray-100">

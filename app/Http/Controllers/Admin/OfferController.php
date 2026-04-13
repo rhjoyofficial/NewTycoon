@@ -69,9 +69,8 @@ class OfferController extends Controller
                 $offer->products()->attach($productId, ['order' => $index]);
             }
         }
-
-        return redirect()->route('admin.offers.index')
-            ->with('success', 'Offer created successfully!');
+        flash('Offer created successfully.', 'success');
+        return redirect()->route('admin.offers.index');
     }
 
     public function edit(Offer $offer)
@@ -131,8 +130,8 @@ class OfferController extends Controller
             $offer->products()->detach();
         }
 
-        return redirect()->route('admin.offers.index')
-            ->with('success', 'Offer updated successfully!');
+        flash('Offer updated successfully.', 'success');
+        return redirect()->route('admin.offers.index');
     }
 
     public function destroy(Offer $offer)
@@ -142,9 +141,8 @@ class OfferController extends Controller
         }
 
         $offer->delete();
-
-        return redirect()->route('admin.offers.index')
-            ->with('success', 'Offer deleted successfully!');
+        flash('Offer deleted successfully.', 'success');
+        return redirect()->route('admin.offers.index');
     }
 
     public function toggleStatus(Offer $offer)
@@ -152,7 +150,14 @@ class OfferController extends Controller
         $offer->status = $offer->status === 'active' ? 'inactive' : 'active';
         $offer->save();
 
-        return back()->with('success', 'Offer status updated!');
+        $isActive = $offer->status === 'active';
+
+        flash(
+            "Offer " . ($isActive ? 'activated' : 'deactivated') . " successfully.",
+            $isActive ? 'success' : 'warning'
+        );
+
+        return redirect()->route('admin.offers.index');
     }
 
     public function reorder(Request $request)

@@ -1,6 +1,5 @@
-
 ```
-Tycoon
+AgainTycoon
 ├─ app
 │  ├─ Helpers
 │  │  ├─ flash.php
@@ -125,10 +124,12 @@ Tycoon
 │  ├─ Services
 │  │  ├─ Category
 │  │  │  └─ CategoryProductsService.php
+│  │  ├─ CheckoutService.php
 │  │  ├─ FooterService.php
 │  │  ├─ NavigationService.php
 │  │  ├─ Offer
 │  │  │  └─ OfferService.php
+│  │  ├─ PaymentService.php
 │  │  ├─ Product
 │  │  │  ├─ ActiveProductService.php
 │  │  │  ├─ CategoryService.php
@@ -152,6 +153,9 @@ Tycoon
 ├─ bootstrap
 │  ├─ app.php
 │  ├─ cache
+│  │  ├─ pac75FF.tmp
+│  │  ├─ packages.php
+│  │  └─ services.php
 │  └─ providers.php
 ├─ composer.json
 ├─ composer.lock
@@ -202,108 +206,10 @@ Tycoon
 │  │  ├─ 2026_02_24_072317_create_section_banners_table.php
 │  │  └─ 2026_02_25_082551_create_catalogs_table.php
 │  └─ seeders
-│     ├─ BrandSeeder.php
-│     ├─ CartSeeder.php
-│     ├─ CatalogSeeder.php
-│     ├─ CategorySeeder.php
 │     ├─ DatabaseSeeder.php
-│     ├─ FooterSeeder.php
-│     ├─ HeroSlideSeeder.php
-│     ├─ OfferSeeder.php
-│     ├─ OrderSeeder.php
-│     ├─ PermissionSeeder.php
-│     ├─ ProductSeeder.php
-│     ├─ ReviewSeeder.php
 │     ├─ RolePermissionSeeder.php
 │     ├─ RoleSeeder.php
-│     ├─ SectionSeeder.php
-│     ├─ UserProfileSeeder.php
 │     └─ UserSeeder.php
-├─ needs.txt
-├─ package-lock.json
-├─ package.json
-├─ phpunit.xml
-├─ postcss.config.js
-├─ public
-│  ├─ .htaccess
-│  ├─ favicon.ico
-│  ├─ images
-│  │  ├─ 4659490.png
-│  │  ├─ ads
-│  │  │  ├─ addss.png
-│  │  │  ├─ ads.jpg
-│  │  │  ├─ ads15.png
-│  │  │  ├─ ads2.png
-│  │  │  ├─ ads3.png
-│  │  │  ├─ adss.jpg
-│  │  │  ├─ adsss.png
-│  │  │  └─ Gemini_Generated_Image_ytnm84ytnm84ytnm.png
-│  │  ├─ bk png.png
-│  │  ├─ bk-logo.png
-│  │  ├─ car.jpg
-│  │  ├─ cat
-│  │  │  ├─ ac.png
-│  │  │  ├─ cookware.png
-│  │  │  ├─ default.png
-│  │  │  ├─ default2.png
-│  │  │  ├─ electric-kettle.png
-│  │  │  ├─ fan.png
-│  │  │  ├─ gas-burner.png
-│  │  │  ├─ led-tv.png
-│  │  │  ├─ mixer-grinder.png
-│  │  │  ├─ monitor.png
-│  │  │  ├─ pressure-cooker.png
-│  │  │  ├─ refrigerator.png
-│  │  │  ├─ rice-cooker.png
-│  │  │  └─ room-comporter.png
-│  │  ├─ fav.png
-│  │  ├─ footer-product.png
-│  │  ├─ hero
-│  │  │  ├─ demo-banner-no.jpg
-│  │  │  ├─ demo-banner.jpg
-│  │  │  ├─ demo-banner12.png
-│  │  │  ├─ hero-background.mp4
-│  │  │  ├─ slide1.jpg
-│  │  │  ├─ slide2.jpg
-│  │  │  ├─ slide3.jpg
-│  │  │  └─ slide4.jpg
-│  │  ├─ no-image.jpg
-│  │  ├─ offers
-│  │  │  ├─ bg.jpg
-│  │  │  ├─ Gemini_Generated_Image_utd59lutd59lutd5.png
-│  │  │  ├─ main-banner.jpeg
-│  │  │  ├─ main-banner.jpg
-│  │  │  ├─ main-banner.png
-│  │  │  ├─ offers-bg.gif
-│  │  │  └─ winter-bg.jpg
-│  │  ├─ placeholder.jpg
-│  │  ├─ products
-│  │  │  ├─ 1.png
-│  │  ├─ smartads
-│  │  │  ├─ air-purifier.png
-│  │  │  └─ tv.png
-│  │  ├─ stories
-│  │  │  ├─ bd-01.jpg
-│  │  └─ wh-logo.png
-│  ├─ index.php
-│  ├─ js
-│  │  ├─ button-lock.js
-│  │  ├─ cart.js
-│  │  ├─ gsap
-│  │  │  ├─ gsap-featured-products.js
-│  │  │  ├─ gsap-offer-products.js
-│  │  │  └─ gsap-tilt-category-card.js
-│  │  └─ wishlist.js
-│  ├─ robots.txt
-│  └─ videos
-│     ├─ 2offers-bg.mp4
-│     ├─ back-cover-video.mp4
-│     ├─ hero-background.mp4
-│     ├─ offers-bg.mp4
-│     └─ stories
-│        ├─ story.mp4
-│        └─ storyOk.mp4
-├─ README.md
 ├─ resources
 │  ├─ css
 │  │  ├─ app.css
@@ -317,12 +223,14 @@ Tycoon
 │  ├─ lang
 │  │  ├─ bn
 │  │  │  ├─ common.php
+│  │  │  ├─ footer.php
 │  │  │  ├─ home.php
 │  │  │  ├─ navbar.php
 │  │  │  ├─ newsletter.php
 │  │  │  └─ products.php
 │  │  └─ en
 │  │     ├─ common.php
+│  │     ├─ footer.php
 │  │     ├─ home.php
 │  │     ├─ navbar.php
 │  │     ├─ newsletter.php
@@ -385,23 +293,27 @@ Tycoon
 │     │  │  ├─ create.blade.php
 │     │  │  ├─ edit.blade.php
 │     │  │  └─ index.blade.php
-│     │  └─ settings
-│     │     ├─ email.blade.php
-│     │     ├─ general.blade.php
+│     │  ├─ settings
+│     │  │  ├─ email.blade.php
+│     │  │  ├─ general.blade.php
+│     │  │  ├─ index.blade.php
+│     │  │  ├─ maintenance.blade.php
+│     │  │  ├─ payment.blade.php
+│     │  │  ├─ permissions
+│     │  │  │  └─ index.blade.php
+│     │  │  ├─ roles
+│     │  │  │  ├─ create.blade.php
+│     │  │  │  ├─ edit.blade.php
+│     │  │  │  ├─ index.blade.php
+│     │  │  │  └─ partials
+│     │  │  │     └─ permission-group.blade.php
+│     │  │  ├─ shipping.blade.php
+│     │  │  ├─ store.blade.php
+│     │  │  └─ tax.blade.php
+│     │  └─ users
+│     │     ├─ create.blade.php
 │     │     ├─ index.blade.php
-│     │     ├─ maintenance.blade.php
-│     │     ├─ payment.blade.php
-│     │     ├─ permissions
-│     │     │  └─ index.blade.php
-│     │     ├─ roles
-│     │     │  ├─ create.blade.php
-│     │     │  ├─ edit.blade.php
-│     │     │  ├─ index.blade.php
-│     │     │  └─ partials
-│     │     │     └─ permission-group.blade.php
-│     │     ├─ shipping.blade.php
-│     │     ├─ store.blade.php
-│     │     └─ tax.blade.php
+│     │     └─ profile.blade.php
 │     ├─ auth
 │     │  ├─ confirm-password.blade.php
 │     │  ├─ forgot-password.blade.php
@@ -412,16 +324,28 @@ Tycoon
 │     ├─ components
 │     │  ├─ ads-banner.blade.php
 │     │  ├─ category-slider.blade.php
+│     │  ├─ danger-button.blade.php
 │     │  ├─ flash-container.blade.php
+│     │  ├─ guest-layout.blade.php
+│     │  ├─ input-error.blade.php
+│     │  ├─ input-label.blade.php
+│     │  ├─ modal.blade.php
 │     │  ├─ offer-product-card.blade.php
 │     │  ├─ offer-products.blade.php
 │     │  ├─ offer-section.blade.php
+│     │  ├─ primary-button.blade.php
 │     │  ├─ product-cards
 │     │  │  ├─ minimal.blade.php
 │     │  │  └─ modern.blade.php
 │     │  ├─ product-slider.blade.php
 │     │  ├─ products.blade.php
-│     │  └─ server-flash.blade.php
+│     │  ├─ secondary-button.blade.php
+│     │  ├─ server-flash.blade.php
+│     │  └─ text-input.blade.php
+│     ├─ customer
+│     │  ├─ dashboard.blade.php
+│     │  ├─ order.blade.php
+│     │  └─ profile.blade.php
 │     ├─ errors
 │     │  ├─ 404.blade.php
 │     │  └─ 500.blade.php
@@ -439,6 +363,10 @@ Tycoon
 │     │  ├─ layouts
 │     │  │  ├─ app.blade.php
 │     │  │  └─ guest.blade.php
+│     │  ├─ orders
+│     │  │  ├─ index.blade.php
+│     │  │  ├─ show.blade.php
+│     │  │  └─ track.blade.php
 │     │  ├─ pages
 │     │  │  ├─ about.blade.php
 │     │  │  ├─ catalogs.blade.php
@@ -464,46 +392,14 @@ Tycoon
 │     │  │  └─ show.blade.php
 │     │  └─ search
 │     │     └─ results.blade.php
-│     ├─ profile
-│     │  ├─ edit.blade.php
-│     │  └─ partials
-│     │     ├─ delete-user-form.blade.php
-│     │     ├─ update-password-form.blade.php
-│     │     └─ update-profile-information-form.blade.php
-│     └─ test-flash.blade.php
+│     └─ layouts
+│        └─ app.blade.php
 ├─ routes
 │  ├─ admin.php
 │  ├─ auth.php
 │  ├─ console.php
 │  └─ web.php
-├─ storage
-│  ├─ app
-│  │  ├─ private
-│  │  └─ public
-│  ├─ debugbar
-│  ├─ framework
-│  │  ├─ cache
-│  │  │  └─ data
-│  │  ├─ sessions
-│  │  ├─ testing
-│  │  └─ views
-│  └─ logs
 ├─ tailwind.config.js
-├─ tests
-│  ├─ Feature
-│  │  ├─ Auth
-│  │  │  ├─ AuthenticationTest.php
-│  │  │  ├─ EmailVerificationTest.php
-│  │  │  ├─ PasswordConfirmationTest.php
-│  │  │  ├─ PasswordResetTest.php
-│  │  │  ├─ PasswordUpdateTest.php
-│  │  │  └─ RegistrationTest.php
-│  │  ├─ ExampleTest.php
-│  │  └─ ProfileTest.php
-│  ├─ Pest.php
-│  ├─ TestCase.php
-│  └─ Unit
-│     └─ ExampleTest.php
 └─ vite.config.js
 
 ```

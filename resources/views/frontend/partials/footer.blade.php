@@ -14,7 +14,7 @@
             <div class="lg:col-span-4 flex justify-center lg:justify-start" data-aos="fade-up">
                 <div class="p-2 max-w-sm w-full">
                     <!-- Logo -->
-                    <div class="text-center lg:text-left">
+                    <div class="text-center lg:text-left mb-6">
                         <a href="{{ url('/') }}" aria-label="Home" class="inline-block"
                             title="Tycoon Hi-Tech Park">
                             <img src="{{ asset('images/wh-logo.png') }}" alt="BK Logo" class="h-6 md:h-8 w-auto">

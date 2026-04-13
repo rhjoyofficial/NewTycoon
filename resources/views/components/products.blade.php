@@ -267,7 +267,8 @@
                                             </div>
                                         </div>
 
-                                        <span class="hidden md:inline-block text-xs text-emerald-600 font-medium">
+                                        <span
+                                            class="hidden md:inline-block text-xs {{ $product->in_stock ? 'text-emerald-600' : 'text-red-600' }} font-medium">
                                             {{ $product->in_stock ? '✓ Available' : '✗ Sold Out' }}
                                         </span>
                                     </div>
@@ -312,7 +313,8 @@
                                             </div>
                                         </div>
 
-                                        <span class="hidden md:inline-block text-xs text-primary font-medium">
+                                        <span
+                                            class="hidden md:inline-block text-xs {{ $product->in_stock ? 'text-emerald-600' : 'text-red-600' }} font-medium">
                                             {{ $product->in_stock ? '✓ Available' : '✗ Sold Out' }}
                                         </span>
                                     </div>

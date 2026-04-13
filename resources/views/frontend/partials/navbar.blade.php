@@ -168,8 +168,8 @@
                                             class="block px-4 py-2 text-base text-gray-700 hover:bg-gray-100">Admin
                                             Dashboard</a>
                                     @endif
-                                    <a href="{{ route('profile') }}"
-                                        class="block px-4 py-2 text-base text-gray-700 hover:bg-gray-100">Profile</a>
+                                    <a href="{{ route('dashboard') }}"
+                                        class="block px-4 py-2 text-base text-gray-700 hover:bg-gray-100">Dashboard</a>
                                     <a href="{{ route('orders.track') }}"
                                         class="block px-4 py-2 text-base text-gray-700 hover:bg-gray-100">Track Order</a>
                                     @if (auth()->user()->hasRole('customer'))

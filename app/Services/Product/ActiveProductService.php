@@ -63,6 +63,7 @@ class ActiveProductService
                     ->orWhere('average_rating', '>=', 4.2)
                     ->orWhere('total_sold', '>', 50);
             })
+            ->latest()
             ->orderByDesc('average_rating')
             ->orderByDesc('total_sold')
             ->limit($limit)

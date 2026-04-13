@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
 class ProductSlider extends Component
 {
     public $slidingProducts;
-    public $banner;          // renamed from adsImages
+    public $banner;
     public $title;
     public $sliderId;
     public $autoPlay;
@@ -21,8 +21,8 @@ class ProductSlider extends Component
     public $cardStyle;
 
     public function __construct(
+        $banner,
         $slidingProducts = [],
-        $banner,     
         $title = 'Recommended for you',
         $sliderId = 'productSlider',
         $autoPlay = true,
@@ -32,8 +32,8 @@ class ProductSlider extends Component
         $spaceBetween = 24,
         $cardStyle = 'modern'
     ) {
-        $this->slidingProducts = $slidingProducts ?: [];
         $this->banner = $banner;
+        $this->slidingProducts = $slidingProducts ?: [];
         $this->title = $title;
         $this->sliderId = $sliderId;
         $this->autoPlay = filter_var($autoPlay, FILTER_VALIDATE_BOOLEAN);

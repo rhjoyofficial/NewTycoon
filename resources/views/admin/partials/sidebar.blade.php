@@ -21,9 +21,9 @@
     }" id="sidebar">
 
     <!-- Logo -->
-    <div class="h-20 flex items-center justify-center border-b border-gray-700">
+    <div class="h-16 flex items-center justify-center border-b border-gray-700">
         <a href="{{ route('admin.dashboard') }}" class="group flex flex-col items-center">
-            <img src="{{ asset('images/wh-logo.png') }}" alt="Azmion Admin Logo" loading="lazy" class="h-8 md:h-10 w-auto">
+            <img src="{{ asset('images/wh-logo.png') }}" alt="Azmion Admin Logo" loading="lazy" class="h-8 w-auto">
 
             <span
                 class="mt-1 text-xs tracking-wide text-gray-400 group-hover:text-gray-200 transition-colors duration-300">
@@ -33,7 +33,7 @@
     </div>
 
     <!-- Navigation -->
-    <nav class="flex-1 px-3 py-6 space-y-1 overflow-y-auto no-scrollbar">
+    <nav class="flex-1 p-3 overflow-y-auto no-scrollbar">
         <!-- Dashboard -->
         <a href="{{ route('admin.dashboard') }}"
             class="group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.dashboard') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}">
@@ -364,7 +364,7 @@
                 </button>
 
                 <div x-show="open" x-collapse class="ml-8 mt-1 space-y-1">
-                    <a href="{{ route('admin.settings.index') }}"
+                    {{-- <a href="{{ route('admin.settings.index') }}"
                         class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.settings.index') ? 'bg-primary/10 text-primary' : 'text-gray-400 hover:text-white hover:bg-gray-700/30' }}">
                         <svg class="mr-3 h-4 w-4 {{ request()->routeIs('admin.settings.index') ? 'text-primary' : 'text-gray-500 group-hover:text-primary' }}"
                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -372,7 +372,7 @@
                                 d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                         General Settings
-                    </a>
+                    </a> --}}
                     <a href="{{ route('admin.settings.roles.index') }}"
                         class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.settings.roles.*') ? 'bg-primary/10 text-primary' : 'text-gray-400 hover:text-white hover:bg-gray-700/30' }}">
                         <svg class="mr-3 h-4 w-4 {{ request()->routeIs('admin.settings.roles.*') ? 'text-primary' : 'text-gray-500 group-hover:text-primary' }}"

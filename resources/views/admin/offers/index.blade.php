@@ -266,7 +266,7 @@
                                                 method="POST" class="inline">
                                                 @csrf
                                                 <button type="submit"
-                                                    class="inline-flex items-center px-3 py-1.5 border border-yellow-300 text-yellow-700 rounded-lg hover:bg-yellow-50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-yellow-500 transition-colors"
+                                                    class="inline-flex items-center px-3 py-1.5 border {{ $offer->is_active ? 'border-green-300 text-green-700' : 'border-yellow-300 text-yellow-700' }} rounded-lg hover:bg-yellow-50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-yellow-500 transition-colors"
                                                     title="{{ $offer->is_active ? 'Deactivate' : 'Activate' }}">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">

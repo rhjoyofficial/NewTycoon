@@ -93,6 +93,8 @@ return new class extends Migration
             $table->foreignId('shipping_address_id')->nullable()->constrained('addresses')->nullOnDelete();
             $table->foreignId('billing_address_id')->nullable()->constrained('addresses')->nullOnDelete();
 
+            $table->string('guest_access_token_hash', 64)->nullable()->index();
+
             $table->timestamps();
             $table->softDeletes();
 
