@@ -20,55 +20,78 @@ class Cart extends Model
     }
 
     /**
-     * Get the cart for the current user/session
+     * Get the cart for the current user/session.
+     *
+     * NOTE: Guest→user cart merging is NOT done here because session()->regenerate()
+     * in the login controller changes the session ID before this method ever runs.
+     * Merging is performed explicitly via Cart::mergeGuestCart() in
+     * AuthenticatedSessionController::store() using the pre-regeneration session ID.
      */
-    public static function getCurrentCart()
+    public static function getCurrentCart(): static
     {
-        $sessionId = Session::getId();
-
         if (Auth::check()) {
-            $cart = self::firstOrCreate([
-                'user_id' => Auth::id(),
-            ]);
-
-            // If there's a session cart, merge it
-            $sessionCart = self::where('session_id', $sessionId)->first();
-            if ($sessionCart) {
-                $cart->mergeCart($sessionCart);
-                $sessionCart->delete();
-            }
-        } else {
-            // For guest users, use session
-            $cart = self::firstOrCreate([
-                'session_id' => $sessionId
-            ]);
+            return DB::transaction(function () {
+                return self::firstOrCreate(['user_id' => Auth::id()]);
+            });
         }
 
-        return $cart;
+        return self::firstOrCreate(['session_id' => Session::getId()]);
     }
 
     /**
-     * Merge another cart into this one
+     * Merge the guest cart (identified by the pre-regeneration session ID) into
+     * the authenticated user's cart. Called once, immediately after login.
+     *
+     * Uses a DB transaction + row-level locks to be safe under concurrent requests.
      */
-    public function mergeCart(Cart $otherCart)
+    public static function mergeGuestCart(string $guestSessionId): void
     {
-        foreach ($otherCart->items as $item) {
-            $existingItem = $this->items()
-                ->where('product_id', $item->product_id)
+        if (!Auth::check()) {
+            return;
+        }
+
+        DB::transaction(function () use ($guestSessionId) {
+            $sessionCart = self::where('session_id', $guestSessionId)
+                ->whereNull('user_id')
+                ->lockForUpdate()
                 ->first();
 
-            if ($existingItem) {
-                $existingItem->quantity += $item->quantity;
-                $existingItem->save();
-            } else {
-                $this->items()->create([
-                    'product_id' => $item->product_id,
-                    'quantity' => $item->quantity,
-                    'price' => $item->price,
-                    'options' => $item->options
-                ]);
+            if (!$sessionCart || $sessionCart->items->isEmpty()) {
+                return;
             }
-        }
+
+            $userCart = self::firstOrCreate(['user_id' => Auth::id()]);
+            $userCart->mergeCart($sessionCart);
+            $sessionCart->delete();
+        });
+    }
+
+    /**
+     * Merge another cart's items into this cart.
+     * Wrapped in a transaction with row locks — safe to call from a parent transaction.
+     */
+    public function mergeCart(Cart $otherCart): void
+    {
+        DB::transaction(function () use ($otherCart) {
+            foreach ($otherCart->fresh()->items as $item) {
+                $existingItem = $this->items()
+                    ->where('product_id', $item->product_id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($existingItem) {
+                    // Atomic increment — avoids read-modify-write race condition
+                    $existingItem->increment('quantity', $item->quantity);
+                } else {
+                    $this->items()->create([
+                        'product_id' => $item->product_id,
+                        'quantity'   => $item->quantity,
+                        'price'      => $item->price,
+                        'options'    => $item->options,
+                    ]);
+                }
+            }
+        });
     }
 
     /**

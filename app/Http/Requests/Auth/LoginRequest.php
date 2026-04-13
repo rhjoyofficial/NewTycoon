@@ -49,6 +49,18 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // Reject deactivated accounts. We must check AFTER a successful attempt
+        // so the error is indistinguishable from a wrong-password error to the
+        // outside world (prevents account enumeration via different error messages).
+        if (Auth::user()->status === 'deactivated') {
+            Auth::logout();
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'email' => __('Your account has been deactivated. Please contact support.'),
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 
