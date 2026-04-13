@@ -19,8 +19,4 @@
         @endif
     @endforeach
 
-    {{-- The old static banners and product sliders below are removed --}}
-    {{-- <x-ads-banner ... />  (removed) --}}
-    {{-- <x-product-slider ... /> (removed) --}}
-    {{-- ... etc --}}
 @endsection

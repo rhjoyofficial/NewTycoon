@@ -173,7 +173,7 @@
                                     <a href="{{ route('orders.track') }}"
                                         class="block px-4 py-2 text-base text-gray-700 hover:bg-gray-100">Track Order</a>
                                     @if (auth()->user()->hasRole('customer'))
-                                        <a href="/orders"
+                                        <a href="/my-orders"
                                             class="block px-4 py-2 text-base text-gray-700 hover:bg-gray-100">My Orders</a>
                                     @endif
                                     @if (auth()->user()->hasPermission('manage_products'))

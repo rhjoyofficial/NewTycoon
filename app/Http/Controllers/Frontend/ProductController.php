@@ -143,7 +143,7 @@ class ProductController extends Controller
     {
         $query = Product::query()
             ->with(['category:id,name_en,name_bn,slug,parent_id'])
-            ->featured(); 
+            ->featured();
 
         $products = $this->getFilteredProductsQuery($request, $query)->paginate($request->get('per_page', 20));
 
@@ -405,10 +405,9 @@ class ProductController extends Controller
 
         // Get breadcrumbs
         $breadcrumbs = $this->getBreadcrumbsOptimized($product);
-        // dd($breadcrumbs);
-        // Track view (async, no performance impact)
-        $this->trackProductView($product);
 
+        $this->trackProductView($product);
+        // dd($product, $reviews, $relatedProducts, $breadcrumbs);
         return view('frontend.products.show', compact('product', 'reviews', 'relatedProducts', 'breadcrumbs'));
     }
 
