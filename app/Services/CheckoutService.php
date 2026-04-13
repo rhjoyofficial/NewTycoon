@@ -30,13 +30,18 @@ class CheckoutService
         $lineItems = $cart->items
             ->map(fn($item) => [
                 'product_id' => $item->product_id,
-                'quantity' => (int) $item->quantity,
+                'quantity'   => (int) $item->quantity,
             ])
             ->values()
             ->all();
 
-        return DB::transaction(function () use ($cart, $validated, $request, $lineItems) {
-            $order = $this->createOrderFromLineItems($lineItems, $validated, $request);
+        // Resolve (and optionally create) the user BEFORE the transaction so
+        // that Auth::login() — a session side-effect — is never inside a DB
+        // transaction boundary.
+        $user = $this->resolveCheckoutUser($validated, $request);
+
+        return DB::transaction(function () use ($cart, $validated, $request, $lineItems, $user) {
+            $order = $this->createOrderFromLineItems($lineItems, $validated, $request, $user);
             $cart->items()->delete();
 
             return $order;
@@ -47,59 +52,67 @@ class CheckoutService
     {
         $lineItems = [[
             'product_id' => (int) $buyNowData['product_id'],
-            'quantity' => (int) $buyNowData['quantity'],
+            'quantity'   => (int) $buyNowData['quantity'],
         ]];
 
-        return DB::transaction(fn() => $this->createOrderFromLineItems($lineItems, $validated, $request));
+        // Same pattern: resolve user outside the transaction.
+        $user = $this->resolveCheckoutUser($validated, $request);
+
+        return DB::transaction(fn() => $this->createOrderFromLineItems($lineItems, $validated, $request, $user));
     }
 
-    protected function createOrderFromLineItems(array $lineItems, array $validated, Request $request): Order
+    protected function createOrderFromLineItems(array $lineItems, array $validated, Request $request, ?User $user = null): Order
     {
-        $user = $this->resolveCheckoutUser($validated, $request);
-        $products = $this->lockProducts($lineItems);
+
+        $products  = $this->lockProducts($lineItems);
         $pricingLines = $this->buildPricingLines($lineItems, $products);
-        $subtotal = round(collect($pricingLines)->sum('line_total'), 2);
-        $shippingCost = 0.0;
+
+        $subtotal       = round(collect($pricingLines)->sum('line_total'), 2);
+        $shippingCost   = 0.0;
         $discountAmount = 0.0;
-        $taxAmount = 0.0;
-        $total = round($subtotal + $shippingCost + $taxAmount - $discountAmount, 2);
+        $taxAmount      = 0.0;
+        $total          = round($subtotal + $shippingCost + $taxAmount - $discountAmount, 2);
 
         $order = Order::create([
-            'order_number' => Order::generateOrderNumber(),
-            'user_id' => $user?->id,
-            'customer_name' => $validated['name'],
-            'customer_email' => $validated['email'],
-            'customer_phone' => $validated['phone'],
-            'shipping_name' => $validated['name'],
-            'shipping_email' => $validated['email'],
-            'shipping_phone' => $validated['phone'],
-            'shipping_address_line1' => $validated['address'],
-            'shipping_address_line2' => null,
-            'shipping_city' => $validated['city'],
-            'shipping_state' => 'Dhaka',
-            'shipping_country' => 'Bangladesh',
-            'shipping_zip_code' => $validated['postal_code'],
-            'billing_same_as_shipping' => true,
-            'subtotal' => $subtotal,
-            'shipping_cost' => $shippingCost,
-            'tax_amount' => $taxAmount,
-            'discount_amount' => $discountAmount,
-            'total_amount' => $total,
-            'payment_method' => $validated['payment_method'],
-            'payment_status' => 'pending',
-            'shipping_method' => 'standard',
-            'status' => 'pending',
-            'customer_note' => $validated['notes'] ?? null,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
+            'order_number'            => Order::generateOrderNumber(),
+            'user_id'                 => $user?->id,
+            'customer_name'           => $validated['name'],
+            'customer_email'          => $validated['email'],
+            'customer_phone'          => $validated['phone'],
+            'shipping_name'           => $validated['name'],
+            'shipping_email'          => $validated['email'],
+            'shipping_phone'          => $validated['phone'],
+            'shipping_address_line1'  => $validated['address'],
+            'shipping_address_line2'  => null,
+            'shipping_city'           => $validated['city'],
+            'shipping_state'          => 'Dhaka',
+            'shipping_country'        => 'Bangladesh',
+            'shipping_zip_code'       => $validated['postal_code'],
+            'billing_same_as_shipping'=> true,
+            'subtotal'                => $subtotal,
+            'shipping_cost'           => $shippingCost,
+            'tax_amount'              => $taxAmount,
+            'discount_amount'         => $discountAmount,
+            'total_amount'            => $total,
+            'payment_method'          => $validated['payment_method'],
+            'payment_status'          => 'pending',
+            'shipping_method'         => 'standard',
+            'status'                  => 'pending',
+            'customer_note'           => $validated['notes'] ?? null,
+            'ip_address'              => $request->ip(),
+            'user_agent'              => $request->userAgent(),
         ]);
 
+        // Generate the guest access token and persist only its hash.
+        // We store the plain token in a local variable so we can attach it to
+        // the returned Order instance AFTER fresh() — fresh() creates a new
+        // Eloquent object from DB which would lose any non-column properties.
+        $guestToken = null;
         if (!$user) {
-            $plainToken = Str::random(40);
+            $guestToken = Str::random(40);
             $order->forceFill([
-                'guest_access_token_hash' => hash('sha256', $plainToken),
+                'guest_access_token_hash' => hash('sha256', $guestToken),
             ])->save();
-            $order->guest_access_token = $plainToken;
         }
 
         foreach ($pricingLines as $line) {
@@ -107,18 +120,18 @@ class CheckoutService
             $product = $line['product'];
 
             OrderItem::create([
-                'order_id' => $order->id,
-                'product_id' => $product->id,
-                'product_name' => $product->name,
-                'product_sku' => $product->sku ?? 'N/A',
+                'order_id'      => $order->id,
+                'product_id'    => $product->id,
+                'product_name'  => $product->name,
+                'product_sku'   => $product->sku ?? 'N/A',
                 'product_image' => is_array($product->featured_images) && !empty($product->featured_images)
                     ? $product->featured_images[0]
                     : null,
-                'quantity' => $line['quantity'],
-                'unit_price' => $line['unit_price'],
-                'total_price' => $line['line_total'],
+                'quantity'        => $line['quantity'],
+                'unit_price'      => $line['unit_price'],
+                'total_price'     => $line['line_total'],
                 'discount_amount' => 0,
-                'tax_amount' => 0,
+                'tax_amount'      => 0,
             ]);
 
             $product->reserveStock($line['quantity']);
@@ -127,7 +140,15 @@ class CheckoutService
 
         $this->paymentService->createPendingPayment($order, $validated['payment_method']);
 
-        return $order->fresh(['items.product', 'payment']);
+        // fresh() loads a new Eloquent instance from DB — re-attach the plain
+        // token so buildSuccessUrl() can include it in the redirect URL.
+        $freshOrder = $order->fresh(['items.product', 'payment']);
+
+        if ($guestToken !== null) {
+            $freshOrder->guest_access_token = $guestToken;
+        }
+
+        return $freshOrder;
     }
 
     protected function resolveCheckoutUser(array $validated, Request $request): ?User
@@ -138,29 +159,35 @@ class CheckoutService
             return $user;
         }
 
+        // Create account and log in BEFORE the DB transaction so the session
+        // side-effect (Auth::login) is outside the transactional boundary.
         $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'phone' => $validated['phone'],
+            'name'     => $validated['name'],
+            'email'    => $validated['email'],
+            'phone'    => $validated['phone'],
             'password' => Hash::make($validated['password']),
-            'status' => 'active',
+            'status'   => 'active',
         ]);
 
+        $user->markEmailAsVerified();
         $user->assignRole('customer');
 
+        // Create a blank profile so profile-related pages don't throw errors.
+        $user->profile()->create([]);
+
         Address::create([
-            'user_id' => $user->id,
-            'type' => 'shipping',
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'phone' => $validated['phone'],
+            'user_id'        => $user->id,
+            'type'           => 'shipping',
+            'name'           => $validated['name'],
+            'email'          => $validated['email'],
+            'phone'          => $validated['phone'],
             'address_line_1' => $validated['address'],
             'address_line_2' => null,
-            'city' => $validated['city'],
-            'state' => 'Dhaka',
-            'postal_code' => $validated['postal_code'],
-            'country' => 'Bangladesh',
-            'is_default' => true,
+            'city'           => $validated['city'],
+            'state'          => 'Dhaka',
+            'postal_code'    => $validated['postal_code'],
+            'country'        => 'Bangladesh',
+            'is_default'     => true,
         ]);
 
         Auth::login($user);

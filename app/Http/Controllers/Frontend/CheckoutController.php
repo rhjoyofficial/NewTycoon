@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 use App\Services\CheckoutService;
 
 class CheckoutController extends Controller
@@ -50,10 +51,14 @@ class CheckoutController extends Controller
 
         $user = Auth::user();
         $addresses = $user ? $user->addresses()->where('type', 'shipping')->get() : collect();
-        $isGuest = !Auth::check();
-        $isBuyNow = false; // This is from cart
+        $isGuest   = !Auth::check();
+        $isBuyNow  = false;
 
-        return view('frontend.checkout.index', compact('cart', 'user', 'addresses', 'isGuest', 'isBuyNow'));
+        // Issue a one-time checkout nonce to prevent duplicate order submissions.
+        $checkoutNonce = Str::uuid()->toString();
+        Session::put('checkout_nonce', $checkoutNonce);
+
+        return view('frontend.checkout.index', compact('cart', 'user', 'addresses', 'isGuest', 'isBuyNow', 'checkoutNonce'));
     }
 
     /**
@@ -99,7 +104,6 @@ class CheckoutController extends Controller
      */
     public function buyNowCheckout()
     {
-        // Get buy now data from session
         $buyNowData = Session::get('buy_now_product');
 
         if (!$buyNowData) {
@@ -107,10 +111,10 @@ class CheckoutController extends Controller
                 ->with('error', 'No product selected for purchase');
         }
 
-        // Get product
+        // Always fetch a fresh product so the displayed price matches what the
+        // order will actually charge.  The session price is ignored here.
         $product = Product::with('category')->findOrFail($buyNowData['product_id']);
 
-        // Check stock again
         if (
             $product->track_quantity &&
             $product->quantity < $buyNowData['quantity'] &&
@@ -121,25 +125,34 @@ class CheckoutController extends Controller
                 ->with('error', "{$product->name} is out of stock");
         }
 
-        // Create temporary cart-like structure for the view
+        // Build a lightweight cart-like object for the shared checkout view.
+        // Use the fresh DB price — NOT the session price — so what the user sees
+        // is exactly what they will be charged.
+        $freshPrice = (float) $product->price;
+        $quantity   = (int) $buyNowData['quantity'];
+
         $cart = (object) [
             'items' => collect([
                 (object) [
-                    'product' => $product,
-                    'quantity' => $buyNowData['quantity'],
-                    'price' => $buyNowData['price'],
+                    'product'  => $product,
+                    'quantity' => $quantity,
+                    'price'    => $freshPrice,
                 ]
             ]),
-            'subtotal' => $buyNowData['price'] * $buyNowData['quantity'],
-            'total' => $buyNowData['price'] * $buyNowData['quantity'],
+            'subtotal' => $freshPrice * $quantity,
+            'total'    => $freshPrice * $quantity,
         ];
 
-        $user = Auth::user();
+        $user      = Auth::user();
         $addresses = $user ? $user->addresses()->where('type', 'shipping')->get() : collect();
-        $isGuest = !Auth::check();
-        $isBuyNow = true; // This is buy now
+        $isGuest   = !Auth::check();
+        $isBuyNow  = true;
 
-        return view('frontend.checkout.index', compact('cart', 'user', 'addresses', 'isGuest', 'isBuyNow'));
+        // Issue idempotency nonce for buy-now flow too.
+        $checkoutNonce = Str::uuid()->toString();
+        Session::put('checkout_nonce', $checkoutNonce);
+
+        return view('frontend.checkout.index', compact('cart', 'user', 'addresses', 'isGuest', 'isBuyNow', 'checkoutNonce'));
     }
 
     /**
@@ -147,35 +160,51 @@ class CheckoutController extends Controller
      */
     public function process(Request $request)
     {
+        // ── Idempotency check ────────────────────────────────────────────────
+        // The checkout page embeds a one-time nonce in the form.  Consuming it
+        // here prevents double-click / rapid re-submission from creating two
+        // identical orders.  The nonce is only absent on the very first page
+        // load before JS has set it — treat that as a missing-nonce rejection.
+        $submittedNonce = $request->input('checkout_nonce');
+        $sessionNonce   = Session::get('checkout_nonce');
+
+        if (!$submittedNonce || !$sessionNonce || !hash_equals($sessionNonce, $submittedNonce)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Duplicate submission or invalid request. Please return to checkout and try again.',
+            ], 422);
+        }
+
+        // Consume the nonce immediately — before any work — so concurrent
+        // requests that somehow pass the check above cannot both proceed.
+        Session::forget('checkout_nonce');
+
+        // ── Validation ───────────────────────────────────────────────────────
         $rules = [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'required|string|max:20',
-            'address' => 'required|string|max:500',
-            'city' => 'required|string|max:100',
-            'postal_code' => 'required|string|max:10',
+            'name'           => 'required|string|max:255',
+            'email'          => 'required|email|max:255',
+            'phone'          => 'required|string|max:20',
+            'address'        => 'required|string|max:500',
+            'city'           => 'required|string|max:100',
+            'postal_code'    => 'required|string|max:10',
             'payment_method' => 'required|in:cod,online',
-            'notes' => 'nullable|string|max:1000',
-            'terms' => 'accepted',
-            'is_buy_now' => 'boolean', // Flag to identify buy now
+            'notes'          => 'nullable|string|max:1000',
+            'terms'          => 'accepted',
+            'is_buy_now'     => 'boolean',
         ];
 
-        // Guest account creation
         if (!Auth::check() && $request->boolean('create_account')) {
-            $rules['email'] = 'required|email|max:255|unique:users,email';
+            $rules['email']    = 'required|email|max:255|unique:users,email';
             $rules['password'] = 'required|min:8|confirmed';
         }
 
         $validated = $request->validate($rules);
 
-        // Determine if this is buy now or cart checkout
-        $isBuyNow = $request->boolean('is_buy_now');
-
-        if ($isBuyNow) {
+        if ($request->boolean('is_buy_now')) {
             return $this->processBuyNow($request, $validated);
-        } else {
-            return $this->processCart($request, $validated);
         }
+
+        return $this->processCart($request, $validated);
     }
 
     /**
