@@ -257,17 +257,26 @@ class Order extends Model
 
     /**
      * Cancel the order.
+     *
+     * Guards against double-cancellation: calling this on an already-cancelled
+     * order would otherwise call reverseSale() twice, double-restoring stock.
      */
-    public function cancel($reason = null)
+    public function cancel($reason = null): void
     {
+        if ($this->status === 'cancelled') {
+            return;
+        }
+
         $this->update([
-            'status' => 'cancelled',
+            'status'              => 'cancelled',
             'cancellation_reason' => $reason,
-            'cancelled_at' => now(),
+            'cancelled_at'        => now(),
         ]);
 
-        // Restock products if cancelled
-        foreach ($this->items as $item) {
+        // Restore stock for every item.  Load fresh from DB to avoid stale
+        // collection if cancel() is called from within a transaction that
+        // has already mutated the items.
+        foreach ($this->items()->with('product')->get() as $item) {
             if ($item->product) {
                 $item->product->reverseSale($item->quantity, (float) $item->unit_price);
             }
@@ -276,29 +285,32 @@ class Order extends Model
 
     /**
      * Refund the order.
+     *
+     * Guards against double-refunds so that calling this twice does not
+     * create duplicate Transaction records or double-update payment status.
      */
-    public function refund($amount = null, $full = true)
+    public function refund($amount = null, bool $full = true): void
     {
-        if ($full) {
-            $refundAmount = $this->total_amount;
-        } else {
-            $refundAmount = $amount;
+        if (in_array($this->payment_status, ['refunded', 'partially_refunded'], true)) {
+            return;
         }
+
+        $refundAmount = $full ? (float) $this->total_amount : (float) $amount;
 
         $this->update([
             'payment_status' => 'refunded',
-            'status' => 'refunded',
+            'status'         => 'refunded',
         ]);
 
-        // Create refund transaction
         Transaction::create([
-            'order_id' => $this->id,
-            'user_id' => $this->user_id,
-            'type' => 'refund',
-            'amount' => $refundAmount,
-            'status' => 'completed',
-            'gateway' => $this->payment_gateway,
-            'transaction_id' => 'REF-' . Str::random(10),
+            'order_id'       => $this->id,
+            'user_id'        => $this->user_id,
+            'type'           => 'refund',
+            'amount'         => $refundAmount,
+            'status'         => 'completed',
+            'gateway'        => $this->payment_gateway,
+            'transaction_id' => 'REF-' . strtoupper(Str::random(10)),
+            'processed_at'   => now(),
         ]);
 
         $this->payments()->update(['status' => 'refunded']);
