@@ -37,30 +37,50 @@
                             </div>
 
                             <div class="p-6 space-y-6">
-                                <!-- Title -->
+                                <!-- Title (English) -->
                                 <div>
-                                    <label for="title" class="block text-sm font-medium text-gray-700 mb-1">
-                                        Title <span class="text-red-500">*</span>
+                                    <label for="title_en" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Title (English) <span class="text-red-500">*</span>
                                     </label>
-                                    <input type="text" id="title" name="title" required value="{{ old('title') }}"
-                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors @error('title') border-red-300 @enderror"
+                                    <input type="text" id="title_en" name="title_en" required value="{{ old('title_en') }}"
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors @error('title_en') border-red-300 @enderror"
                                         placeholder="e.g., Summer Sale 2024">
-                                    @error('title')
+                                    @error('title_en')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
 
-                                <!-- Subtitle -->
+                                <!-- Title (Bangla) -->
                                 <div>
-                                    <label for="subtitle" class="block text-sm font-medium text-gray-700 mb-1">
-                                        Subtitle
+                                    <label for="title_bn" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Title (বাংলা)
                                     </label>
-                                    <textarea id="subtitle" name="subtitle" rows="2"
-                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors @error('subtitle') border-red-300 @enderror"
-                                        placeholder="Brief description of the offer">{{ old('subtitle') }}</textarea>
-                                    @error('subtitle')
+                                    <input type="text" id="title_bn" name="title_bn" value="{{ old('title_bn') }}"
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                                        placeholder="e.g., গ্রীষ্মকালীন সেল ২০২৪">
+                                </div>
+
+                                <!-- Subtitle (English) -->
+                                <div>
+                                    <label for="subtitle_en" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Subtitle (English)
+                                    </label>
+                                    <textarea id="subtitle_en" name="subtitle_en" rows="2"
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors @error('subtitle_en') border-red-300 @enderror"
+                                        placeholder="Brief description of the offer">{{ old('subtitle_en') }}</textarea>
+                                    @error('subtitle_en')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
+                                </div>
+
+                                <!-- Subtitle (Bangla) -->
+                                <div>
+                                    <label for="subtitle_bn" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Subtitle (বাংলা)
+                                    </label>
+                                    <textarea id="subtitle_bn" name="subtitle_bn" rows="2"
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                                        placeholder="অফারের সংক্ষিপ্ত বিবরণ">{{ old('subtitle_bn') }}</textarea>
                                 </div>
 
                                 <!-- Main Banner Image -->
