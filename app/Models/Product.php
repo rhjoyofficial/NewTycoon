@@ -245,6 +245,15 @@ class Product extends Model
             : asset('images/no-image.jpg');
     }
 
+    public function getSecondaryFeaturedImageUrlAttribute(): string
+    {
+        $image = $this->featured_images[1] ?? $this->featured_images[0];
+
+        return $image
+            ? asset('storage/' . $image)
+            : asset('images/no-image.jpg');
+    }
+
     public function getFeaturedImagesUrlsAttribute(): array
     {
         return collect($this->featured_images ?? [])

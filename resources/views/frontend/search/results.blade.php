@@ -222,17 +222,12 @@
                                     <div
                                         class="relative w-full aspect-square bg-gradient-to-br from-gray-50 to-white overflow-hidden">
                                         <!-- Primary Image -->
-                                        <img src="{{ $product->featured_images[0] }}" alt="{{ $product->name }}"
+                                        <img src="{{ $product->featured_image_url }}" alt="{{ $product->name }}"
                                             class="absolute inset-0 w-full h-full object-contain transition-opacity duration-500 group-hover:opacity-0">
-
                                         <!-- Secondary Image on Hover (if available) -->
-                                        @if ($product->gallery_images && count($product->gallery_images) > 0)
-                                            <img src="{{ $product->gallery_images[0] }}" alt="{{ $product->name }}"
-                                                class="absolute inset-0 w-full h-full object-contain opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-                                        @else
-                                            <img src="{{ $product->featured_image_url }}" alt="{{ $product->name }}"
-                                                class="absolute inset-0 w-full h-full object-contain opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-                                        @endif
+                                        <img src="{{ $product->secondary_featured_image_url ? $product->secondary_featured_image_url : $product->featured_image_url }}"
+                                            alt="{{ $product->name }}"
+                                            class="absolute inset-0 w-full h-full object-contain opacity-0 transition-opacity duration-500 group-hover:opacity-100">
 
                                         <!-- Badges -->
                                         <div class="absolute top-3 left-3 flex flex-col space-y-1 z-10 items-start">
