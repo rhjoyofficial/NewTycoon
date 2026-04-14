@@ -220,7 +220,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
         Route::resource('ad-banners', AdBannerController::class)->except('show');
         Route::resource('sections', SectionController::class)->except('show');
-        Route::resource('catalogs', CatalogController::class);
+        Route::resource('catalogs', CatalogController::class)->names('catalogs');
+
+        Route::patch('catalogs/{catalog}/toggle', [CatalogController::class, 'toggleStatus'])->name('catalogs.toggle');
 
         // Pages
         Route::prefix('pages')->name('pages.')->group(function () {

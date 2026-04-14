@@ -49,7 +49,7 @@ class CatalogController extends Controller
         Catalog::create($data);
 
         flash('Catalog created successfully.', 'success');
-        return redirect()->route('admin.catalogs.index');
+        return redirect()->route('admin.content.catalogs.index');
     }
 
     public function edit(Catalog $catalog)
@@ -59,28 +59,40 @@ class CatalogController extends Controller
 
     public function update(Request $request, Catalog $catalog)
     {
-        $request->validate([
-            'title' => 'required',
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'company_name' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'sort_order' => 'nullable|integer|min:0',
+            'is_active' => 'boolean',
             'pdf_file' => 'nullable|mimes:pdf|max:20480',
-            'thumbnail' => 'nullable|image'
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
+        // Cast is_active to boolean for consistency
         $data = $request->only([
             'title',
             'company_name',
             'description',
-            'is_active',
             'sort_order'
         ]);
 
+        // Explicitly handle is_active
+        $data['is_active'] = $request->boolean('is_active');
+
+        // Handle file uploads
         if ($request->hasFile('pdf_file')) {
-            Storage::disk('public')->delete($catalog->pdf_file);
+            if ($catalog->pdf_file) {
+                Storage::disk('public')->delete($catalog->pdf_file);
+            }
             $data['pdf_file'] = $request->file('pdf_file')
                 ->store('catalogs/pdfs', 'public');
         }
 
         if ($request->hasFile('thumbnail')) {
-            Storage::disk('public')->delete($catalog->thumbnail);
+            if ($catalog->thumbnail) {
+                Storage::disk('public')->delete($catalog->thumbnail);
+            }
             $data['thumbnail'] = $request->file('thumbnail')
                 ->store('catalogs/thumbnails', 'public');
         }
@@ -88,7 +100,7 @@ class CatalogController extends Controller
         $catalog->update($data);
 
         flash('Catalog updated successfully.', 'success');
-        return redirect()->route('admin.catalogs.index');
+        return redirect()->route('admin.content.catalogs.index');
     }
 
     public function destroy(Catalog $catalog)
@@ -100,6 +112,18 @@ class CatalogController extends Controller
 
         $catalog->delete();
         flash('Catalog deleted successfully.', 'success');
-        return redirect()->route('admin.catalogs.index');
+        return redirect()->route('admin.content.catalogs.index');
+    }
+
+    public function toggleStatus(Catalog $catalog)
+    {
+        $catalog->update(['is_active' => !$catalog->is_active]);
+
+        flash(
+            'Catalog status updated to ' . ($catalog->is_active ? 'Active' : 'Inactive') . '.',
+            'success'
+        );
+
+        return redirect()->back();
     }
 }

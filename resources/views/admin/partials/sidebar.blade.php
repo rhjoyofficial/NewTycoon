@@ -234,6 +234,17 @@
                         Sections
                     </a>
 
+                    <!-- Catalogs -->
+                    <a href="{{ route('admin.content.catalogs.index') }}"
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.content.catalogs.*') ? 'bg-primary/10 text-primary' : 'text-gray-400 hover:text-white hover:bg-gray-700/30' }}">
+                        <svg class="mr-3 h-4 w-4 {{ request()->routeIs('admin.content.catalogs.*') ? 'text-primary' : 'text-gray-500 group-hover:text-primary' }}"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        Catalogs
+                    </a>
+
                     <!-- Add more content management links here as needed -->
                     {{-- <a href="javascript:void(0);"
                         class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors text-gray-400 hover:text-white hover:bg-gray-700/30">
