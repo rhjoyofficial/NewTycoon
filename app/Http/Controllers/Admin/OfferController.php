@@ -19,7 +19,11 @@ class OfferController extends Controller
             ->orderByDesc('created_at')
             ->paginate(20);
 
-        return view('admin.offers.index', compact('offers'));
+        $activeCount    = Offer::where('status', 'active')->count();
+        $scheduledCount = Offer::where('status', 'scheduled')->count();
+        $totalViews     = (int) Offer::sum('view_count');
+
+        return view('admin.offers.index', compact('offers', 'activeCount', 'scheduledCount', 'totalViews'));
     }
 
     public function create()
@@ -33,22 +37,24 @@ class OfferController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'subtitle' => 'nullable|string|max:500',
+            'title_en'          => 'required|string|max:255',
+            'title_bn'          => 'nullable|string|max:255',
+            'subtitle_en'       => 'nullable|string|max:500',
+            'subtitle_bn'       => 'nullable|string|max:500',
             'main_banner_image' => 'nullable|image|max:5120',
-            'timer_enabled' => 'boolean',
-            'timer_end_date' => 'nullable|date|after:now',
-            'view_all_link' => 'nullable|string|max:255',
-            'view_all_text' => 'nullable|string|max:50',
-            'product_source' => 'required|in:manual,discount,category,tag',
-            'source_config' => 'nullable|array',
-            'product_limit' => 'required|integer|min:1|max:100',
-            'status' => 'required|in:draft,active,inactive,scheduled',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after:start_date',
-            'order' => 'nullable|integer',
-            'products' => 'nullable|array',
-            'products.*' => 'exists:products,id',
+            'timer_enabled'     => 'boolean',
+            'timer_end_date'    => 'nullable|date|after:now',
+            'view_all_link'     => 'nullable|string|max:255',
+            'view_all_text'     => 'nullable|string|max:50',
+            'product_source'    => 'required|in:manual,discount,category,tag',
+            'source_config'     => 'nullable|array',
+            'product_limit'     => 'required|integer|min:1|max:100',
+            'status'            => 'required|in:draft,active,inactive,scheduled',
+            'start_date'        => 'nullable|date',
+            'end_date'          => 'nullable|date|after:start_date',
+            'order'             => 'nullable|integer',
+            'products'          => 'nullable|array',
+            'products.*'        => 'exists:products,id',
         ]);
 
         if ($request->hasFile('main_banner_image')) {
@@ -85,22 +91,24 @@ class OfferController extends Controller
     public function update(Request $request, Offer $offer)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'subtitle' => 'nullable|string|max:500',
+            'title_en'          => 'required|string|max:255',
+            'title_bn'          => 'nullable|string|max:255',
+            'subtitle_en'       => 'nullable|string|max:500',
+            'subtitle_bn'       => 'nullable|string|max:500',
             'main_banner_image' => 'nullable|image|max:5120',
-            'timer_enabled' => 'boolean',
-            'timer_end_date' => 'nullable|date',
-            'view_all_link' => 'nullable|string|max:255',
-            'view_all_text' => 'nullable|string|max:50',
-            'product_source' => 'required|in:manual,discount,category,tag',
-            'source_config' => 'nullable|array',
-            'product_limit' => 'required|integer|min:1|max:100',
-            'status' => 'required|in:draft,active,inactive,scheduled',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after:start_date',
-            'order' => 'nullable|integer',
-            'products' => 'nullable|array',
-            'products.*' => 'exists:products,id',
+            'timer_enabled'     => 'boolean',
+            'timer_end_date'    => 'nullable|date',
+            'view_all_link'     => 'nullable|string|max:255',
+            'view_all_text'     => 'nullable|string|max:50',
+            'product_source'    => 'required|in:manual,discount,category,tag',
+            'source_config'     => 'nullable|array',
+            'product_limit'     => 'required|integer|min:1|max:100',
+            'status'            => 'required|in:draft,active,inactive,scheduled',
+            'start_date'        => 'nullable|date',
+            'end_date'          => 'nullable|date|after:start_date',
+            'order'             => 'nullable|integer',
+            'products'          => 'nullable|array',
+            'products.*'        => 'exists:products,id',
         ]);
 
         if ($request->hasFile('main_banner_image')) {

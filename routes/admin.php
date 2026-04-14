@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\CatalogController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ContentController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\FooterController;
 use App\Http\Controllers\Admin\HeroSlideController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\OfferController;
@@ -114,6 +115,22 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::post('/bulk/delete', [CategoryController::class, 'bulkDelete'])->name('bulk.delete');
         Route::post('/bulk/activate', [CategoryController::class, 'bulkActivate'])->name('bulk.activate');
         Route::post('/bulk/deactivate', [CategoryController::class, 'bulkDeactivate'])->name('bulk.deactivate');
+    });
+
+    // Footer Management
+    Route::prefix('footer')->name('footer.')->group(function () {
+        Route::get('/', [FooterController::class, 'index'])->name('index');
+        Route::put('/settings', [FooterController::class, 'updateSettings'])->name('settings.update');
+
+        // Columns
+        Route::post('/columns', [FooterController::class, 'storeColumn'])->name('columns.store');
+        Route::put('/columns/{column}', [FooterController::class, 'updateColumn'])->name('columns.update');
+        Route::delete('/columns/{column}', [FooterController::class, 'destroyColumn'])->name('columns.destroy');
+
+        // Links (nested under column for store, standalone for update/destroy)
+        Route::post('/columns/{column}/links', [FooterController::class, 'storeLink'])->name('links.store');
+        Route::put('/links/{link}', [FooterController::class, 'updateLink'])->name('links.update');
+        Route::delete('/links/{link}', [FooterController::class, 'destroyLink'])->name('links.destroy');
     });
 
     Route::prefix('offer')->name('offers.')->group(function () {
