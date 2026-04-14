@@ -6,8 +6,10 @@
     <x-category-slider :categories="$categories" />
     <x-products :featuredProducts="$featuredProducts" />
     @foreach ($offers as $offer)
-        @php $offerProducts = $offer->getSourceProducts(); @endphp
-        @include('components.offer-products', ['offer' => $offer, 'offerProducts' => $offerProducts])
+        @include('components.offer-section', [
+            'offer' => $offer,
+            'offerProducts' => $offer->offerProducts,
+        ])
     @endforeach
 
     @foreach ($sections as $section)

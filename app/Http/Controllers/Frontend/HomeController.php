@@ -23,48 +23,20 @@ class HomeController extends Controller
     public function index()
     {
         $heroSlides = HeroSlide::active()->sorted()->get();
-        // dd($heroSlides);
-
-        // Get active categories with active parents
         $categories = Category::active()->featured()->limit(20)->get();
-        // $categories = Cache::remember('homepage.featured.categories', 3600, function () {
-        //     return Category::active()->root()->featured()->limit(12)->get();
-        // });
 
         $products = $this->activeProductService->getHomepageActiveProducts();
-        // Get active featured products
         $featuredProducts = $this->activeProductService->getActiveFeaturedProducts(8);
-        // $featuredProducts = Cache::remember('homepage.featured.products', 3600, function () {
-        //     return $this->activeProductService->getActiveFeaturedProducts(8);
-        // });
 
-        // $featuredProducts = FeaturedProductViewResource::collection($featuredProducts);
-        // dd($featuredProducts);
-
-        // Get new Arrivals products
-        // $newArrivals = $this->activeProductService->getActiveNewArrivals();
-        // $newArrivals = FeaturedProductViewResource::collection($newArrivals);
-        // Get Best Sells products
-        // $bestsells = $this->activeProductService->getActiveBestSells();
-        // $bestsells = FeaturedProductViewResource::collection($bestsells);
-
-        // Get Recommended Products products
-        // $recommendedProducts = $this->activeProductService->getActiveRecommendedProducts();
-        // $recommendedProducts = FeaturedProductViewResource::collection($recommendedProducts);
-
-        // $smartSections = $this->smartSections();
-        // $adsBanners = $this->getAdsBanners();
-        // $adsAnotherBanners = $this->getAnotherAdsBanners();
-
-        // Get all active offers; products are resolved per-offer in the blade via getSourceProducts()
-        $offers = Offer::active()->get();
+        $offers = Offer::active()->get()->map(function ($offer) {
+            $offer->offerProducts = $offer->getSourceProducts();
+            return $offer;
+        });
 
         $sections = Section::with('banner')->where('is_active', true)->orderBy('order')->get();
         $sections->transform(function ($section) {
             if ($section->type === 'product_slider') {
-
                 $productType = $section->settings['product_type'] ?? 'new_arrivals';
-
                 $section->products = match ($productType) {
                     'new_arrivals' => $this->activeProductService->getActiveNewArrivals(),
                     'best_sells'   => $this->activeProductService->getActiveBestSells(),
@@ -72,10 +44,9 @@ class HomeController extends Controller
                     default        => collect(),
                 };
             }
-
             return $section;
         });
-        // dd($this->activeProductService->getActiveNewArrivals($limit = 50));
+
         return view('frontend.home', compact(
             'heroSlides',
             'categories',

@@ -87,6 +87,30 @@
                                         placeholder="অফারের সংক্ষিপ্ত বিবরণ">{{ old('subtitle_bn', $offer->subtitle_bn) }}</textarea>
                                 </div>
 
+                                <!-- Short Description (English) -->
+                                <div>
+                                    <label for="short_des_en" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Short Description (English)
+                                    </label>
+                                    <textarea id="short_des_en" name="short_des_en" rows="3"
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors @error('short_des_en') border-red-300 @enderror"
+                                        placeholder="A brief description of the offer">{{ old('short_des_en', $offer->short_des_en) }}</textarea>
+                                    @error('short_des_en')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <!-- Short Description (Bangla) -->
+                                <div>
+                                    <label for="short_des_bn" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Short Description (বাংলা)
+                                    </label>
+                                    <textarea id="short_des_bn" name="short_des_bn" rows="3"
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                                        placeholder="অফারের সংক্ষিপ্ত বিবরণ">{{ old('short_des_bn', $offer->short_des_bn) }}</textarea>
+                                </div>
+
+
                                 <!-- Main Banner Image -->
                                 <div>
                                     <label for="main_banner_image" class="block text-sm font-medium text-gray-700 mb-1">
