@@ -176,7 +176,13 @@ class Offer extends Model
                 return $this->getTagProducts();
             case 'manual':
             default:
-                return $this->products()->with('category')->take($this->product_limit)->get();
+                return $this->products()
+                    ->with('category')
+                    ->active()
+                    ->inStock()
+                    ->orderBy('offer_products.order')
+                    ->take($this->product_limit)
+                    ->get();
         }
     }
 

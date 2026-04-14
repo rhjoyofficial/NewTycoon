@@ -5,7 +5,10 @@
     @include('frontend.partials.hero')
     <x-category-slider :categories="$categories" />
     <x-products :featuredProducts="$featuredProducts" />
-    @include('components.offer-products')
+    @foreach ($offers as $offer)
+        @php $offerProducts = $offer->getSourceProducts(); @endphp
+        @include('components.offer-products', ['offer' => $offer, 'offerProducts' => $offerProducts])
+    @endforeach
 
     @foreach ($sections as $section)
         @if ($section->type === 'product_slider')
