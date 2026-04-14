@@ -63,7 +63,7 @@
 
                     <!-- Subscription Form -->
                     <div class="mt-6">
-                        <h3 class="text-lg font-medium mb-1 text-white font-cambay">
+                        <h3 class="text-lg font-medium mb-1 text-white font-sans">
                             {{ __('footer.subscribe_title') }}
                         </h3>
 
@@ -121,7 +121,7 @@
             <div class="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 @foreach ($footerData['columns'] as $index => $column)
                     <div class="flex-1" data-aos="fade-up" data-aos-delay="{{ ($index + 1) * 100 }}">
-                        <h3 class="text-xl font-semibold mb-6 text-white font-cambay">
+                        <h3 class="text-xl font-semibold mb-6 text-white font-sans">
                             {{ $column['title'] }}
                         </h3>
                         <ul class="space-y-3">
@@ -146,7 +146,7 @@
         <div class="border-b border-gray-700/50 my-2" data-aos="fade-right"></div>
 
         <!-- Bottom Section -->
-        <div class="flex flex-col md:flex-row justify-between items-center gap-6 pt-6 font-cambay">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-6 pt-6 font-sans">
             <!-- Copyright -->
             <p class="text-gray-400 text-sm order-2 md:order-1" data-aos="fade-right">
                 Copyright © Tycoonbd.com, All Right Reserved © {{ date('Y') }}

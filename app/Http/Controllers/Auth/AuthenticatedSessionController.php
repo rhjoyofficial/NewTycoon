@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\Cart;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,10 +25,27 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
+        // Capture the guest session ID BEFORE regeneration.
+        // session()->regenerate() below will assign a new ID, making the
+        // old guest cart unreachable if we don't save this first.
+        $guestSessionId = $request->session()->getId();
+
         $request->authenticate();
 
         $request->session()->regenerate();
+
+        // Merge any guest cart items into the now-authenticated user's cart
+        // using the OLD session ID captured before regeneration.
+        Cart::mergeGuestCart($guestSessionId);
+
         flash('Login successful', 'success');
+
+        $user = Auth::user();
+
+        if ($user->hasAnyRole(['admin', 'moderator'])) {
+            return redirect()->intended(route('admin.dashboard'));
+        }
+
         return redirect()->intended(route('home'));
     }
 

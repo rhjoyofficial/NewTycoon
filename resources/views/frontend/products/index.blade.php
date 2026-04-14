@@ -6,15 +6,41 @@
 @section('content')
     <div class="max-w-8xl mx-auto px-4 py-8">
         <!-- Page Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2 font-poppins">{{ $title ?? 'All Products' }}</h1>
-            <p class="text-gray-600 font-inter"> {{ $description ?? 'Browse our complete collection of premium products' }}
-            </p>
+        <div class="mb-6 flex items-end justify-between gap-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-900 font-poppins">{{ $title ?? 'All Products' }}</h1>
+                <p class="text-gray-500 text-sm mt-1">{{ $description ?? 'Browse our complete collection of premium products' }}</p>
+            </div>
+            <!-- Mobile filter toggle -->
+            <button type="button" id="mobile-filter-toggle"
+                    class="lg:hidden inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
+                </svg>
+                Filters
+            </button>
         </div>
+
+        {{-- Mobile filter drawer overlay --}}
+        <div id="mobile-filter-overlay"
+             class="fixed inset-0 bg-black/40 z-40 hidden lg:hidden"
+             aria-hidden="true"></div>
 
         <div class="flex flex-col lg:flex-row gap-8">
             <!-- Filters Sidebar -->
-            <div class="lg:w-1/4">
+            <div id="filter-sidebar"
+                 class="fixed inset-y-0 left-0 z-50 w-72 bg-white overflow-y-auto no-scrollbar transform -translate-x-full transition-transform duration-300 ease-in-out
+                        lg:relative lg:inset-auto lg:w-1/4 lg:transform-none lg:z-auto lg:transition-none lg:block">
+                <div class="p-5 lg:p-0">
+                <!-- Mobile sidebar header -->
+                <div class="flex items-center justify-between mb-5 lg:hidden">
+                    <h2 class="font-bold text-gray-900">Filters</h2>
+                    <button type="button" id="mobile-filter-close" class="p-1 rounded-lg hover:bg-gray-100">
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
                 <div
                     class="bg-white rounded-xl p-6 mb-6 border border-gray-200 lg:sticky lg:top-6 max-h-[calc(100vh-2rem)] overflow-y-auto no-scrollbar">
                     <!-- Search Filter -->
@@ -148,7 +174,8 @@
                         </a>
                     @endif
                 </div>
-            </div>
+                </div>{{-- /p-5 --}}
+            </div>{{-- /filter-sidebar --}}
 
             <!-- Products Grid -->
             <div class="lg:w-3/4">
@@ -404,6 +431,29 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // ── Mobile filter drawer ──────────────────────────────────
+            var sidebar  = document.getElementById('filter-sidebar');
+            var overlay  = document.getElementById('mobile-filter-overlay');
+            var openBtn  = document.getElementById('mobile-filter-toggle');
+            var closeBtn = document.getElementById('mobile-filter-close');
+
+            function openDrawer() {
+                sidebar.classList.remove('-translate-x-full');
+                sidebar.classList.add('translate-x-0');
+                overlay.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeDrawer() {
+                sidebar.classList.add('-translate-x-full');
+                sidebar.classList.remove('translate-x-0');
+                overlay.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            if (openBtn)  openBtn.addEventListener('click', openDrawer);
+            if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+            if (overlay)  overlay.addEventListener('click', closeDrawer);
             // FIXED: Sort select change handler
             const sortSelect = document.getElementById('sortSelect');
             if (sortSelect) {

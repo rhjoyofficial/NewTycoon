@@ -5,7 +5,12 @@
     @include('frontend.partials.hero')
     <x-category-slider :categories="$categories" />
     <x-products :featuredProducts="$featuredProducts" />
-    @include('components.offer-products')
+    @foreach ($offers as $offer)
+        @include('components.offer-section', [
+            'offer' => $offer,
+            'offerProducts' => $offer->offerProducts,
+        ])
+    @endforeach
 
     @foreach ($sections as $section)
         @if ($section->type === 'product_slider')
@@ -19,8 +24,4 @@
         @endif
     @endforeach
 
-    {{-- The old static banners and product sliders below are removed --}}
-    {{-- <x-ads-banner ... />  (removed) --}}
-    {{-- <x-product-slider ... /> (removed) --}}
-    {{-- ... etc --}}
 @endsection

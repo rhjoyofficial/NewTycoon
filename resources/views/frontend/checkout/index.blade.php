@@ -270,6 +270,11 @@
                         </div>
                     </div>
                 </div>
+
+                {{-- Hidden fields --}}
+                <input type="hidden" name="is_buy_now" value="{{ $isBuyNow ? '1' : '0' }}">
+                {{-- One-time idempotency nonce: consumed server-side on first submission --}}
+                <input type="hidden" name="checkout_nonce" value="{{ $checkoutNonce }}">
             </form>
         </div>
     </div>

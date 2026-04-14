@@ -12,8 +12,8 @@
                 <img src="{{ asset($smartSection['image']) }}" alt="{{ $smartSection['title'] }}"
                     class="absolute inset-0 w-full h-full object-cover rounded-2xl" loading="lazy">
                 <div class="relative z-10 flex flex-col items-center justify-start h-full text-center text-black py-12">
-                    <h3 class="text-2xl md:text-5xl font-bold mb-4 font-cambay">{{ $smartSection['title'] }}</h3>
-                    <p class="text-lg md:text-xl mb-6 font-cambay">{{ $smartSection['description'] }}</p>
+                    <h3 class="text-2xl md:text-5xl font-bold mb-4 font-sans">{{ $smartSection['title'] }}</h3>
+                    <p class="text-lg md:text-xl mb-6 font-sans">{{ $smartSection['description'] }}</p>
                     <a href="{{ $smartSection['button_url'] ?? '#' }}"
                         class="inline-block px-6 py-3 border-2 border-black hover:border-gray-500 rounded-full text-lg font-medium transition duration-300 font-poppins">
                         {{ $smartSection['button'] }}
@@ -28,9 +28,9 @@
                     class="{{ $smartSection['reverse'] ? 'md:order-2' : 'md:order-1' }} md:col-span-2 bg-[#EFF4F5] rounded-2xl p-8 
              h-full flex flex-col justify-between">
                     <div>
-                        <h3 class="text-5xl font-semibold text-gray-900 mb-4 font-cambay">{{ $smartSection['title'] }}
+                        <h3 class="text-5xl font-semibold text-gray-900 mb-4 font-sans">{{ $smartSection['title'] }}
                         </h3>
-                        <p class="text-gray-600 text-lg mb-6 font-cambay">{{ $smartSection['description'] }}</p>
+                        <p class="text-gray-600 text-lg mb-6 font-sans">{{ $smartSection['description'] }}</p>
                     </div>
                     <a href="{{ $smartSection['button_url'] ?? '#' }}"
                         class="inline-block self-start px-6 py-3 border-2 border-black hover:border-gray-500 rounded-full text-lg font-medium transition  duration-300 font-poppins"

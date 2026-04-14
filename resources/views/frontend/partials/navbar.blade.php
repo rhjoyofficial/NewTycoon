@@ -1,5 +1,5 @@
 <!-- resources/views/components/navbar.blade.php -->
-<nav class="bg-[#111827] fixed top-0 left-0 right-0 z-50 font-cambay border-b shadow-sm">
+<nav class="bg-[#111827] fixed top-0 left-0 right-0 z-50 font-sans border-b shadow-sm">
     <!-- TOP BAR -->
     <div class="top-bar border-b border-gray-200">
         <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -173,7 +173,7 @@
                                     <a href="{{ route('orders.track') }}"
                                         class="block px-4 py-2 text-base text-gray-700 hover:bg-gray-100">Track Order</a>
                                     @if (auth()->user()->hasRole('customer'))
-                                        <a href="/orders"
+                                        <a href="/my-orders"
                                             class="block px-4 py-2 text-base text-gray-700 hover:bg-gray-100">My Orders</a>
                                     @endif
                                     @if (auth()->user()->hasPermission('manage_products'))
