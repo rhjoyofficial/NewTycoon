@@ -7,7 +7,7 @@
 
             {{-- Banner Image --}}
             @if ($offer->main_banner_image)
-                <img src="{{ asset($offer->main_banner_image) }}"
+                <img src="{{ $offer->main_banner_url }}"
                     class="absolute inset-0 w-full h-full object-cover aspect-[28/5]" alt="{{ $offer->title }}" />
                 <div class="absolute inset-0 bg-black/40"></div>
             @endif

@@ -56,19 +56,8 @@ class HomeController extends Controller
         // $adsBanners = $this->getAdsBanners();
         // $adsAnotherBanners = $this->getAnotherAdsBanners();
 
-        // Get active offer with products
-        $offer = Offer::active()
-            ->with(['products' => function ($query) {
-                $query->with('category')->active()->inStock()->limit(12);
-            }])
-            ->first();
-
-        // Get offer products based on source
-        if ($offer) {
-            $offerProducts = $offer->getSourceProducts();
-        } else {
-            $offerProducts = collect();
-        }
+        // Get all active offers; products are resolved per-offer in the blade via getSourceProducts()
+        $offers = Offer::active()->get();
 
         $sections = Section::with('banner')->where('is_active', true)->orderBy('order')->get();
         $sections->transform(function ($section) {
@@ -92,8 +81,7 @@ class HomeController extends Controller
             'categories',
             'featuredProducts',
             'products',
-            'offer',
-            'offerProducts',
+            'offers',
             'sections'
         ));
     }

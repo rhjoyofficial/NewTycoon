@@ -2,15 +2,8 @@
 @props(['offer'])
 
 @php
-    // Get offer data from service
-    $offerService = app(App\Services\Offer\OfferService::class);
-    $offerData = $offerService->getOfferWithProducts($offer);
-
-    $offerInfo = $offerData['data'];
-    $offerProducts = $offerData['products'];
-
-    // Increment view count
-    $offerService->recordView($offer);
+    $offerProducts = $offer->getSourceProducts();
+    $offer->incrementViewCount();
 @endphp
 
 <!-- Offers Section -->
@@ -24,20 +17,9 @@
 
     {{-- Full Width Background Container --}}
     <div class="absolute inset-0 w-full h-full overflow-hidden">
-        <div class="relative w-full h-full">
-            @if ($offerInfo['background_type'] === 'video' && $offerInfo['background_video'])
-                <video autoplay loop muted playsinline class="w-full h-full object-cover">
-                    <source src="{{ $offerInfo['background_video'] }}" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
-            @elseif($offerInfo['background_type'] === 'color' && $offerInfo['background_color'])
-                <div class="w-full h-full" style="background-color: {{ $offerInfo['background_color'] }}"></div>
-            @else
-                <img src="{{ $offerInfo['background_image'] }}" class="w-full h-full object-cover"
-                    alt="{{ $offerInfo['title'] }} Background" loading="lazy"
-                    onerror="this.src='{{ asset('images/offers/default-bg.jpg') }}'">
-            @endif
-        </div>
+        <img src="{{ $offer->main_banner_url }}" class="w-full h-full object-cover"
+            alt="{{ $offer->title }} Background" loading="lazy"
+            onerror="this.src='{{ asset('images/offers/default-bg.jpg') }}'">
     </div>
 
     {{-- Gradient Overlay for better readability --}}
@@ -48,9 +30,9 @@
         {{-- TOP BANNER AREA --}}
         <div class="w-full relative mb-4 overflow-hidden rounded-xl">
             {{-- Background Image (Full Width + Full Height) --}}
-            @if ($offerInfo['main_banner_image'])
+            @if ($offer->main_banner_image)
                 <div class="absolute inset-0">
-                    <img src="{{ $offerInfo['main_banner_image'] }}" alt="{{ $offerInfo['title'] }} Banner"
+                    <img src="{{ $offer->main_banner_url }}" alt="{{ $offer->title }} Banner"
                         class="w-full h-full object-cover" loading="lazy"
                         onerror="this.src='{{ asset('images/offers/default-banner.jpg') }}'">
                 </div>
@@ -62,17 +44,17 @@
                     {{-- Left: Title & Info --}}
                     <div class="text-center lg:text-left">
                         <h2 class="text-white text-2xl md:text-3xl font-bold font-poppins mb-2">
-                            {{ $offerInfo['title'] }}
+                            {{ $offer->title }}
                         </h2>
-                        @if ($offerInfo['subtitle'])
+                        @if ($offer->subtitle)
                             <p class="text-white/90 text-base md:text-lg font-sans max-w-2xl">
-                                {{ $offerInfo['subtitle'] }}
+                                {{ $offer->subtitle }}
                             </p>
                         @endif
                     </div>
 
                     {{-- Right: Timer --}}
-                    @if ($offerInfo['timer_enabled'] && $offerInfo['timer_end_date'])
+                    @if ($offer->timer_enabled && $offer->timer_end_date)
                         <div class="flex-shrink-0">
                             <div class="backdrop-blur-md bg-white/10 border border-white/20 px-6 py-3 rounded-xl">
                                 <div class="text-xs tracking-wide text-white/80 font-sans mb-1 text-center">
@@ -81,7 +63,7 @@
 
                                 <div id="offer-timer-{{ $offer->id }}"
                                     class="flex items-center justify-center gap-3 text-white font-poppins text-lg md:text-xl"
-                                    data-end-date="{{ $offerInfo['timer_end_date'] }}">
+                                    data-end-date="{{ $offer->timer_end_date->format('Y-m-d H:i:s') }}">
 
                                     {{-- Days --}}
                                     <div class="flex items-center gap-1">
@@ -125,7 +107,7 @@
         </div>
 
         {{-- PRODUCT SLIDER SECTION --}}
-        @if (count($offerProducts) > 0)
+        @if ($offerProducts->count() > 0)
             <div class="mt-4">
                 {{-- Header Row --}}
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
@@ -134,14 +116,14 @@
                             Special Offer Products
                         </h3>
                         <p class="text-white/80 text-sm md:text-base font-sans mt-1">
-                            {{ count($offerProducts) }} products on discount
+                            {{ $offerProducts->count() }} products on discount
                         </p>
                     </div>
 
-                    <a href="{{ $offerInfo['view_all_link'] }}"
+                    <a href="{{ $offer->formatted_view_all_link }}"
                         class="inline-flex items-center px-5 py-2.5 bg-white text-gray-900 font-semibold rounded-md hover:bg-gray-100 transition-colors"
                         onclick="recordOfferClick({{ $offer->id }})">
-                        {{ $offerInfo['view_all_text'] }}
+                        {{ $offer->view_all_text ?? 'View All' }}
                         <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -159,7 +141,7 @@
                         @endforeach
                     </div>
 
-                    @if (count($offerProducts) > 1)
+                    @if ($offerProducts->count() > 1)
                         <div
                             class="swiper-button-next !text-white !bg-black/30 backdrop-blur-sm !w-10 !h-10 md:!w-12 md:!h-12 !rounded-full after:!text-lg hover:!bg-black/50">
                         </div>
@@ -186,7 +168,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const swiperElement = document.querySelector('.offer-products-swiper-{{ $offer->id }}');
             if (swiperElement) {
-                const productCount = {{ count($offerProducts) }};
+                const productCount = {{ $offerProducts->count() }};
                 const swiperConfig = {
                     slidesPerView: 1.3,
                     spaceBetween: 16,
