@@ -52,6 +52,7 @@ class UpdateCategoryRequest extends FormRequest
                         $parentData = DB::table('categories as c')
                             ->leftJoin('products as p', 'c.id', '=', 'p.category_id')
                             ->where('c.id', $value)
+                            ->whereNull('c.deleted_at')
                             ->select(
                                 'c.depth',
                                 'c.is_active',
@@ -119,6 +120,7 @@ class UpdateCategoryRequest extends FormRequest
                         $parentActive = DB::table('categories')
                             ->where('id', $category->parent_id)
                             ->where('is_active', true)
+                            ->whereNull('deleted_at')
                             ->exists();
 
                         if (!$parentActive) {
@@ -220,9 +222,11 @@ class UpdateCategoryRequest extends FormRequest
                     ->orWhereIn('parent_id', function ($subQuery) use ($categoryId) {
                         $subQuery->select('id')
                             ->from('categories')
-                            ->where('parent_id', $categoryId);
+                            ->where('parent_id', $categoryId)
+                            ->whereNull('deleted_at');
                     });
             })
+            ->whereNull('deleted_at')
             ->pluck('id')
             ->toArray();
     }
@@ -235,17 +239,22 @@ class UpdateCategoryRequest extends FormRequest
         // Get all descendants and their depths
         $maxDepth = DB::table('categories as c1')
             ->leftJoin('categories as c2', 'c1.id', '=', 'c2.parent_id')
-            ->where('c1.id', $categoryId)
-            ->orWhere('c1.parent_id', $categoryId)
-            ->orWhereIn('c1.parent_id', function ($query) use ($categoryId) {
-                $query->select('id')
-                    ->from('categories')
-                    ->where('parent_id', $categoryId);
+            ->where(function ($query) use ($categoryId) {
+                $query->where('c1.id', $categoryId)
+                    ->orWhere('c1.parent_id', $categoryId)
+                    ->orWhereIn('c1.parent_id', function ($sub) use ($categoryId) {
+                        $sub->select('id')
+                            ->from('categories')
+                            ->where('parent_id', $categoryId)
+                            ->whereNull('deleted_at');
+                    });
             })
+            ->whereNull('c1.deleted_at')
             ->max('c1.depth');
 
         $currentDepth = DB::table('categories')
             ->where('id', $categoryId)
+            ->whereNull('deleted_at')
             ->value('depth');
 
         return $maxDepth ? ($maxDepth - $currentDepth) : 0;

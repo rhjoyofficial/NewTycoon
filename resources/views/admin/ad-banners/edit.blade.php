@@ -87,6 +87,7 @@
                         @enderror
                     </div>
                     <div class="flex items-center mt-6">
+                        <input type="hidden" name="is_active" value="0">
                         <input type="checkbox" name="is_active" id="is_active" value="1"
                             {{ old('is_active', $adBanner->is_active) ? 'checked' : '' }}
                             class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">

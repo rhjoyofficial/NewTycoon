@@ -494,8 +494,12 @@ class ProductController extends Controller
     private function getLeafCategoriesOptimized()
     {
         return DB::table('categories as c')
-            ->leftJoin('categories as children', 'c.id', '=', 'children.parent_id')
+            ->leftJoin('categories as children', function ($join) {
+                $join->on('c.id', '=', 'children.parent_id')
+                    ->whereNull('children.deleted_at');
+            })
             ->where('c.is_active', true)
+            ->whereNull('c.deleted_at')
             ->select(
                 'c.id',
                 'c.name_en',
@@ -555,9 +559,14 @@ class ProductController extends Controller
     private function getCategoryFullPath(int $categoryId): string
     {
         $category = DB::table('categories as c1')
-            ->leftJoin('categories as c2', 'c1.parent_id', '=', 'c2.id')
-            ->leftJoin('categories as c3', 'c2.parent_id', '=', 'c3.id')
+            ->leftJoin('categories as c2', function ($join) {
+                $join->on('c1.parent_id', '=', 'c2.id')->whereNull('c2.deleted_at');
+            })
+            ->leftJoin('categories as c3', function ($join) {
+                $join->on('c2.parent_id', '=', 'c3.id')->whereNull('c3.deleted_at');
+            })
             ->where('c1.id', $categoryId)
+            ->whereNull('c1.deleted_at')
             ->select('c1.name_en as name', 'c2.name_en as parent_name', 'c3.name_en as grandparent_name')
             ->first();
 

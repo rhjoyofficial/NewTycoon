@@ -42,11 +42,13 @@ class CategoryController extends Controller
             ])->withCount('products')->orderBy('order')->orderBy('name_en')->paginate(8);
 
         $rootCategories = DB::table('categories')->whereNull('parent_id')
+            ->whereNull('deleted_at')
             ->whereNotExists(function ($query) {
                 $query->select(DB::raw(1))->from('products')->whereColumn('products.category_id', 'categories.id');
             })->select('id', 'name_en', 'name_bn')->get();
 
         $stats = DB::table('categories')
+            ->whereNull('deleted_at')
             ->selectRaw('
                 COUNT(*) as totalCategories,
                 SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as activeCategories,
@@ -68,6 +70,14 @@ class CategoryController extends Controller
     }
 
     /**
+     * Show category detail — redirects to edit since there is no separate show view
+     */
+    public function show(Category $category)
+    {
+        return redirect()->route('admin.categories.edit', $category);
+    }
+
+    /**
      * Show create form
      */
     public function create()
@@ -76,6 +86,7 @@ class CategoryController extends Controller
             ->leftJoin('products as p', 'c.id', '=', 'p.category_id')
             ->where('c.is_active', true)
             ->where('c.depth', '<', Category::MAX_DEPTH)
+            ->whereNull('c.deleted_at')
             ->whereNull('p.id') // No products
             ->select('c.id', 'c.name_en', 'c.name_bn', 'c.depth', 'c.parent_id')
             ->orderBy('c.depth')
@@ -142,6 +153,7 @@ class CategoryController extends Controller
             ->where('c.id', '!=', $category->id)
             ->whereNotIn('c.id', $descendantIds)
             ->whereNull('p.id')
+            ->whereNull('c.deleted_at')
             ->where('c.depth', '<', Category::MAX_DEPTH)
             ->select('c.id', 'c.name_en', 'c.name_bn', 'c.depth')
             ->orderBy('c.depth')
@@ -154,7 +166,10 @@ class CategoryController extends Controller
 
         $hasProducts = DB::table('products')->where('category_id', $category->id)->exists();
 
-        $hasChildren = DB::table('categories')->where('parent_id', $category->id)->exists();
+        $hasChildren = DB::table('categories')
+            ->where('parent_id', $category->id)
+            ->whereNull('deleted_at')
+            ->exists();
 
         return view('admin.categories.edit', [
             'category' => $category->load('children:id,parent_id,name_en,name_bn', 'products:id,name_en,category_id'),
@@ -223,7 +238,10 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         try {
-            $hasChildren = DB::table('categories')->where('parent_id', $category->id)->exists();
+            $hasChildren = DB::table('categories')
+                ->where('parent_id', $category->id)
+                ->whereNull('deleted_at')
+                ->exists();
 
             if ($hasChildren) {
                 flash('Cannot Delete!', 'error', 8000, 'This category has subcategories. Please delete or reassign them first.');
@@ -290,6 +308,7 @@ class CategoryController extends Controller
             $parentActive = DB::table('categories')
                 ->where('id', $category->parent_id)
                 ->where('is_active', true)
+                ->whereNull('deleted_at')
                 ->exists();
 
             if (!$parentActive) {
@@ -327,9 +346,13 @@ class CategoryController extends Controller
         try {
             // OPTIMIZED: Get categories with children/products count in one query
             $categoriesData = DB::table('categories as c')
-                ->leftJoin('categories as children', 'c.id', '=', 'children.parent_id')
+                ->leftJoin('categories as children', function ($join) {
+                    $join->on('c.id', '=', 'children.parent_id')
+                        ->whereNull('children.deleted_at');
+                })
                 ->leftJoin('products as p', 'c.id', '=', 'p.category_id')
                 ->whereIn('c.id', $request->ids)
+                ->whereNull('c.deleted_at')
                 ->select(
                     'c.id',
                     'c.image',
@@ -407,6 +430,7 @@ class CategoryController extends Controller
                     $parentActive = DB::table('categories')
                         ->where('id', $category->parent_id)
                         ->where('is_active', true)
+                        ->whereNull('deleted_at')
                         ->exists();
 
                     if (!$parentActive) {
@@ -486,12 +510,14 @@ class CategoryController extends Controller
                 $sibling = DB::table('categories')
                     ->where('parent_id', $category->parent_id ?: null)
                     ->where('order', '<', $category->order)
+                    ->whereNull('deleted_at')
                     ->orderBy('order', 'desc')
                     ->first();
             } else {
                 $sibling = DB::table('categories')
                     ->where('parent_id', $category->parent_id ?: null)
                     ->where('order', '>', $category->order)
+                    ->whereNull('deleted_at')
                     ->orderBy('order', 'asc')
                     ->first();
             }
@@ -531,6 +557,7 @@ class CategoryController extends Controller
             ->leftJoin('products as p', 'c.id', '=', 'p.category_id')
             ->where('c.is_active', true)
             ->where('c.depth', '<', Category::MAX_DEPTH)
+            ->whereNull('c.deleted_at')
             ->whereNull('p.id');
 
         if ($categoryId) {
@@ -566,9 +593,11 @@ class CategoryController extends Controller
                     ->orWhereIn('parent_id', function ($subQuery) use ($categoryId) {
                         $subQuery->select('id')
                             ->from('categories')
-                            ->where('parent_id', $categoryId);
+                            ->where('parent_id', $categoryId)
+                            ->whereNull('deleted_at');
                     });
             })
+            ->whereNull('deleted_at')
             ->pluck('id')
             ->toArray();
     }
@@ -578,18 +607,18 @@ class CategoryController extends Controller
      */
     private function getFullPath(int $categoryId): string
     {
-        $category = DB::table('categories')->where('id', $categoryId)->first();
+        $category = DB::table('categories')->where('id', $categoryId)->whereNull('deleted_at')->first();
         if (!$category) return '';
 
         $path = [$category->name_en];
 
         if ($category->parent_id) {
-            $parent = DB::table('categories')->where('id', $category->parent_id)->first();
+            $parent = DB::table('categories')->where('id', $category->parent_id)->whereNull('deleted_at')->first();
             if ($parent) {
                 array_unshift($path, $parent->name_en);
 
                 if ($parent->parent_id) {
-                    $grandparent = DB::table('categories')->where('id', $parent->parent_id)->first();
+                    $grandparent = DB::table('categories')->where('id', $parent->parent_id)->whereNull('deleted_at')->first();
                     if ($grandparent) {
                         array_unshift($path, $grandparent->name_en);
                     }

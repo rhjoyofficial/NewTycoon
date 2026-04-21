@@ -83,9 +83,14 @@ class UpdateProductRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     // OPTIMIZED: Single query with all checks
                     $categoryData = DB::table('categories as c')
-                        ->leftJoin('categories as parent', 'c.parent_id', '=', 'parent.id')
-                        ->leftJoin('categories as children', 'c.id', '=', 'children.parent_id')
+                        ->leftJoin('categories as parent', function ($join) {
+                            $join->on('c.parent_id', '=', 'parent.id')->whereNull('parent.deleted_at');
+                        })
+                        ->leftJoin('categories as children', function ($join) {
+                            $join->on('c.id', '=', 'children.parent_id')->whereNull('children.deleted_at');
+                        })
                         ->where('c.id', $value)
+                        ->whereNull('c.deleted_at')
                         ->select(
                             'c.is_active',
                             'c.depth',

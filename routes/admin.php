@@ -72,28 +72,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::post('/{product}/change-status', [ProductController::class, 'changeStatus'])->name('changeStatus');
 
         // Bulk Actions
-        Route::post('/bulk/action', [ProductController::class, 'bulkActon'])->name('bulk-action');
-        Route::post('/bulk/delete', [ProductController::class, 'bulkDelete'])->name('bulk.delete');
-        Route::post('/bulk/activate', [ProductController::class, 'bulkActivate'])->name('bulk.activate');
-        Route::post('/bulk/deactivate', [ProductController::class, 'bulkDeactivate'])->name('bulk.deactivate');
-        Route::post('/bulk/feature', [ProductController::class, 'bulkFeature'])->name('bulk.feature');
-
-        // Single Actions
-        Route::post('/{product}/toggle-feature', [ProductController::class, 'toggleFeature'])->name('toggle.feature');
-        Route::post('/{product}/toggle-bestseller', [ProductController::class, 'toggleBestseller'])->name('toggle.bestseller');
-        Route::post('/{product}/toggle-new', [ProductController::class, 'toggleNew'])->name('toggle.new');
-        Route::post('/{product}/update-stock', [ProductController::class, 'updateStock'])->name('update.stock');
-        Route::post('/{product}/duplicate', [ProductController::class, 'duplicate'])->name('duplicate');
-
-        // Images
-        Route::post('/{product}/images', [ProductController::class, 'uploadImages'])->name('upload.images');
-        Route::delete('/{product}/images/{image}', [ProductController::class, 'deleteImage'])->name('delete.image');
-        Route::post('/{product}/images/reorder', [ProductController::class, 'reorderImages'])->name('reorder.images');
-
-        // Export/Import
-        Route::get('/export', [ProductController::class, 'export'])->name('export');
-        Route::post('/import', [ProductController::class, 'import'])->name('import');
-        Route::get('/import/template', [ProductController::class, 'importTemplate'])->name('import.template');
+        Route::post('/bulk/action', [ProductController::class, 'bulkAction'])->name('bulk-action');
+        Route::post('/bulk/delete', [ProductController::class, 'destroyMultiple'])->name('bulk.delete');
+        Route::post('/{product}/toggle-feature', [ProductController::class, 'updateFeaturedStatus'])->name('toggle.feature');
+        Route::post('/{product}/update-stock', [ProductController::class, 'updateStockStatus'])->name('update.stock');
     });
 
     // Categories Management

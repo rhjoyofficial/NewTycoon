@@ -392,10 +392,12 @@ class Category extends Model
                     ->orWhereIn('parent_id', function ($subQuery) {
                         $subQuery->select('id')
                             ->from('categories')
-                            ->where('parent_id', $this->id);
+                            ->where('parent_id', $this->id)
+                            ->whereNull('deleted_at');
                     });
             })
             ->where('is_active', true)
+            ->whereNull('deleted_at')
             ->pluck('id')
             ->toArray();
     }
@@ -424,12 +426,14 @@ class Category extends Model
                         $query->orWhereIn('id', function ($subQuery) {
                             $subQuery->select('parent_id')
                                 ->from('categories')
-                                ->where('id', $this->parent_id);
+                                ->where('id', $this->parent_id)
+                                ->whereNull('deleted_at');
                         });
                     }
                 }
             })
             ->where('is_active', true)
+            ->whereNull('deleted_at')
             ->count();
 
         // Should match the number of categories in the chain
@@ -457,10 +461,12 @@ class Category extends Model
                     $query->orWhereIn('id', function ($subQuery) {
                         $subQuery->select('parent_id')
                             ->from('categories')
-                            ->where('id', $this->parent_id);
+                            ->where('id', $this->parent_id)
+                            ->whereNull('deleted_at');
                     });
                 }
             })
+            ->whereNull('deleted_at')
             ->orderBy('depth', 'asc')
             ->get();
 

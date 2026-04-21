@@ -368,21 +368,7 @@
             }
         }
 
-        // Auto-generate slug from English name
-        document.getElementById('name_en').addEventListener('input', function() {
-            const slugField = document.getElementById('slug');
-            if (!slugField.value) {
-                const slug = this.value.toLowerCase()
-                    .replace(/[^\w\s-]/g, '')
-                    .replace(/\s+/g, '-')
-                    .replace(/--+/g, '-');
-                slugField.value = slug;
-            }
-        });
-
-        // Mark slug as manually modified
-        document.getElementById('slug').addEventListener('input', function() {
-            this.dataset.manual = 'true';
-        });
+        // Auto-generate slug from English name (slug field is hidden/auto-generated server-side)
+        // No client-side slug field in create form — slug is generated from name_en in prepareForValidation
     </script>
 @endpush

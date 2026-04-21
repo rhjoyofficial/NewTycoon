@@ -33,7 +33,7 @@
 
                         <!-- Hotline -->
                         <div class="flex items-center justify-center lg:justify-start gap-2">
-                            <i class="fas fa-phone-alt text-primary text-xs"></i>
+                            <i class="fas fa-phone text-primary text-xs"></i>
                             <a href="tel:{{ $footerData['contact_info']['hotline_1'] ?? '+8801xxxxxxxxx' }}"
                                 class="hover:text-white transition">
                                 {{ $footerData['contact_info']['hotline_1'] ?? '+8801xxxxxxxxx' }}

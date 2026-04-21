@@ -30,6 +30,7 @@ class StoreCategoryRequest extends FormRequest
                         $parentData = DB::table('categories as c')
                             ->leftJoin('products as p', 'c.id', '=', 'p.category_id')
                             ->where('c.id', $value)
+                            ->whereNull('c.deleted_at')
                             ->select(
                                 'c.depth',
                                 'c.is_active',
@@ -77,6 +78,7 @@ class StoreCategoryRequest extends FormRequest
                         $parentActive = DB::table('categories')
                             ->where('id', $this->parent_id)
                             ->where('is_active', true)
+                            ->whereNull('deleted_at')
                             ->exists();
 
                         if (!$parentActive) {
